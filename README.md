@@ -32,12 +32,11 @@ Downloads
 =========
 Precompiled versions can be downloaded from Gitlab.
 
-Linux Standalones: [Download](https://git.isea.rwth-aachen.de/ESS/impedance-model-toolchain/iseaframe/-/jobs/artifacts/master/download?job=linux_standalones)<br/>
-Windows Standalones: [Download](https://git.isea.rwth-aachen.de/ESS/impedance-model-toolchain/iseaframe/-/jobs/artifacts/master/download?job=windows_standalones)<br/>
-Wndows Simulink Converter: [Download](https://git.isea.rwth-aachen.de/ESS/impedance-model-toolchain/iseaframe/-/jobs/artifacts/master/download?job=windows_simulink_converter)<br/>
-Wndows sFunctions: [Download](https://git.isea.rwth-aachen.de/ESS/impedance-model-toolchain/iseaframe/-/jobs/artifacts/master/download?job=windows_s_functions)
+Linux Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=linux_standalones)<br/>
+Windows Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=windows_standalones)<br/>
+Wndows Simulink Converter: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=windows_simulink_converter)<br/>
 <br/><br/>
-Documentation: [Download](https://git.isea.rwth-aachen.de/ESS/impedance-model-toolchain/iseaframe/-/jobs/artifacts/master/download?job=documentation)
+Documentation: [View online](https://isea.pages.rwth-aachen.de/framework) | [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=documentation) | [Download Development Version](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=documentation)
 
 
 Required Software:
@@ -49,7 +48,7 @@ Required Software:
 
 Compiling
 =========
-This software can be compiled on Linux or Windows. Instructions can be found in the [documentation](doxygen/compiling.md).
+This software can be compiled on Linux or Windows. Instructions can be found in the [documentation](https://isea.pages.rwth-aachen.de/framework/compiling.html).
 
 Documentation
 =========
@@ -59,6 +58,8 @@ The other one can be build as described by running
 <pre>
 make doc 
 </pre>
+
+The current version of the documentation can be viewed [here](https://isea.pages.rwth-aachen.de/framework)
 
 Featured Projects
 =================
