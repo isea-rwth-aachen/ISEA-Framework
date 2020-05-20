@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    
+    <Options>
+        <SampleRate> 1000 </SampleRate>
+        <AirTemperature ReadFromFile="false"> 25.0 </AirTemperature>
+        <ConvectionActivated advancedAreaAggregation="true">true</ConvectionActivated>
+        <RadiationActivated>true</RadiationActivated>
+    </Options>
+    
+    <ThermalMaterials>
+        <Electrolyte class="Material" cache="true">
+            <Density>2000</Density>
+            <SpecificCapacity>4000</SpecificCapacity>
+            <Conductivity>10</Conductivity>
+        </Electrolyte>
+    </ThermalMaterials>
+
+    <CoolingBlocks/>
+    
+    <CachedCoolings/>
+    
+    <CustomDefinitions>
+
+        <BatteryCell class="CellElement" observable="True">
+            <ThermalBlock ref="PouchBagThermal"/>
+        </BatteryCell>
+
+        <PouchBagThermal class="RectangularBlock">
+            <Material cacheref="Electrolyte"/>
+            <Dimensions>0.075, 0.075, 0.1</Dimensions>
+            <SizeX>3</SizeX>
+            <SizeY>4</SizeY>
+            <SizeZ>5</SizeZ>
+            <InitialTemperature>25</InitialTemperature>
+        </PouchBagThermal>
+        
+    </CustomDefinitions>
+
+    <!-- Von diesem Knoten aus beginnt das Parsen sowohl des elektrischen, als auch des thermischen Modells -->
+    
+    <RootElement class="ParallelTwoPort">
+      <Children count="1">
+          <Cell ref="BatteryCell"/>
+      </Children>
+    </RootElement>
+
+</Configuration>

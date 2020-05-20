@@ -1,0 +1,5 @@
+<Soc class="Soc" cache="True">
+    <InitialCapacity> ... </InitialCapacity>
+    <InitialSoc> ... </InitialSoc>
+    <MeasurementPoints> ... </MeasurementPoints>
+</Soc>

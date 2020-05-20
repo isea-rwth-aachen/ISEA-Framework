@@ -1,0 +1,61 @@
+<Configuration>
+    <Options>
+        <Aging>
+            <CalculationCycles>2</CalculationCycles>
+            <AgingSteps>2</AgingSteps>
+            <AgingStepTime>30</AgingStepTime>
+            <SteadyStateCycles>1</SteadyStateCycles>
+        </Aging>
+    </Options>
+    
+    <Observer>
+        <Aging>
+            <Filter1 class="MatlabFilter">
+                <Filename>sanyo_aging.mat</Filename>
+            </Filter1>
+        </Aging>
+    </Observer>      
+
+    <Aging>
+        <InitialCapacityFactor>1,1</InitialCapacityFactor>
+        <InitialResistanceFactor>1,1</InitialResistanceFactor>
+
+        <Calendarian>
+            <InitialCapacityFactor>0,0</InitialCapacityFactor>
+            <InitialResistanceFactor>0,0</InitialResistanceFactor>
+            <InitialCellAge>0,0</InitialCellAge>
+        </Calendarian>
+
+        <Cyclical>
+            <InitialCapacityFactor>0,0</InitialCapacityFactor>
+            <InitialResistanceFactor>0,0</InitialResistanceFactor>
+            <InitialChargeThroughput>0,0</InitialChargeThroughput>
+        </Cyclical>
+    </Aging>
+
+    <CustomDefinitions>
+        
+        <MyCellElement1 class="CellElement" observable="True">
+           
+ 	    <Aging>
+                <Calendarian class="CalendarianAging" enabled="True">
+                    <TimeExponent>0.75</TimeExponent>
+                    <FormulaCapacity>( 7.543 * V - 23.75 ) * pow( 10, 6 ) * exp( -6976 / T )</FormulaCapacity>
+                    <MinAlphaCapacity>0</MinAlphaCapacity>
+                    <FormulaResistance>( 5.270 * V - 16.32 ) * pow( 10, 5 ) * exp( - 5986 / T )</FormulaResistance>
+                    <MinAlphaResistance>0</MinAlphaResistance>
+                </Calendarian>
+                <Cyclical class="CyclicalAging" enabled="True">
+                    <ChargeExponentCapacity>0.5</ChargeExponentCapacity>
+                    <ChargeExponentResistance>1</ChargeExponentResistance>
+                    <FormulaCapacity>7.348 * pow( 10, -3 ) * pow( meanV - 3.667, 2 ) + 7.6 * pow( 10, -4 ) + 4.081 * pow( 10, -3 ) * deltaDOD</FormulaCapacity>
+                    <MinBetaCapacity>0</MinBetaCapacity>
+                    <FormulaResistance>2.153 * pow( 10, -4 ) * pow( meanV - 3.725, 2 ) - 1.521 * pow( 10, -5 ) + 2.798 * pow( 10, -4 ) * deltaDOD</FormulaResistance>
+                    <MinBetaResistance>0.000015</MinBetaResistance>
+                </Cyclical>
+            </Aging>
+        </MyCellElement1>
+
+    </CustomDefinitions>
+
+</Configuration>

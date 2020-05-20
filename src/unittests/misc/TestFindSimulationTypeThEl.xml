@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Options>
+		<SampleRate>1000</SampleRate>
+        <AirTemperature> 30.0 </AirTemperature>
+        <ConvectionActivated advancedAreaAggregation="true">false</ConvectionActivated>
+        <RadiationActivated>false</RadiationActivated>
+	</Options>
+
+    <ThermalMaterials>
+        <Epoxy class="Material" cache="true">
+            <Density>2090</Density>
+            <SpecificCapacity>1000</SpecificCapacity>
+            <Conductivity>0.61</Conductivity>
+        </Epoxy>
+    </ThermalMaterials>
+
+    <CachedCoolings />
+
+    <CoolingBlocks />
+
+	<CustomDefinitions>
+
+		<MyCellElement class="CellElement" observable="True">
+			<ThermalState class= "ThermalState" cache= "True">
+				<InitialTemperature>10</InitialTemperature>
+			</ThermalState>
+			<Soc class="Soc" cache="True">
+				<InitialCapacity>1.7</InitialCapacity>
+				<InitialSoc>0</InitialSoc>
+				<MeasurementPoints>10, 20, 30, 40, 50, 60, 70, 80, 90, 100</MeasurementPoints>
+			</Soc>
+			<Children>
+                <OhmicResistance class="OhmicResistance">
+                    <Object class="ConstObj">
+                        <Value>10.0</Value>
+                    </Object>
+                </OhmicResistance>
+			</Children>
+            <ThermalBlock class="RectangularBlock">
+                <Material cacheref="Epoxy"/>
+                <Dimensions>0.1, 0.1, 0.1</Dimensions>
+                <SizeX>10</SizeX>
+                <SizeY>1</SizeY>
+                <SizeZ>1</SizeZ>
+                <InitialTemperature>10</InitialTemperature>
+            </ThermalBlock>
+		</MyCellElement>
+
+	</CustomDefinitions>
+
+	<RootElement class="SerialTwoPort">
+		<Children count="1">
+			<Cell ref="MyCellElement"/>
+		</Children>
+	</RootElement>
+
+</Configuration>

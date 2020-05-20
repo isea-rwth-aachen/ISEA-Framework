@@ -1,0 +1,68 @@
+<div class="fragment">
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#0000FF">&lt;Configuration&gt;</font></b>
+    <b><font color="#0000FF">&lt;Options&gt;</font></b>
+        <b><font color="#0000FF">&lt;Aging&gt;</font></b>
+            <b><font color="#0000FF">&lt;CalculationCycles&gt;</font></b>2<b><font color="#0000FF">&lt;/CalculationCycles&gt;</font></b>
+            <b><font color="#0000FF">&lt;AgingSteps&gt;</font></b>2<b><font color="#0000FF">&lt;/AgingSteps&gt;</font></b>
+            <b><font color="#0000FF">&lt;AgingStepTime&gt;</font></b>30<b><font color="#0000FF">&lt;/AgingStepTime&gt;</font></b>
+            <b><font color="#0000FF">&lt;SteadyStateCycles&gt;</font></b>1<b><font color="#0000FF">&lt;/SteadyStateCycles&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Aging&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Options&gt;</font></b>
+    
+    <b><font color="#0000FF">&lt;Observer&gt;</font></b>
+        <b><font color="#0000FF">&lt;Aging&gt;</font></b>
+            <b><font color="#0000FF">&lt;Filter1</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"MatlabFilter"</font><b><font color="#0000FF">&gt;</font></b>
+                <b><font color="#0000FF">&lt;Filename&gt;</font></b>sanyo_aging.mat<b><font color="#0000FF">&lt;/Filename&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Filter1&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Aging&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Observer&gt;</font></b>      
+
+    <b><font color="#0000FF">&lt;Aging&gt;</font></b>
+        <b><font color="#0000FF">&lt;InitialCapacityFactor&gt;</font></b>1,1<b><font color="#0000FF">&lt;/InitialCapacityFactor&gt;</font></b>
+        <b><font color="#0000FF">&lt;InitialResistanceFactor&gt;</font></b>1,1<b><font color="#0000FF">&lt;/InitialResistanceFactor&gt;</font></b>
+
+        <b><font color="#0000FF">&lt;Calendarian&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialCapacityFactor&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialCapacityFactor&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialResistanceFactor&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialResistanceFactor&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialCellAge&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialCellAge&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Calendarian&gt;</font></b>
+
+        <b><font color="#0000FF">&lt;Cyclical&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialCapacityFactor&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialCapacityFactor&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialResistanceFactor&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialResistanceFactor&gt;</font></b>
+            <b><font color="#0000FF">&lt;InitialChargeThroughput&gt;</font></b>0,0<b><font color="#0000FF">&lt;/InitialChargeThroughput&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Cyclical&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Aging&gt;</font></b>
+
+    <b><font color="#0000FF">&lt;CustomDefinitions&gt;</font></b>
+        
+        <b><font color="#0000FF">&lt;MyCellElement1</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CellElement"</font> <font color="#009900">observable</font><font color="#990000">=</font><font color="#FF0000">"True"</font><b><font color="#0000FF">&gt;</font></b>
+           
+ 	    <b><font color="#0000FF">&lt;Aging&gt;</font></b>
+                <b><font color="#0000FF">&lt;Calendarian</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CalendarianAging"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"True"</font><b><font color="#0000FF">&gt;</font></b>
+                    <b><font color="#0000FF">&lt;TimeExponent&gt;</font></b>0.75<b><font color="#0000FF">&lt;/TimeExponent&gt;</font></b>
+                    <b><font color="#0000FF">&lt;FormulaCapacity&gt;</font></b>( 7.543 * V - 23.75 ) * pow( 10, 6 ) * exp( -6976 / T )<b><font color="#0000FF">&lt;/FormulaCapacity&gt;</font></b>
+                    <b><font color="#0000FF">&lt;MinAlphaCapacity&gt;</font></b>0<b><font color="#0000FF">&lt;/MinAlphaCapacity&gt;</font></b>
+                    <b><font color="#0000FF">&lt;FormulaResistance&gt;</font></b>( 5.270 * V - 16.32 ) * pow( 10, 5 ) * exp( - 5986 / T )<b><font color="#0000FF">&lt;/FormulaResistance&gt;</font></b>
+                    <b><font color="#0000FF">&lt;MinAlphaResistance&gt;</font></b>0<b><font color="#0000FF">&lt;/MinAlphaResistance&gt;</font></b>
+                <b><font color="#0000FF">&lt;/Calendarian&gt;</font></b>
+                <b><font color="#0000FF">&lt;Cyclical</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CyclicalAging"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"True"</font><b><font color="#0000FF">&gt;</font></b>
+                    <b><font color="#0000FF">&lt;ChargeExponentCapacity&gt;</font></b>0.5<b><font color="#0000FF">&lt;/ChargeExponentCapacity&gt;</font></b>
+                    <b><font color="#0000FF">&lt;ChargeExponentResistance&gt;</font></b>1<b><font color="#0000FF">&lt;/ChargeExponentResistance&gt;</font></b>
+                    <b><font color="#0000FF">&lt;FormulaCapacity&gt;</font></b>7.348 * pow( 10, -3 ) * pow( meanV - 3.667, 2 ) + 7.6 * pow( 10, -4 ) + 4.081 * pow( 10, -3 ) * deltaDOD<b><font color="#0000FF">&lt;/FormulaCapacity&gt;</font></b>
+                    <b><font color="#0000FF">&lt;MinBetaCapacity&gt;</font></b>0<b><font color="#0000FF">&lt;/MinBetaCapacity&gt;</font></b>
+                    <b><font color="#0000FF">&lt;FormulaResistance&gt;</font></b>2.153 * pow( 10, -4 ) * pow( meanV - 3.725, 2 ) - 1.521 * pow( 10, -5 ) + 2.798 * pow( 10, -4 ) * deltaDOD<b><font color="#0000FF">&lt;/FormulaResistance&gt;</font></b>
+                    <b><font color="#0000FF">&lt;MinBetaResistance&gt;</font></b>0.000015<b><font color="#0000FF">&lt;/MinBetaResistance&gt;</font></b>
+                <b><font color="#0000FF">&lt;/Cyclical&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Aging&gt;</font></b>
+        <b><font color="#0000FF">&lt;/MyCellElement1&gt;</font></b>
+
+    <b><font color="#0000FF">&lt;/CustomDefinitions&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/Configuration&gt;</font></b>
+</tt></pre>
+</div>

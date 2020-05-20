@@ -1,0 +1,82 @@
+Maximum capacity in Ah: 65.0364
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 0
+ Cellelement 1
+Voltage: 3.78263 Current: 4.5 Power: 17.0218 Dissipation Power: 0.0110586 Soc: 30 Temperature: 23.3
+
+Cellelement 1
+ C/C0: 1
+ R/R0: 1
+ CellAge: 0 days
+ ChargeThroughput: 0 Ah,  Fullcycles: 0
+
+Aging Step 1
+
+Cellelement 1
+ C/C0: 0.960078
+ R/R0: 1.00476
+ CellAge: 30 days
+ ChargeThroughput: 432 Ah,  Fullcycles: 6.64243
+
+Maximum capacity in Ah: 62.44
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 2.5
+ Cellelement 1
+Voltage: 3.78264 Current: 4.5 Power: 17.0219 Dissipation Power: 0.0111111 Soc: 30 Temperature: 23.3
+
+Aging Step 2
+
+Cellelement 1
+ C/C0: 0.943542
+ R/R0: 1.00819
+ CellAge: 60 days
+ ChargeThroughput: 864 Ah,  Fullcycles: 13.2849
+
+Maximum capacity in Ah: 61.3646
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 5
+ Cellelement 1
+Voltage: 3.78265 Current: 4.5 Power: 17.0219 Dissipation Power: 0.0111491 Soc: 30 Temperature: 23.3
+
+Aging Step 3
+
+Cellelement 1
+ C/C0: 0.930854
+ R/R0: 1.01128
+ CellAge: 90 days
+ ChargeThroughput: 1296 Ah,  Fullcycles: 19.9273
+
+Maximum capacity in Ah: 60.5394
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 7.5
+ Cellelement 1
+Voltage: 3.78266 Current: 4.5 Power: 17.022 Dissipation Power: 0.0111833 Soc: 30 Temperature: 23.3
+
+Aging Step 4
+
+Cellelement 1
+ C/C0: 0.920157
+ R/R0: 1.01417
+ CellAge: 120 days
+ ChargeThroughput: 1728 Ah,  Fullcycles: 26.5697
+
+Maximum capacity in Ah: 59.8437
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 10
+ Cellelement 1
+Voltage: 3.78266 Current: 4.5 Power: 17.022 Dissipation Power: 0.0112152 Soc: 30 Temperature: 23.3
+
+Aging Step 5
+
+Cellelement 1
+ C/C0: 0.910733
+ R/R0: 1.01691
+ CellAge: 150 days
+ ChargeThroughput: 2160 Ah,  Fullcycles: 33.2122
+
+Run was succesful

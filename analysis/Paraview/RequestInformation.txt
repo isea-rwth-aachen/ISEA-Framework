@@ -1,0 +1,24 @@
+import numpy as np
+import scipy.io as sio
+folder = "C:/Users/l/Documents/Rest/Simulationsdaten/Beste Ergebnisse/Bodenkuhlung/SOC_95_Bodenkuhlung_15kW_Start30grad_mitGradient_GanzePlatte/"
+
+def SetOutputTimesteps(algorithm, timesteps):
+      executive = algorithm.GetExecutive()
+      outInfo = executive.GetOutputInformation(0)
+      outInfo.Remove(executive.TIME_STEPS())
+      for timestep in timesteps:
+        outInfo.Append(executive.TIME_STEPS(), timestep)
+      outInfo.Remove(executive.TIME_RANGE())
+      outInfo.Append(executive.TIME_RANGE(), timesteps[0])
+      outInfo.Append(executive.TIME_RANGE(), timesteps[-1])
+
+#Time = np.loadtxt( folder + 'Init/Patch_Temperatures.csv', delimiter=',', comments='#', usecols=0)
+diga = sio.loadmat(folder + 'Patch_Temperatures_00.mat')
+Time = diga["diga"]["daten"][0,0]["Programmdauer"][0,0][0]
+
+
+try:
+    SetOutputTimesteps(self, Time)
+except:
+    SetOutputTimesteps(self, (Time,))
+

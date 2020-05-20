@@ -1,0 +1,29 @@
+<MyCellElement class="CellElement">
+
+    <ThermalState class="ThermalState" cache="True">
+        <InitialTemperature> ... </InitialTemperature>
+    </ThermalState>
+
+    <Soc class="Soc" cache="True">
+        <InitialCapacity> ... </InitialCapacity>
+        <InitialSoc> ... </InitialSoc>
+        <MeasurementPoints> ... </MeasurementPoints>
+    </Soc>
+
+    <Anode>
+        <AnodeElement1 class="AnodeElement">
+            <Children>...</Children>
+        </AnodeElement1>
+    </Anode>
+
+    <Cathode>
+        <CathodeElement1 class="CathodeElement">
+            <Children>...</Children>
+        </CathodeElement1>
+    </Cathode>
+
+    <Other>
+        ...
+    </Other>
+
+</MyCellElement>

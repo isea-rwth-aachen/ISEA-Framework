@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Options>
+        <SampleRate> 1000 </SampleRate>
+        <MinStateSize>1</MinStateSize>
+		<MinOutputSize>1</MinOutputSize>
+        <MinNumberOfCells>1</MinNumberOfCells>
+        <AirTemperature ReadFromFile="false"> 25.0 </AirTemperature>
+        <ConvectionActivated>false</ConvectionActivated>
+        <RadiationActivated>false</RadiationActivated>
+        <ThermalStopCriterionInDegreeC>3.5</ThermalStopCriterionInDegreeC>
+        <SocStopCriterionInPercent>4.1</SocStopCriterionInPercent>
+        <GeometricalTolerance length="0.00000101" angleInDegrees="0.00101" percentOfQuantity="1.00001"/>
+    </Options>
+
+    <!-- Hier werden die für das thermische Modell benutzten Materialien gecachet -->
+    <ThermalMaterials>
+        <Electrolyte class="Material" cache="true">
+            <Density>1</Density>
+            <SpecificCapacity>1000</SpecificCapacity>
+            <Conductivity>0.5</Conductivity>
+        </Electrolyte>
+    
+    </ThermalMaterials>
+
+    <CoolingBlocks/>
+    <CachedCoolings/>
+
+    <!-- Hier werden genutzte Bauelemente und Verschaltugen definiert
+         Dieser Teil kann als Bibliothek angesehen werden in dem genutzte Elemente definiert und später verwendet werden -->
+
+    <CustomDefinitions>
+
+        <!-- Ein Ohmscher Widerstand, der von Temperatur und SOC abhängig ist. Dieser wird als 2D Lookup hinterlegt  -->
+
+        <MyOhmicResistance class="OhmicResistance">
+            <Object class="LookupObj2dWithState">
+                <ColState cacheref="ThermalState"/>
+                <RowState cacheref="Soc"/>
+                <LookupData desc="Rser">  
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+                </LookupData>
+               <MeasurementPointsColumn desc="MeasureTemp">0,10,23,50</MeasurementPointsColumn>
+               <MeasurementPointsRow desc="StateOfCharge">5,20,35,50,65,80,90</MeasurementPointsRow>
+            </Object>
+        </MyOhmicResistance>
+
+        <!-- Eine OCV, die von Temperatur und SOC abhängig ist als 2D Lookup  -->
+
+        <MyParallelRC class="ParallelRC">
+            <LookupOhmicResistance class="LookupObj2dWithState">
+                <ColState cacheref="Soc"/>
+                <RowState cacheref="ThermalState"/>
+                <LookupData>
+                    1,1,1,1,1,1,1;
+                    1,1,1,1,1,1,1;
+                    1,1,1,1,1,1,1;
+                    1,1,1,1,1,1,1;
+                </LookupData>
+               <MeasurementPointsColumn desc="MeasureTemp">0,10,23,50</MeasurementPointsColumn>
+               <MeasurementPointsRow desc="StateOfCharge">5,20,35,50,65,80,90</MeasurementPointsRow>
+            </LookupOhmicResistance>
+            <LookupTau class="LookupObj2dWithState">
+               <ColState cacheref="Soc"/>
+               <RowState cacheref="ThermalState"/>
+               <LookupData>
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+                   2,2,2,2,2,2,2;
+               </LookupData>
+               <MeasurementPointsColumn desc="MeasureTemp">0,10,23,50</MeasurementPointsColumn>
+               <MeasurementPointsRow desc="StateOfCharge">5,20,35,50,65,80,90</MeasurementPointsRow>
+            </LookupTau>
+        </MyParallelRC>
+
+        <SimpleBlockRCBattery class="CellElement" observable="True">
+            <ThermalState class="ThermalState" cache="True">
+                <InitialTemperature>20</InitialTemperature>
+            </ThermalState>
+            <Soc class="Soc" cache="True">
+                <InitialCapacity>1</InitialCapacity>
+                <InitialSoc>0</InitialSoc>
+                <MeasurementPoints>5,10,20,23,35,50,65,80,90</MeasurementPoints>
+            </Soc>
+            <Children>
+                <OhmicResistance ref="MyOhmicResistance"/>
+                <ParallelRC ref="MyParallelRC"/>
+            </Children>
+            <ThermalBlock ref="SimpleBlockRCBatteryThermal"/>
+        </SimpleBlockRCBattery>
+
+        <SimpleBlockRCBatteryThermal class="RectangularBlock">
+            <Material cacheref="Electrolyte"/>
+            <Dimensions>0.02, 0.02, 0.02</Dimensions>
+            <SizeX>1</SizeX>
+            <SizeY>1</SizeY>
+            <SizeZ>1</SizeZ>
+            <InitialTemperature>20</InitialTemperature>
+        </SimpleBlockRCBatteryThermal>
+
+    </CustomDefinitions>
+
+    <RootElement class="SerialTwoPort">
+      <Children dy="0.04" count="2">
+            <SimpleBlockRCBattery ref="SimpleBlockRCBattery"/>
+        </Children>
+    </RootElement>
+
+</Configuration>

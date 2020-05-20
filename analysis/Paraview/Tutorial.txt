@@ -1,0 +1,14 @@
+1. Download and install Paraview (https://www.paraview.org/download/) used Version 5.6.1 64bit
+2. Install Python 2.7 (https://www.python.org/download/releases/2.7/)
+3. Define Python folders as environment variables (WIN10: System Properties-> Advanced -> Evironment variables .. and under PATH add new system variables:"C:\Python27\" and"C:\Python27\Scripts\"
+4. Open terminal (cmd) and install pip using following command: python get-pip.py
+5. Install Scipy with the command: pip install scipy
+6. Copy Scipy in Folder: C:\Python27\Lib\site-packages and embed it into Paraview : $YOUR_PATH$\bin\Lib\site-packages
+7. Open Paraview
+8. Select in the upper bar: Sources->Alphabetical->Programmable Source
+9. Press on the top right gear wheel to open a second input window
+10. Copy Python code from Script.txt into the first input field (heading Script)
+11. Copy Python code from RequestInformation.txt into the second input field (heading RequestInformation)
+12. Convert Patch_Temperatures.mat with Matlab to another compression format with the command: save("Patch_temperatures_00.mat", "diga","-v6")
+13. Assign the variable "folder" to the path where Patch_Temperatures_00.mat, Patch_Areas.csv and Patch_Vertices.csv are located
+14. Press Apply and see results

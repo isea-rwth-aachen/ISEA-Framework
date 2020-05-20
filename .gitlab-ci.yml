@@ -1,0 +1,157 @@
+stages:
+ - build_framework
+ - build
+ - test
+ - docs
+
+linux_compile:
+  stage: build_framework
+  artifacts:
+    paths:
+    - buildReleaseLinux
+    - src/exceptions/xmlData.cpp
+    - src/version/version.cpp
+    - src/version/version.h
+    expire_in: 1 week
+  script:
+    - ./buildtools/make_release.sh -c -b buildReleaseLinux ./ ; cd buildReleaseLinux ; make -j32 framework unittests
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+windows_compile:
+  stage: build_framework
+  artifacts:
+    paths:
+    - buildReleaseWindows
+    expire_in: 1 week
+  script:
+    - ./buildtools/make_release.sh -w -c -b buildReleaseWindows ./ ; cd buildReleaseWindows ; make -j32 framework unittests
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+linux_standalones:
+  stage: build
+  artifacts:
+    paths:
+    - buildReleaseLinux/standalones
+  script:
+    - cd buildReleaseLinux ; make -j32 standalones
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+windows_standalones:
+  stage: build
+  artifacts:
+    paths:
+    - buildReleaseWindows/standalones
+  script:
+    - cd buildReleaseWindows ; make -j32 standalones
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+windows_simulink_converter:
+  stage: build
+  artifacts:
+    paths:
+    - buildReleaseWindows/simulinkConverter
+  script:
+    - cd buildReleaseWindows ; make -j32 simulinkConverter
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+unittest_numeric:
+  stage: test
+  script:
+    - cd buildReleaseLinux/unittest; ./unittestNumeric
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+unittest_symbolic:
+  stage: test
+  script:
+    - cd buildReleaseLinux/unittest; ./unittestSymbolic
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+unittest_valgrind:
+  stage: test
+  script:
+    - cd buildReleaseLinux/unittest/; ../../buildtools/valgrind.sh
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+standalone_test:
+  stage: test
+  artifacts:
+    paths:
+    - scenariotest/standalone_test/output.txt
+    expire_in: 1 week
+  script:
+    - cd scenariotest/standalone_test/; ./runTests.sh ../../buildReleaseLinux/standalones | tee output.txt
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+documentation:
+  stage: docs
+  artifacts:
+    paths:
+    - buildReleaseLinux/docRelease/html
+  script:
+    - cd buildReleaseLinux ; make -j32 docRelease
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+development_documentation:
+  stage: docs
+  artifacts:
+    paths:
+    - buildReleaseLinux/doc/html
+  script:
+    - cd buildReleaseLinux ; make -j32 doc
+  only:
+    - master
+    - web
+  tags:
+    - linux
+
+pages:
+  stage: docs
+  artifacts:
+    paths:
+    - public
+  script:
+    - cp -r buildReleaseLinux/docRelease/html public
+  only:
+    - master
+  tags:
+    - linux

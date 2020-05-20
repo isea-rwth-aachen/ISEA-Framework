@@ -1,0 +1,11 @@
+<Observer>
+    <Filter1 class="MatlabFilter">
+        <filename>
+            sanyo.mat
+        </filename>
+        <maxSampleSize>
+            10000
+        </maxSampleSize>
+    </Filter1>
+</Observer>
+

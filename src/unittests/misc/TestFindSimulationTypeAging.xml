@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Options>
+        <SampleRate>1</SampleRate>
+        <AirTemperature ReadFromFile="false">25</AirTemperature>
+        <ConvectionActivated advancedAreaAggregation="true">true</ConvectionActivated>
+        <RadiationActivated>true</RadiationActivated>
+        <StepTime>1.0</StepTime>
+        <Aging>
+            <CalculationCycles>2</CalculationCycles>
+            <AgingSteps>2</AgingSteps>
+            <AgingStepTime>30</AgingStepTime>
+            <SteadyStateCycles>1</SteadyStateCycles>
+        </Aging>
+    </Options>
+
+    <ThermalMaterials>
+        <ActiveMaterial class="MaterialCylindric" cache="true">
+            <Density>2690</Density>
+            <SpecificCapacity>197</SpecificCapacity>
+            <ConductivityRho>1.01</ConductivityRho>
+            <ConductivityPhi>31.22</ConductivityPhi>
+            <ConductivityZ>31.22</ConductivityZ>
+        </ActiveMaterial>
+    </ThermalMaterials>
+
+    <CoolingBlocks/>
+
+    <CachedCoolings/>
+
+    <Aging>
+        <ResistanceFactor> 1 </ResistanceFactor>
+        <AnodeLAM> 0 </AnodeLAM>
+        <CathodeLAM> 0 </CathodeLAM>
+        <LLI> 0 </LLI>
+        <CellAge> 0 </CellAge>
+        <ChargeThroughput> 0 </ChargeThroughput>
+    </Aging>
+
+    <CustomDefinitions>
+        <MyRges class="OhmicResistance">
+            <Object class="ConstObj">
+                <Value>0.03</Value>
+            </Object>
+        </MyRges>
+
+        <MyCellElement1 class="CellElement" observable="True">
+            <ThermalState class="ThermalState" cache="True">
+                <InitialTemperature>25</InitialTemperature>
+            </ThermalState>
+            <Soc class="Soc" cache="True">
+                <InitialCapacity>2.05</InitialCapacity>
+                <InitialSoc>92</InitialSoc>
+                <Measurementpoints>10, 20, 30, 40, 50, 60, 70, 80, 90, 100</Measurementpoints>
+            </Soc>
+            <Aging>
+                <Calendarian class="CalendarianAging" enabled="True">
+                    <TimeExponent>0.75</TimeExponent>
+                    <FormulaCapacity>( 7.543 * V - 23.75 ) * pow( 10, 6 ) * exp( -6976 / T )</FormulaCapacity>
+                    <MinAlphaCapacity>0</MinAlphaCapacity>
+                    <FormulaResistance>( 5.270 * V - 16.32 ) * pow( 10, 5 ) * exp( - 5986 / T )</FormulaResistance>
+                    <MinAlphaResistance>0</MinAlphaResistance>
+                </Calendarian>
+                <Cyclical class="CyclicalAging" enabled="True">
+                    <ChargeExponentCapacity>0.5</ChargeExponentCapacity>
+                    <ChargeExponentResistance>1</ChargeExponentResistance>
+                    <FormulaCapacity>7.348 * pow( 10, -3 ) * pow( meanV - 3.667, 2 ) + 7.6 * pow( 10, -4 ) + 4.081 * pow( 10, -3 ) * deltaDOD</FormulaCapacity>
+                    <MinBetaCapacity>0</MinBetaCapacity>
+                    <FormulaResistance>2.153 * pow( 10, -4 ) * pow( meanV - 3.725, 2 ) - 1.521 * pow( 10, -5 ) + 2.798 * pow( 10, -4 ) * deltaDOD</FormulaResistance>
+                    <MinBetaResistance>0.000015</MinBetaResistance>
+                </Cyclical>
+            </Aging>
+            <Children>
+                <OhmicResistance ref="MyRges"/>
+            </Children>
+            <ThermalBlock ref="My18650"/>
+        </MyCellElement1>
+
+        <My18650 class="QuadraticCellBlock">
+            <CellMaterial cacheref="ActiveMaterial"/>
+            <FillMaterial cacheref="ActiveMaterial"/>
+            <Length>0.0195</Length>
+            <RadiusCell>0.009</RadiusCell>
+            <Height>0.065</Height>
+            <CellRhoDivision>1</CellRhoDivision>
+            <PhiDivision>8</PhiDivision>
+            <HeightDivision>8</HeightDivision>
+            <ArcPolygonization>0.0001</ArcPolygonization>
+            <InitialTemperature>28.5</InitialTemperature>
+        </My18650>
+
+    </CustomDefinitions>
+    <RootElement class="SerialTwoPort">
+        <Children count="1">
+            <Pack ref="MyCellElement1"/>
+        </Children>
+    </RootElement>
+</Configuration>

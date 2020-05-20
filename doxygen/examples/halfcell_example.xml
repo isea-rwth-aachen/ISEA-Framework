@@ -1,0 +1,37 @@
+<TeslaCell class="CellElement" observable="True">
+
+    <Anode>
+        <Parallel class="ParallelTwoPort">
+            <Children>
+                <AnodeElement1 class="AnodeElement">
+                    <Children>
+                        <OcvAnode ref="U_A"/>
+                        <RmphnAnode ref="Z_ct_A"/>
+                    </Children>
+                </AnodeElement1>
+                <AnodeElement2 class="AnodeElement">
+                    <Children>
+                        <OcvAnode ref="U_A"/>
+                        <RmphnAnode ref="Z_ct_A"/>
+                    </Children>
+                </AnodeElement2>
+            </Children>
+        </Parallel>
+    </Anode>
+
+    <Cathode>
+        <CathodeElement1 class="CathodeElement">
+            <Children>
+                <OcvCathode ref="U_C"/>
+                <RmphnCathode ref="Z_ct_C" />
+                <SphericalDiffusionCathode ref="Z_diff_C"/>
+            </Children>
+        </CathodeElement1>
+    </Cathode>
+    
+    <Other>
+        <ParallelRCElectrolyte ref="Z_El"/>
+        <OhmicResistanceCurrentCollector ref="R_CC"/>
+    </Other>
+
+</TeslaCell>

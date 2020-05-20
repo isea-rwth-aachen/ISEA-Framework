@@ -1,0 +1,220 @@
+Version 2.18.0
+===========
+- Standalone tests are applied to all XML files in the scenarios folder
+- New scenariotests for the simulink s-functions
+- The XML options MaxStateSize, MaxOutputSize, MaxNumberOfCells and MaxProbeSize have been renamed to MinStateSize, MinOutputSize, MinNumberOfCells and MinProbeSize
+
+Version 2.17.3
+===========
+- Switch names of the simulink outputs V_Bat and V_Bat_Cell that were interchanged in previous versions
+
+Version 2.17.2
+===========
+- Simulink s-functions for linux added to the gitlab pipeline
+
+Version 2.17.1
+===========
+- Updated documentation
+- All documentation is available in English
+
+Version 2.17.0
+===========
+- New aging model based on a halfcell simulation
+- Implementation of the anode overhang effect
+- Updated version of the xml parser library
+- The initial aging state can no longer be set globally for all cells
+
+Version 2.16.1
+===========
+- Eigen no longer needs to be patched
+
+Version 2.16.0
+===========
+- Symbolic version of the framework
+- Converter to create a simulink model of the simulation
+
+Version 2.15.1
+===========
+- Documentation for compiling the framework and running a simulation
+
+Version 2.15.0
+===========
+- Windows version can be compiled using windows 10
+
+Version 2.14.1
+===========
+- Fixed coupling of thermal and electrical simulation
+- Fixed bug where cyclical aging would get wrong time and dod values
+- Fixed bug in output during aging simulation
+
+Version 2.14.0
+===========
+- Added support for power profiles
+
+Version 2.13.2
+===========
+- Stopped the aging simulation from calling the electrical observer too early, resulting in an initial voltage value of 0 for the second and all subsequent aging steps
+- Electrical and thermal stop criterions can be specified in the XML file
+- Fixed the reset of the electrical simulation when the thermal stop criterion is reached
+
+Version 2.13.1
+===========
+- Fixed a bug in the electrical factory that is triggered when the XML file contains aging states, but not for all cells
+
+Version 2.13.0
+===========
+- The aging simulation does not write an XML file after each aging step
+- Simulation output can be suppressed with the -q flag
+- Added an XML filter for writing XML files with updated aging state
+
+Version 2.12.0
+===========
+- Compilation for linux works without warnings
+
+Version 2.11.0
+===========
+- The aging simulation standalone writes filter output files into their own subdirectories
+
+Version 2.10.1
+===========
+- Fixed a bug in the matlab and stdout filters if no root two-port is supplied
+
+Version 2.10.0
+===========
+- Added calculation for total capacity of ECM
+
+Version 2.9.1
+===========
+- fixed path for internal CXX test
+
+Version 2.9.0
+===========
+- The verification standalone also checks for an aging simulation
+
+Version 2.8.0
+===========
+- Created a class for running aging simulations
+
+Version 2.7.0
+===========
+- Parameters for executable have changed: Only two parameters for the simulation have to be provided, xml and current profile. The simulation time step is provided in the xml via the option-node StepTime 
+
+Version 2.6.1
+===========
+- fix in matlab filter for thermal probes. The buffer was not cleared correctly, causing samples to be continous aggregated.
+
+Version 2.6.0
+===========
+- Material now also have an emissivity instead of beeing a black body (emissivity = 1)
+
+Version 2.5.0
+===========
+- A forced cooling via an alpha coefficent can now be used
+
+Version 2.4.1
+===========
+- The matio wrapper now tries to open the file several times over a period until throwing. The fomer behavior caused trouble, when the network storage was unresponsive.
+
+Version 2.4.0
+===========
+- Added support for outputting the heatCapacity and surface area
+
+Version 2.3.3
+===========
+- Changed parameters of the tesla cell/module to the correct value
+- Added filter script for paraview
+
+Version 2.3.2
+===========
+- Fixed a bug the matio wrapper if an empty vector<vector> is supplied 
+
+Version 2.3.1
+===========
+- Fixed a bug in the xmlparser that was introduced in 2.3.0
+
+Version 2.3.0
+===========
+- Conductivity matrix of the thermal model can be exported for matlab and csv
+
+Version 2.2.0
+===========
+- Added support for reversible heat 
+
+Version 2.1.0
+===========
+- SVGExport: changed icons for spherical diffusion and rmphn
+
+Version 2.0.5
+===========
+- Added GetName function to rmphn
+
+Version 2.0.4
+===========
+- Fixed a bug with MaxSampleSize that was introduced in 1.17. The time vector was not cleared and kept growing
+
+Version 2.0.3
+===========
+- Fixed unittests
+
+Version 2.0.2
+===========
+- Fixed a compile bug for windows, where ABSOLUTE is defined as a macro and
+thus the correct enum can't be resolved 
+
+Version 2.0.1
+===========
+- Fixed a bug for heat generation of rmph and spherical diffusion
+- Added additional developer for ageing simulation
+
+Version 2.0
+===========
+- Heuristic ageing model added, cyclic and calendaric
+- Half-cell simulation are possible with different ocvs and impedances for the anode and cathode
+- Multiparticle model for the anode is supported
+- WARNING: With this version the XML format changed slighty
+
+Version 1.17.2
+===========
+- StdoutFilter now provides also the temperature in case the output twoport is a cellelement
+
+Version 1.17.1
+===========
+- Error for deprecated XMl-parameter InitialThermalState -> InitialTemperature
+
+Version 1.17
+===========
+- MatlabFilter has a new property "MaxSampleSize", which limits the samples that are saved into a matfile
+
+Version 1.16
+===========
+- SOC behavior has been changed. It is not limited anymore between 0 and 100% SOC. 
+- The SOC does not need additional information of the MeasurementPoints
+
+Version 1.15
+===========
+- Sqlite support for output filter
+
+Version 1.14
+===========
+- Results from thermal probes are processed in the thermal filter
+- Standalone output has been changed to Decimation + Stdoutfilter
+
+Version 1.13
+===========
+- fixed issue with matlab filter not creating csv-files
+- fixed issue with csv filter. The filter did not correctly propagate data to the next filter
+- Added terminal voltage, current and thermal power as output values
+- deleted block-observer as it was not used
+
+Version 1.12.1
+===========
+- Fixed missing root port for observer
+- Added temperature to electrical matlab filter
+
+Version 1.12
+===========
+- Added support for physical motivated impedances (Dissertation Witzenhausen, 2017) 
+- Voltage, current and power can be now referenced as states
+- Added plugin for paraview
+- Added support for multiobjects. Several Objects can now be used as if they were a single object
+- Added an executable for generating dot files

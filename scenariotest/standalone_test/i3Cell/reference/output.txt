@@ -1,0 +1,29 @@
+Could not read steptime from XML file, assuming default value of 1.0
+Maximum capacity in Ah: 65.0364
+Surface area: 0.058325
+Total heat capacity: 2081.25
+Time: 0
+ Cellelement 1
+Voltage: 4.18374 Current: -0.478011 Power: -1.99987 Dissipation Power: 0.000125949 Soc: 100 Temperature: 23.3
+
+Time: 1
+ Cellelement 1
+Voltage: 4.18352 Current: -0.478041 Power: -1.9999 Dissipation Power: 0.000131459 Soc: 99.9998 Temperature: 23.3
+
+Time: 2
+ Cellelement 1
+Voltage: 4.18322 Current: -0.478066 Power: -1.99986 Dissipation Power: 0.000146806 Soc: 99.9996 Temperature: 23.1913
+
+Time: 3
+ Cellelement 1
+Voltage: 4.18298 Current: -0.478101 Power: -1.99988 Dissipation Power: 0.000170259 Soc: 99.9994 Temperature: 23.139
+
+Time: 4
+ Cellelement 1
+Voltage: 4.18276 Current: -0.478128 Power: -1.99989 Dissipation Power: 0.000200478 Soc: 99.9992 Temperature: 23.1004
+
+Time: 5
+ Cellelement 1
+Voltage: 4.18497 Current: 1.91261 Power: 8.00422 Dissipation Power: 0.00202139 Soc: 100 Temperature: 23.0683
+
+Run was succesful

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Options>
+		<SampleRate>1000</SampleRate>
+		<MinStateSize>1</MinStateSize>
+		<MinOutputSize>1</MinOutputSize>
+	</Options>
+
+        <Observer>
+            <Electrical>
+            </Electrical>
+        </Observer>
+
+
+	<CustomDefinitions>
+		<MyR class="OhmicResistance">
+			<Object class="ConstObj">
+                            <Value>1</Value>
+                        </Object>
+		</MyR>
+
+		<MyRC2 class="ParallelRC">
+			<LookupOhmicResistance class="ConstObj">
+                            <Value>0.00410406018886447320</Value>
+			</LookupOhmicResistance>
+			<LookupTau class="ConstObj">
+                            <Value>20</Value>
+			</LookupTau>
+		</MyRC2>
+
+	</CustomDefinitions>
+
+        <RootElement class="ParallelTwoPort">
+            <Children count="1">
+                <MyRC1 ref="MyRC2" />
+                <MyRC1 ref="MyR" />
+            </Children>
+        </RootElement>
+
+</Configuration>

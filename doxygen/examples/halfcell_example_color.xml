@@ -1,0 +1,43 @@
+<div class="fragment">
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#0000FF">&lt;TeslaCell</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CellElement"</font> <font color="#009900">observable</font><font color="#990000">=</font><font color="#FF0000">"True"</font><b><font color="#0000FF">&gt;</font></b>
+
+    <b><font color="#0000FF">&lt;Anode&gt;</font></b>
+        <b><font color="#0000FF">&lt;Parallel</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"ParallelTwoPort"</font><b><font color="#0000FF">&gt;</font></b>
+            <b><font color="#0000FF">&lt;Children&gt;</font></b>
+                <b><font color="#0000FF">&lt;AnodeElement1</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"AnodeElement"</font><b><font color="#0000FF">&gt;</font></b>
+                    <b><font color="#0000FF">&lt;Children&gt;</font></b>
+                        <b><font color="#0000FF">&lt;OcvAnode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"U_A"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;RmphnAnode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Z_ct_A"</font><b><font color="#0000FF">/&gt;</font></b>
+                    <b><font color="#0000FF">&lt;/Children&gt;</font></b>
+                <b><font color="#0000FF">&lt;/AnodeElement1&gt;</font></b>
+                <b><font color="#0000FF">&lt;AnodeElement2</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"AnodeElement"</font><b><font color="#0000FF">&gt;</font></b>
+                    <b><font color="#0000FF">&lt;Children&gt;</font></b>
+                        <b><font color="#0000FF">&lt;OcvAnode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"U_A"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;RmphnAnode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Z_ct_A"</font><b><font color="#0000FF">/&gt;</font></b>
+                    <b><font color="#0000FF">&lt;/Children&gt;</font></b>
+                <b><font color="#0000FF">&lt;/AnodeElement2&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Children&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Parallel&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Anode&gt;</font></b>
+
+    <b><font color="#0000FF">&lt;Cathode&gt;</font></b>
+        <b><font color="#0000FF">&lt;CathodeElement1</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CathodeElement"</font><b><font color="#0000FF">&gt;</font></b>
+            <b><font color="#0000FF">&lt;Children&gt;</font></b>
+                <b><font color="#0000FF">&lt;OcvCathode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"U_C"</font><b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;RmphnCathode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Z_ct_C"</font> <b><font color="#0000FF">/&gt;</font></b>
+                <b><font color="#0000FF">&lt;SphericalDiffusionCathode</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Z_diff_C"</font><b><font color="#0000FF">/&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Children&gt;</font></b>
+        <b><font color="#0000FF">&lt;/CathodeElement1&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Cathode&gt;</font></b>
+    
+    <b><font color="#0000FF">&lt;Other&gt;</font></b>
+        <b><font color="#0000FF">&lt;ParallelRCElectrolyte</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Z_El"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;OhmicResistanceCurrentCollector</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"R_CC"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Other&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/TeslaCell&gt;</font></b></tt></pre>
+</div>
