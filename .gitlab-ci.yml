@@ -3,6 +3,7 @@ stages:
  - build
  - test
  - docs
+ - pages
 
 linux_compile:
   stage: build_framework
@@ -145,7 +146,7 @@ development_documentation:
     - linux
 
 pages:
-  stage: docs
+  stage: pages
   artifacts:
     paths:
     - public
