@@ -23,8 +23,6 @@ For electrical parameter identification the [FittingGUI](https://github.com/HWit
 The author of the FittingGUI worked very close with the development team for implementation of electrical equivalent circuits.
 
 
-![Simulation](misc/images/Simulation_scenario.png "Simulation")
-
 Introduction video
 ===================
 [![ISEAFrame teaser](http://img.youtube.com/vi/mcJhqVV0yNU/0.jpg)](http://www.youtube.com/watch?v=mcJhqVV0yNU "ISEAFrame teaser")
