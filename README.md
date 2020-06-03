@@ -68,7 +68,6 @@ Parts of the framework are used in the following projects:
   * Förderkennzeichen: 64.65.69-EM-2011A
 
 2. Offenes Batterie-Alterungs-Tool zur Lebensdauerprognose von Batteriepacks unter Berücksichtigung von Unsicherheiten und Streuung von Zellqualität,
-  * Website: [openbat](https://openbat.de)
   * Förderkennzeichen: 0325905
 
 Authors
