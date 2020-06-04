@@ -46,6 +46,9 @@ Required Software:
 + boost
 + matio
 
+Only for Windows:
++ Visual C++ Redistributable
+
 Compiling
 =========
 This software can be compiled on Linux or Windows. Instructions can be found in the [documentation](https://isea.pages.rwth-aachen.de/framework/compiling.html).
