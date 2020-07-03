@@ -5,9 +5,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 cmake_policy(SET CMP0009 NEW)
 set(ISEAFrameVERSION_MAJOR 2)
-set(ISEAFrameVERSION_MINOR 18)
-set(ISEAFramePATCH_LEVEL 0)
-set(ISEAFrameNAME "Scenariotest")
+set(ISEAFrameVERSION_MINOR 21)
+set(ISEAFramePATCH_LEVEL 1)
+set(ISEAFrameNAME "Refactor")
 set(ARCH_TYPE
     "64"
     CACHE STRING "")
@@ -155,21 +155,11 @@ endif()
 # the following variables are used by cmake files in subdirectories to specify
 # which dependencies are needed
 set(NEED_SIMULINK OFF)
-# the boost headers are always needed, but some components also require
-# precompiled binaries
-set(NEEDED_BOOST_COMPONENTS "")
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost REQUIRED COMPONENTS ${USED_BOOST_COMPONENTS})
+find_package(Boost REQUIRED)
 
-# find_boost creates targets with Boost:: as a prefix. Add that prefix to each
-# required component to get the target names. these targets are only added to
-# the standalones because mex files cannot be linked to boost
-set(BOOST_TARGETS Boost::boost)
-foreach(component ${USED_BOOST_COMPONENTS})
-  set(BOOST_TARGETS ${BOOST_TARGETS} Boost::${component})
-endforeach()
 set(COMMON_LIBRARIES ${COMMON_LIBRARIES} Boost::boost)
 
 find_package(MATIO REQUIRED)
@@ -177,6 +167,8 @@ set(COMMON_LIBRARIES ${COMMON_LIBRARIES} ${MATIO_LIBRARIES})
 
 find_package(Threads REQUIRED)
 set(COMMON_LIBRARIES ${COMMON_LIBRARIES} Threads::Threads)
+
+set(COMMON_LIBRARIES ${COMMON_LIBRARIES} tinyxml2)
 
 if(USE_SIMULINK)
   set(MATLAB_INCLUDE_DIR
@@ -229,6 +221,7 @@ function(add_release_files target files_to_copy)
   endif()
 endfunction(add_release_files)
 
+add_subdirectory(libraries/tinyxml2)
 add_subdirectory(src/version)
 add_subdirectory(src/exceptions)
 add_subdirectory(src)
@@ -244,11 +237,4 @@ if(NEED_SIMULINK)
       CACHE BOOL "link to simulink libraries" FORCE)
 endif()
 
-set(NEEDED_BOOST_COMPONENTS ${USED_BOOST_COMPONENTS} ${NEEDED_BOOST_COMPONENTS})
-if(NEEDED_BOOST_COMPONENTS)
-  list(REMOVE_DUPLICATES NEEDED_BOOST_COMPONENTS)
-endif()
-set(USED_BOOST_COMPONENTS
-    ${NEEDED_BOOST_COMPONENTS}
-    CACHE STRING "boost components to link against" FORCE)
-mark_as_advanced(USE_SIMULINK USED_BOOST_COMPONENTS)
+mark_as_advanced(USE_SIMULINK)

@@ -38,8 +38,8 @@ class TriangularPrismBlock : public ThermalBlock< T >
      */
     TriangularPrismBlock( const char *description, const Cartesian< T > &emplacementPoint, const TwoDim< T > &vertex1,
                           const TwoDim< T > &vertex2, const TwoDim< T > &vertex3, T height, size_t nZ, const Material< T > *material,
-                          T initialTemperature, const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates =
-                                                 vector< shared_ptr< ::state::ThermalState< T > > >( 1 ),
+                          T initialTemperature, const vector< shared_ptr< state::ThermalState< T > > > &thermalStates =
+                                                 vector< shared_ptr< state::ThermalState< T > > >( 1 ),
                           size_t electricalDiscretizationZ = 1 );
     virtual ~TriangularPrismBlock();
     void CreateData( vector< shared_ptr< ThermalElement< T > > > &thermalElements,
@@ -74,7 +74,7 @@ template < typename T >
 TriangularPrismBlock< T >::TriangularPrismBlock( const char *description, const Cartesian< T > &emplacementPoint,
                                                  const TwoDim< T > &vertex1, const TwoDim< T > &vertex2, const TwoDim< T > &vertex3,
                                                  T height, size_t nZ, const Material< T > *material, T initialTemperature,
-                                                 const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+                                                 const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
                                                  size_t electricalDiscretizationZ )
     : ThermalBlock< T >( thermalStates, emplacementPoint, description )
     , mEmplacementPoint( emplacementPoint )

@@ -18,8 +18,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../misc/macros.h"
 #include "../../misc/matrixInclude.h"
 
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 
 #include "../../system/dae_sys.h"
 #include "../../system/stateSystemGroup.h"
@@ -44,7 +44,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 
 static const double sDelta = 0.000001;
-using namespace ::state;
+using namespace state;
 
 
 void TestXML::TestXmlGetAttributeDoubleGetUnrefrencedChild()
@@ -1209,7 +1209,7 @@ void TestXML::testXMLElectricalElementOhmic2DLookup()
 void TestXML::testXMLTemperatureOperation()
 {
     factory::FactoryBuilder< myMatrixType, double > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
 
     const char* xmlConfig =
      "<?xml version='1.0'?>\
@@ -1221,8 +1221,8 @@ void TestXML::testXMLTemperatureOperation()
     parser->ReadFromMem( xmlConfig );
 
     boost::shared_ptr< xmlparser::XmlParameter > rootparam( parser->GetRoot() );
-    boost::shared_ptr< ::state::ThermalState< double > > temp(
-     boost::static_pointer_cast< ::state::ThermalState< double > >( stateFactory->CreateInstance( rootparam.get() ) ) );
+    boost::shared_ptr< state::ThermalState< double > > temp(
+     boost::static_pointer_cast< state::ThermalState< double > >( stateFactory->CreateInstance( rootparam.get() ) ) );
 
 
     double initValue = 23;
@@ -1232,7 +1232,7 @@ void TestXML::testXMLTemperatureOperation()
 void TestXML::testXMLSocOperations()
 {
     factory::FactoryBuilder< myMatrixType, double > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
 
     const char* xmlConfig =
      "<?xml version='1.0'?>\
@@ -1246,8 +1246,8 @@ void TestXML::testXMLSocOperations()
     parser->ReadFromMem( xmlConfig );
 
     boost::shared_ptr< xmlparser::XmlParameter > rootparam( parser->GetRoot() );
-    boost::shared_ptr< electrical::state::Soc > test(
-     boost::static_pointer_cast< electrical::state::Soc >( stateFactory->CreateInstance( rootparam.get() ) ) );
+    boost::shared_ptr< state::Soc > test(
+     boost::static_pointer_cast< state::Soc >( stateFactory->CreateInstance( rootparam.get() ) ) );
 
     double capacity = 20.0;
     double status = 20.0;
@@ -1262,7 +1262,7 @@ void TestXML::testXMLSocOperations()
 void TestXML::testXMLZarcOperations()
 {
     factory::FactoryBuilder< myMatrixType, double > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< electrical::TwoPort< myMatrixType >, factory::ArgumentTypeElectrical >* electricalFactory =
      factoryBuilder.BuildElectricalFactory();
 
@@ -1325,7 +1325,7 @@ void TestXML::testXMLZarcOperations()
 void TestXML::testXMLCellelementOperations()
 {
     /*
-    boost::scoped_ptr< factory::Factory< ::state::State, factory::ArgumentTypeState > > stateFactory(
+    boost::scoped_ptr< factory::Factory< state::State, factory::ArgumentTypeState > > stateFactory(
     factory::BuildStateFactory() );
     boost::scoped_ptr< factory::Factory<object::Object<double>, factory::ArgumentTypeObject<double> > > objectFactory(
     factory::BuildObjectFactory<double>( stateFactory.get() ) );
@@ -1479,8 +1479,8 @@ void TestXML::testXMLCellelementOperations()
     boost::shared_ptr<xmlparser::XmlParameter> rootparam( parser->GetRoot() );
     boost::shared_ptr< electrical::TwoPort< myMatrixType > > roottp(
     electricalFactory->CreateInstance(rootparam->GetElementChild("CellElement") ) ) ;
-    boost::shared_ptr<electrical::state::Soc> socState(
-    boost::static_pointer_cast<electrical::state::Soc>(stateFactory->GetObjectsOfClass("Soc").at(0)) );
+    boost::shared_ptr<state::Soc> socState(
+    boost::static_pointer_cast<state::Soc>(stateFactory->GetObjectsOfClass("Soc").at(0)) );
 
     double t = 0.000;
     double dt = 100;

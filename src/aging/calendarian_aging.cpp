@@ -14,12 +14,14 @@ CalendarianAging::CalendarianAging( const double agingStepTime, const double min
     , mTimeExponent( timeExponent )
     , mActualVoltage( 0.0 )
     , mActualTemperature( 0.0 )
+    , mActualSoc( 0.0 )
     , mTimeSinceLastAgingStep( 0.0 )
 {
     // Assigns the parameter name and the associated variable to the expressionparser
     std::vector< std::pair< const char*, double& > > expressionParserContent;
     expressionParserContent.push_back( std::pair< const char*, double& >( "V", mActualVoltage ) );
     expressionParserContent.push_back( std::pair< const char*, double& >( "T", mActualTemperature ) );
+    expressionParserContent.push_back( std::pair< const char*, double& >( "SOC", mActualSoc ) );
 
     this->mExpressionParserStressFactorCapacity.AddContent( formulaAlphaCapacity, expressionParserContent );
     this->mExpressionParserStressFactorResistance.AddContent( formulaAlphaResistance, expressionParserContent );
@@ -40,6 +42,7 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
         {
             mActualVoltage = mVoltageValues[i];
             mActualTemperature = mTemperatureValues[i];
+            mActualSoc = mSocValues[i];
             dt = mTimeValues[i] - previousTime;
             alphaCap = this->mExpressionParserStressFactorCapacity.GetSolution();
             alphaRes = this->mExpressionParserStressFactorResistance.GetSolution();
@@ -70,6 +73,7 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
         mTimeValues.clear();
         mVoltageValues.clear();
         mTemperatureValues.clear();
+        mSocValues.clear();
         this->mTimeSinceLastAgingStep = 0.0;
     }
 }
@@ -87,6 +91,7 @@ void CalendarianAging::CollectData( const TwoportState& twoportState, const Twop
         mTimeValues.push_back( mTimeSinceLastAgingStep );
         mVoltageValues.push_back( cellState.mElectricalData->mVoltageValue );
         mTemperatureValues.push_back( twoportState.mThermalState->GetValue< TemperatureGetFormat::KELVIN >() );
+        mSocValues.push_back( twoportState.mSocState->GetValue< state::SocGetFormat::PERCENT >() / 100 );
     }
 }
 
@@ -97,6 +102,7 @@ void CalendarianAging::ResetToPointInTime( double time )
     mTimeValues.erase( firstDelete, mTimeValues.end() );
     mVoltageValues.erase( mVoltageValues.begin() + firstDeleteIndex, mVoltageValues.end() );
     mTemperatureValues.erase( mTemperatureValues.begin() + firstDeleteIndex, mTemperatureValues.end() );
+    mSocValues.erase( mSocValues.begin() + firstDeleteIndex, mSocValues.end() );
 
     mTimeSinceLastAgingStep = time;
 }

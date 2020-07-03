@@ -19,9 +19,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 class TestSoc;
 class TestXML;
 
-namespace electrical
-{
-
 namespace state
 {
 
@@ -40,7 +37,7 @@ enum class SocSetFormat
 };
 
 /// This class describes the behaviour of the State of Charge depending on the capacity
-class Soc : public ::state::State
+class Soc : public State
 {
     friend class ::TestSoc;
     friend class ::TestXML;
@@ -53,6 +50,7 @@ class Soc : public ::state::State
     template < SocGetFormat format = SocGetFormat::PERCENT >
     double GetValue() const;
     double GetValue() const;
+    const double& GetValueRef() const;
 
     template < SocGetFormat format = SocGetFormat::AS >
     double GetInitialCapacity() const;
@@ -91,7 +89,8 @@ class Soc : public ::state::State
 
     double mActualCapacity;    // [As]
     double mActualSoc;         // [%]
-    double mOffset;            // [%]
+    // portion of the soc that is caused by an offset from aging. This offset is already included in mActualSoc.
+    double mOffset;    // [%]
 
     const double mMinimumValue;
     const double mMaximumValue;
@@ -105,15 +104,15 @@ double Soc::GetValue() const
 
     if ( format == SocGetFormat::PERCENT )
     {
-        returnValue = ( mActualSoc + mOffset ) * 100;
+        returnValue = mActualSoc * 100;
     }
     else if ( format == SocGetFormat::AS )
     {
-        returnValue = ( mActualSoc + mOffset ) * mActualCapacity;
+        returnValue = mActualSoc * mActualCapacity;
     }
     else if ( format == SocGetFormat::AH )
     {
-        returnValue = ( mActualSoc + mOffset ) * mActualCapacity / 3600;
+        returnValue = mActualSoc * mActualCapacity / 3600;
     }
     else
     {
@@ -202,7 +201,7 @@ void Soc::SetStoredEnergy( const double value )
     switch ( setFormat )
     {
         case SocSetFormat::ABSOLUT:
-            mActualSoc = value / mActualCapacity - mOffset;
+            mActualSoc = value / mActualCapacity;
             break;
 
         case SocSetFormat::DELTA:
@@ -210,7 +209,7 @@ void Soc::SetStoredEnergy( const double value )
             break;
 
         case SocSetFormat::FACTOR:
-            mActualSoc = value - mOffset;
+            mActualSoc = value;
             break;
 
         default:
@@ -221,6 +220,7 @@ void Soc::SetStoredEnergy( const double value )
 template < SocSetFormat setFormat >
 void Soc::SetOffset( const double value )
 {
+    double oldOffset = mOffset;
     switch ( setFormat )
     {
         case SocSetFormat::ABSOLUT:
@@ -238,6 +238,7 @@ void Soc::SetOffset( const double value )
         default:
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "UndefinedFormat", "Soc" );
     }
+    mActualSoc += mOffset - oldOffset;
 }
 
 template < SocSetFormat setFormat >
@@ -343,7 +344,5 @@ double Soc::GetMaximumValue() const
 }
 
 }    // namespace state
-
-}    // namespace electrical
 
 #endif /* _SOC_ */

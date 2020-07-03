@@ -9,8 +9,9 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../src/export/matlabExport.h"
 #include "../src/export/symbolicExport.h"
 #include "../src/misc/symbolicParser.h"
-#include "../src/thermal/electrical_simulation.h"
+#include "../src/electrical/electrical_simulation.h"
 #include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
+#include "standalone/standalone.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -35,15 +36,19 @@ using ES = MatlabExport< myMatrixType, symbolic::SymbolicExport< std::string::co
 
 int main( int argc, char *argv[] )
 {
-
-    if ( argc < 2 )
+    std::string xmlfile;
+    int depth = 3;
+    standalone::Standalone app( "ISEA-Framework System To Matlab Standalone" );
+    app.mApp.add_option( "xml-file", xmlfile, "XML configuration file" )->required();
+    app.mApp.add_option( "depth", depth, "Depth for the matlab export (1, 2 or 3). Default = 3" );
+    if ( !app.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
 
     boost::scoped_ptr< xmlparser::XmlParser > parser;
     try
     {
         parser.reset( new xmlparser::tinyxml2::XmlParserImpl() );
-        parser->ReadFromFile( argv[1] );
+        parser->ReadFromFile( xmlfile.c_str() );
     }
     catch ( std::exception &e )
     {
@@ -71,11 +76,6 @@ int main( int argc, char *argv[] )
         printf( "%s", message );
         return EXIT_FAILURE;
     }
-    catch ( ... )
-    {
-        printf( "Unknown error while creating the equation systems\n" );
-        return EXIT_FAILURE;
-    }
     electricalSimulation->mRootTwoPort->SetCurrent( ScalarUnit( "InputCurrent" ) );
     electricalSimulation->UpdateSystem();
     electricalSimulation->UpdateSystemValues();
@@ -101,22 +101,22 @@ int main( int argc, char *argv[] )
         {
         }
 
-        if ( argc == 3 )
+        if ( depth == 1 )
         {
-            if ( std::string( argv[2] ) == "2" )
-            {
-                ES< 2 > exporter( electricalSimulation.get(), &std::cout, maxTime );
-            }
-            else if ( std::string( argv[2] ) == "1" )
-                ES< 1 > exporter( electricalSimulation.get(), &std::cout, maxTime );
-            else
-            {
-                ES< 3 > exporter( electricalSimulation.get(), &std::cout, maxTime );
-            }
+            ES< 1 > exporter( electricalSimulation.get(), &std::cout, maxTime );
+        }
+        else if ( depth == 2 )
+        {
+            ES< 2 > exporter( electricalSimulation.get(), &std::cout, maxTime );
+        }
+        else if ( depth == 3 )
+        {
+            ES< 3 > exporter( electricalSimulation.get(), &std::cout, maxTime );
         }
         else
         {
-            ES< 3 > exporter( electricalSimulation.get(), &std::cout, maxTime );
+            std::cerr << "Invalid depth value" << std::endl;
+            return EXIT_FAILURE;
         }
 
 
@@ -128,11 +128,6 @@ int main( int argc, char *argv[] )
     {
         std::cerr << "Error in system export." << std::endl;
         std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch ( ... )
-    {
-        std::cerr << "Unknown error in xml-file." << std::endl;
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

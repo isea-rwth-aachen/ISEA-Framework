@@ -35,8 +35,8 @@ std::vector< std::vector< double > > TestObserver::CopyToVector( const double da
 
 void TestObserver::testObserverOperationsSingleCell()
 {
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2.05, 2.05, 20 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2.05, 2.05, 20 ) );
 
     boost::shared_ptr< electrical::Cellelement< myMatrixType > > cellelem(
      new electrical::Cellelement< myMatrixType >( tempState, socState ) );
@@ -193,8 +193,8 @@ void TestObserver::testObserverOperationsSingleCell()
 
 void TestObserver::testFilters()
 {
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 20 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2, 2, 30 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 20 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2, 2, 30 ) );
     boost::shared_ptr< object::ConstObj< double > > rObject( new object::ConstObj< double >( 1.0 ) );
     boost::shared_ptr< object::ConstObj< double > > ocvObject( new object::ConstObj< double >( 5.0 ) );
 

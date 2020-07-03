@@ -1,4 +1,4 @@
-Thermal blocks     {mxmlthermalblock}
+Thermal blocks     {#xmlthermalblock}
 ===================
 
 \~German

@@ -31,8 +31,8 @@ void TestBlocks::TestRectangularBlock()
     //#endif
 
 
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 200.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> mMaterial( 250.0, 1000.0, 50.0, 40.0, 20.0 );
@@ -45,9 +45,9 @@ void TestBlocks::TestRectangularBlock()
     TS_ASSERT_EQUALS( block.GetNumberOfThermalElements(), 24 );
     TS_ASSERT_EQUALS( oneElement.GetNumberOfThermalElements(), 1 );
 
-    TS_ASSERT_EQUALS( blockZeroHeat.GetThermalStates(), std::vector< boost::shared_ptr< ::state::ThermalState<> > >( 1 ) );
+    TS_ASSERT_EQUALS( blockZeroHeat.GetThermalStates(), std::vector< boost::shared_ptr< state::ThermalState<> > >( 1 ) );
     TS_ASSERT_EQUALS( block.GetThermalStates(), thermalStates );
-    TS_ASSERT_EQUALS( oneElement.GetThermalStates(), std::vector< boost::shared_ptr< ::state::ThermalState<> > >( 1 ) );
+    TS_ASSERT_EQUALS( oneElement.GetThermalStates(), std::vector< boost::shared_ptr< state::ThermalState<> > >( 1 ) );
 
     TS_ASSERT( blockZeroHeat.GetEmplacementPoint().Equals( Cartesian<>( 0.0, 0.0, 0.0 ), sDelta ) );
     TS_ASSERT( block.GetEmplacementPoint().Equals( Cartesian<>( 1.0, 2.0, 2.0 ), sDelta ) );
@@ -147,8 +147,8 @@ void TestBlocks::TestQuadraticCellBlock()
 {
     //#if defined(__EXCEPTIONS__)
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
         Material<> mElectrolyte( 250.0, 1000.0, 50.0, 40.0, 20.0 );
         Material<> mRubber( 250.0, 1000.0, 50.0, 40.0, 20.0 );
 
@@ -190,8 +190,8 @@ void TestBlocks::TestQuadraticCellBlock()
     //#endif
 
 
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 100.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> electrolyte( 250.0, 1000.0, 51.0, 41.0, 21.0 );
@@ -618,8 +618,8 @@ void TestBlocks::TestQuadraticCellBlock()
 
 void TestBlocks::TestQuadraticCellBlockPhiDivisionEight()
 {
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 100.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> electrolyte( 250.0, 1000.0, 51.0, 41.0, 21.0 );
@@ -887,8 +887,8 @@ void TestBlocks::TestSupercap()
 {
     //#if defined(__EXCEPTIONS__)
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
 
         TS_ASSERT_THROWS_EQUALS( Supercap<> block( "", Cartesian<>( 0.0, 0.0, 0.0 ), 0.0, 0.03, 0.04, 0.2, 4, 1, 0.01,
                                                    0, 0, 0, 0.0, thermalStates ),
@@ -921,8 +921,8 @@ void TestBlocks::TestSupercap()
     //#endif
 
 
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 100.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> innerCellMaterial( 250.0, 1000.0, 57.0, 47.0, 27.0 );
@@ -1363,8 +1363,8 @@ void TestBlocks::TestHexagonalCellBlock()
 {
     //#if defined(__EXCEPTIONS__)
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
         Material<> mElectrolyte( 250.0, 1000.0, 50.0, 40.0, 20.0 );
         Material<> mRubber( 250.0, 1000.0, 50.0, 40.0, 20.0 );
 
@@ -1399,8 +1399,8 @@ void TestBlocks::TestHexagonalCellBlock()
     //#endif
 
 
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 100.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> electrolyte( 250.0, 1000.0, 51.0, 41.0, 21.0 );
@@ -1709,8 +1709,8 @@ void TestBlocks::TestTriangularPrismBlock()
     //#endif
 
 
-    std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 200.0, 0.0 );
     thermalStates.at( 0 )->ResetPowerDissipation();
     Material<> material( 250.0, 1000.0, 50.0, 60.0, 20.0 );
@@ -1867,9 +1867,9 @@ void TestBlocks::TestTriangularPrismBlock()
 void TestBlocks::TestMultipleThermalStatesInThermalBlock()
 {
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 24 );
-        BOOST_FOREACH ( boost::shared_ptr< ::state::ThermalState<> > &thermalState, thermalStates )
-            thermalState.reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 24 );
+        BOOST_FOREACH ( boost::shared_ptr< state::ThermalState<> > &thermalState, thermalStates )
+            thermalState.reset( new state::ThermalState<> );
         Material<> mMaterial( 250.0, 1000.0, 50.0, 40.0, 20.0 );
 
         RectangularBlock<> block( "descriptionText", Cartesian<>( 0.0, 0.0, 0.0 ), 0.8, 0.9, 0.6, 8, 9, 6, &mMaterial,
@@ -1890,9 +1890,9 @@ void TestBlocks::TestMultipleThermalStatesInThermalBlock()
         }
     }
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 2 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 1 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 2 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
+        thermalStates.at( 1 ).reset( new state::ThermalState<> );
         Material<> material( 250.0, 1000.0, 50.0, 50.0, 20.0 );
 
         TriangularPrismBlock<> block( "descriptionText", Cartesian<>( 0.0, 0.0, 0.0 ), TwoDim<>( 0.0, 0.0 ),
@@ -1912,11 +1912,11 @@ void TestBlocks::TestMultipleThermalStatesInThermalBlock()
         }
     }
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 4 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 1 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 2 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 3 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 4 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
+        thermalStates.at( 1 ).reset( new state::ThermalState<> );
+        thermalStates.at( 2 ).reset( new state::ThermalState<> );
+        thermalStates.at( 3 ).reset( new state::ThermalState<> );
         Material<> innerCellMaterial( 250.0, 1000.0, 57.0, 47.0, 27.0 );
         Material<> outerCellMaterial( 250.0, 1000.0, 53.0, 43.0, 23.0 );
         Material<> rubber( 250.0, 1000.0, 50.0, 40.0, 20.0 );
@@ -1950,11 +1950,11 @@ void TestBlocks::TestMultipleThermalStatesInThermalBlock()
         }
     }
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 4 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 1 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 2 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 3 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 4 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
+        thermalStates.at( 1 ).reset( new state::ThermalState<> );
+        thermalStates.at( 2 ).reset( new state::ThermalState<> );
+        thermalStates.at( 3 ).reset( new state::ThermalState<> );
         Material<> cellMaterial( 250.0, 1000.0, 57.0, 47.0, 27.0 );
         Material<> rubber( 250.0, 1000.0, 50.0, 40.0, 20.0 );
 
@@ -1987,13 +1987,13 @@ void TestBlocks::TestMultipleThermalStatesInThermalBlock()
         }
     }
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 6 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 1 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 2 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 3 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 4 ).reset( new ::state::ThermalState<> );
-        thermalStates.at( 5 ).reset( new ::state::ThermalState<> );
+        std::vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 6 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
+        thermalStates.at( 1 ).reset( new state::ThermalState<> );
+        thermalStates.at( 2 ).reset( new state::ThermalState<> );
+        thermalStates.at( 3 ).reset( new state::ThermalState<> );
+        thermalStates.at( 4 ).reset( new state::ThermalState<> );
+        thermalStates.at( 5 ).reset( new state::ThermalState<> );
         Material<> cellMaterial( 250.0, 1000.0, 57.0, 47.0, 27.0 );
         Material<> rubber( 250.0, 1000.0, 50.0, 40.0, 20.0 );
 

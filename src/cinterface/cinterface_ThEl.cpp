@@ -20,7 +20,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../export/esbVisualizer.h"
 #include "../export/spiceExport.h"
 #include "../observer/filter/vcpfilter.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "../thermal/simulation_data_outline.h"
 #include "../thermal/thermal_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"

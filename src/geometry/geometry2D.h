@@ -15,9 +15,10 @@
 #endif
 
 #include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
+
 
 #if defined( _MSC_VER )
 #pragma warning( pop )
@@ -26,22 +27,23 @@
 #endif
 
 
-#include <cmath>
-#include <vector>
-#include <map>
-#include <boost/foreach.hpp>
+#include "../exceptions/error_proto.h"
 #include "angle.h"
+#include "tolerance.h"
 #include "two_dim.h"
 #include "unit_vector.h"
-#include "tolerance.h"
-#include "../exceptions/error_proto.h"
+#include <boost/foreach.hpp>
+#include <cmath>
+#include <map>
+#include <vector>
+
 
 // erase later
 namespace thermal
 {
 extern const double globalMaxValue;
 extern const double globalMinValue;
-}
+}    // namespace thermal
 
 #ifndef __NO_STRING__
 #include <fstream>
@@ -54,9 +56,9 @@ class TestAreaClasses;
 namespace geometry
 {
 using namespace thermal;
-using std::vector;
 using std::list;
 using std::map;
+using std::vector;
 
 /// Geometry2D wraps the boost geometry library and represents a polygon in a two dimensional coordinate system
 template < typename T = double >
@@ -170,7 +172,9 @@ Geometry2D< T >::Geometry2D( const vector< TwoDim< T > > &vertices, const map< s
                 phi = phi + Angle< T >::circle;
             T radius = vertices[i].DistanceTo( arc );
 
-            // At least one line for every 45°, otherwise try to make edges as long as proposed by arcPolygonEdgesLength
+            if ( arcPolygonEdgesLength > radius )
+                arcPolygonEdgesLength = radius;
+            // At least one line for every 45ï¿½, otherwise try to make edges as long as proposed by arcPolygonEdgesLength
             size_t n = static_cast< size_t >( fabs( phi.GetRad() ) / asin( arcPolygonEdgesLength / radius ) + 1.0 );
             const size_t n_min = std::max( static_cast< size_t >( fabs( phi.GetRad() ) * 8.0 / Angle< T >::pi + 1.0 ),
                                            static_cast< size_t >( 2 ) );
@@ -182,7 +186,7 @@ Geometry2D< T >::Geometry2D( const vector< TwoDim< T > > &vertices, const map< s
             const T sinVal = sin( 0.5 * phiVal / n );
             const T cosVal = cos( 0.5 * phiVal / n );
             const T tempVal = sinVal / phiVal;
-            const T ratio = 1 / (tempVal + sqrt(tempVal * (tempVal + (2 * (n-1) * cosVal))));
+            const T ratio = 1 / ( tempVal + sqrt( tempVal * ( tempVal + ( 2 * ( n - 1 ) * cosVal ) ) ) );
             radius *= fabs( ratio );
             // radius *= sqrt(2 * Angle<T>::pi / static_cast<double>(n) / sin(2 * Angle<T>::pi / static_cast<double>(n))
             // );//doesn't work exactly -> change that!!!
@@ -288,7 +292,8 @@ bool Geometry2D< T >::IsSelfAdjacent( const Tolerance< T > tolerance ) const
                     UnitVector< T > line( points[i].x() - points[ipp].x(), points[i].y() - points[ipp].y(), 0.0 );
 
                     UnitVector< T > rhsLine( points[j].x() - points[jpp].x(), points[j].y() - points[jpp].y(), 0.0 );
-                    if ( line.IsEqualDirection( rhsLine, tolerance.mAngle ) || line.IsOppositeDirection( rhsLine, tolerance.mAngle ) )
+                    if ( line.IsEqualDirection( rhsLine, tolerance.mAngle ) ||
+                         line.IsOppositeDirection( rhsLine, tolerance.mAngle ) )
                     {
                         T lengthRhsLine = boost::geometry::distance( points[j], points[jpp] ) - tolerance.mLength;
                         if ( ( boost::geometry::distance( points[j], points[i] ) < lengthRhsLine &&
@@ -299,7 +304,8 @@ bool Geometry2D< T >::IsSelfAdjacent( const Tolerance< T > tolerance ) const
                     }
 
                     rhsLine = UnitVector< T >( points[j].x() - points[jmm].x(), points[j].y() - points[jmm].y(), 0.0 );
-                    if ( line.IsEqualDirection( rhsLine, tolerance.mAngle ) || line.IsOppositeDirection( rhsLine, tolerance.mAngle ) )
+                    if ( line.IsEqualDirection( rhsLine, tolerance.mAngle ) ||
+                         line.IsOppositeDirection( rhsLine, tolerance.mAngle ) )
                     {
                         T lengthRhsLine = boost::geometry::distance( points[j], points[jmm] ) - tolerance.mLength;
                         if ( ( boost::geometry::distance( points[j], points[i] ) < lengthRhsLine &&
@@ -556,5 +562,5 @@ Geometry2D< T >::Geometry2D( const Polygon &polygon )
 
 template < typename T >
 const map< size_t, TwoDim< T > > Geometry2D< T >::mNoArcs;
-}
+}    // namespace geometry
 #endif

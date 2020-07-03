@@ -17,7 +17,7 @@ namespace factory
 template < typename MatrixT, typename ValueT >
 struct FactoryBuilder
 {
-    virtual Factory< ::state::State, ArgumentTypeState > *BuildStateFactory();
+    virtual Factory< state::State, ArgumentTypeState > *BuildStateFactory();
     virtual Factory< object::Object< double >, ArgumentTypeObject< double > > *BuildObjectFactory();
     virtual Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *BuildElectricalFactory();
     virtual Factory< thermal::ThermalBlock< double >, ArgumentTypeThermalBlock< double > > *BuildBlockFactory();
@@ -26,7 +26,7 @@ struct FactoryBuilder
     virtual Factory< thermal::CoolingBlock< double >, ArgumentTypeCoolingBlock< double > > *BuildCoolingBlockFactory();
     virtual thermal::ThermalFactory< double > *BuildThermalFactory();
 
-    boost::scoped_ptr< Factory< ::state::State, ArgumentTypeState > > mStateFactory;
+    boost::scoped_ptr< Factory< state::State, ArgumentTypeState > > mStateFactory;
     boost::scoped_ptr< Factory< object::Object< double >, ArgumentTypeObject< double > > > mObjectFactory;
     boost::scoped_ptr< Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > > mElectricalFactory;
     boost::scoped_ptr< Factory< thermal::ThermalBlock< double >, ArgumentTypeThermalBlock< double > > > mBlockFactory;

@@ -11,14 +11,12 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <string>
 
 // ETC
-#include "../../src/electrical/twoport.h"
-
-#include "../../src/export/svgExport.h"
-#include "../../src/export/svgLibraryInterpreter.h"
-
-#include "../../src/factory/factorybuilder.h"
-
-#include "../../src/xmlparser/tinyxml2/xmlparserimpl.h"
+#include "../src/electrical/twoport.h"
+#include "../src/export/svgExport.h"
+#include "../src/export/svgLibraryInterpreter.h"
+#include "../src/factory/factorybuilder.h"
+#include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
+#include "standalone/standalone.h"
 
 template < class MatrixType >
 boost::shared_ptr< electrical::TwoPort< MatrixType > > GenerateNetworkFromFile( const char *fileName )
@@ -37,39 +35,38 @@ boost::shared_ptr< electrical::TwoPort< MatrixType > > GenerateNetworkFromFile( 
 
 int main( int argc, char *argv[] )
 {
-    if ( argc < 3 || std::string( argv[2] ).find( ".xml" ) == std::string::npos )
-    {
-        std::cerr << "Please enter the following parameter: " << std::endl;
-        std::cerr << "1.Description depth: 0=Cellelements, 1=Electricalelements, 2=All" << std::endl;
-        std::cerr << "2.Input xml" << std::endl;
-
+    int depth;
+    std::string xmlfile;
+    std::string svgLibraryFile;
+    standalone::Standalone app( "ISEA-Framework SVG Export Standalone" );
+    app.mApp.add_option( "depth", depth, "Description depth: 0=Cellelements, 1=Electricalelements, 2=All" )->required();
+    app.mApp.add_option( "xml-file", xmlfile, "XML configuration file" )->required();
+    app.mApp.add_option( "svg-library", svgLibraryFile, "SVG library used to draw the components" );
+    if ( !app.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
-    }
 
     std::string svgLib;
-
-    if ( argv[3] )
+    if ( !svgLibraryFile.empty() )
     {
-        std::ifstream instream( argv[3] );
+        std::ifstream instream( svgLibraryFile );
         svgLib = std::string( ( std::istreambuf_iterator< char >( instream ) ), std::istreambuf_iterator< char >() );
     }
 
     try
     {
-        std::string file( argv[2] );
         boost::shared_ptr< electrical::TwoPort< myMatrixType > > tmprootPort(
-         GenerateNetworkFromFile< myMatrixType >( file.c_str() ) );
+         GenerateNetworkFromFile< myMatrixType >( xmlfile.c_str() ) );
 
         // std::string outputName = std::string( argv[2] ) + ".svg";
         // std::shared_ptr< std::ofstream > outPutFile ( new std::ofstream("outputName.svg") );
 
-        if ( *argv[1] == '0' )
+        if ( depth == 0 )
             SvgExport< myMatrixType, CELLLEVEL_DEPTH > test( tmprootPort.get(), &std::cout, svgLib );
 
-        else if ( *argv[1] == '1' )
+        else if ( depth == 1 )
             SvgExport< myMatrixType, ELECTRICALELEMENTS_DEPTH > test( tmprootPort.get(), &std::cout, svgLib );
 
-        else if ( *argv[1] == '2' )
+        else if ( depth == 2 )
             SvgExport< myMatrixType, ALL > test( tmprootPort.get(), &std::cout, svgLib );
 
         else
@@ -83,11 +80,6 @@ int main( int argc, char *argv[] )
     {
         std::cerr << "Error in xml-file." << std::endl;
         std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch ( ... )
-    {
-        std::cerr << "Unknown error in xml-file." << std::endl;
         return EXIT_FAILURE;
     }
 

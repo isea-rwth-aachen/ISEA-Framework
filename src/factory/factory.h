@@ -36,7 +36,7 @@
 
 
 #include "../exceptions/error_proto.h"
-/// The ::factory namespace contains a complete non-intrusive factory for ::electrical, ::object, ::state and ::thermal
+/// The ::factory namespace contains a complete non-intrusive factory for ::electrical, ::object, state and ::thermal
 /// and is further expandable
 namespace factory
 {

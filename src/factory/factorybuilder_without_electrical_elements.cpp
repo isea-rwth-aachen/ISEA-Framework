@@ -22,7 +22,7 @@ FactoryBuilderWithoutElectricalElements< MatrixT, ValueT >::BuildElectricalFacto
         this->BuildAgingTwoPortFactory();
 
     this->mElectricalFactory.reset( new Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical >() );
-    Factory< ::state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
     Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory = this->mObjectFactory.get();
     Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* agingTwoPortFactory =
      this->mAgingTwoPortFactory.get();

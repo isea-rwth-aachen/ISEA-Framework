@@ -8,8 +8,8 @@
 #ifndef XMLPARSERIMPLTINY_H_
 #define XMLPARSERIMPLTINY_H_
 
+#include "../../../libraries/tinyxml2/tinyxml2.h"
 #include "../xmlparser.h"
-#include "tinyxml2.h"
 
 namespace xmlparser
 {
@@ -41,6 +41,6 @@ class XmlParserImpl : public xmlparser::XmlParser
 
     std::string mFilename;
 };
-}
-}
+}    // namespace tinyxml2
+}    // namespace xmlparser
 #endif /* XMLPARSERIMPL_H_ */

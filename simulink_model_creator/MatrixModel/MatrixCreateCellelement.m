@@ -1,4 +1,4 @@
-function[destination] = MatrixCreateCellelement(destination, capacityInASec, initialSoC)
+function[destination] = MatrixCreateCellelement(destination, capacityInASec)
 
 global CellElementCounter;
 
@@ -8,6 +8,5 @@ destination = SetElemNoToDestination(destination, number);
 
 add_block('ElectricalElements/CellElement', destination, 'Position', position);
 set_param([destination '/SoCFactor'], 'Gain', num2str(100.0 / capacityInASec));
-set_param([destination '/SoC'], 'InitialCondition', initialSoC);
 
 end

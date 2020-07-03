@@ -118,8 +118,8 @@ void TestVoltageCurrentPowerInjection::TestFiveArgumentsTwoPorts()
 void TestVoltageCurrentPowerInjection::TestEveryhtingElse()
 {
 #ifndef _SYMBOLIC_
-    boost::shared_ptr< ::state::ThermalState< double > > temp = boost::make_shared< ::state::ThermalState< double > >( 25 );
-    boost::shared_ptr< electrical::state::Soc > socState = boost::make_shared< ::electrical::state::Soc >( 2.05, 2.05, 50 );
+    boost::shared_ptr< state::ThermalState< double > > temp = boost::make_shared< state::ThermalState< double > >( 25 );
+    boost::shared_ptr< state::Soc > socState = boost::make_shared< state::Soc >( 2.05, 2.05, 50 );
 
     double a = 1.0, b = 2.0, c = 3.0;
     auto dataStruct = boost::make_shared< ElectricalDataStruct< double > >( a, b, c );

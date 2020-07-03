@@ -40,8 +40,8 @@ class RectangularBlock : public ThermalBlock< T >
      */
     RectangularBlock( const char *description, const Cartesian< T > &emplacementPoint, T length, T width, T height,
                       size_t nX, size_t nY, size_t nZ, const Material< T > *material, T initialTemperature,
-                      const vector< shared_ptr< ::state::ThermalState< T > > > &thermalState =
-                       vector< shared_ptr< ::state::ThermalState< T > > >( 1 ),
+                      const vector< shared_ptr< state::ThermalState< T > > > &thermalState =
+                       vector< shared_ptr< state::ThermalState< T > > >( 1 ),
                       size_t electricalDiscretizationX = 1, size_t electricalDiscretizationY = 1,
                       size_t electricalDiscretizationZ = 1 );
     virtual ~RectangularBlock();
@@ -76,7 +76,7 @@ class RectangularBlock : public ThermalBlock< T >
 template < typename T >
 RectangularBlock< T >::RectangularBlock( const char *description, const Cartesian< T > &emplacementPoint, T length,
                                          T width, T height, size_t nX, size_t nY, size_t nZ, const Material< T > *material,
-                                         T initialTemperature, const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+                                         T initialTemperature, const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
                                          size_t electricalDiscretizationX, size_t electricalDiscretizationY,
                                          size_t electricalDiscretizationZ )
     : ThermalBlock< T >( thermalStates, emplacementPoint, description )

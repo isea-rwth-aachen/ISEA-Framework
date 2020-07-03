@@ -5,15 +5,15 @@
 * Created By : Manoel Brunnen
 _._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "standalone.h"
+#include "standalone/thermal_standalone.h"
 
 int main( int argc, char *argv[] )
 {
-    standalone::Standalone thermalStandalone( "ISEA-Framework Thermal Simulation Standalone" );
+    standalone::ThermalStandalone thermalStandalone( "ISEA-Framework Thermal Simulation Standalone" );
     if ( !thermalStandalone.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
 
-    thermalStandalone.ReadOptions();
+    thermalStandalone.ReadXmlOptions();
 
     if ( !thermalStandalone.CreateThermalSimulation() )
         return EXIT_FAILURE;

@@ -12,7 +12,7 @@
 #include "../../aging/generic_aging.h"
 #include "../../electrical/cellelement.h"
 #include "../../object/const_obj.h"
-#include "../../states/aging_state.h"
+#include "../../state/aging_state.h"
 
 #include "../classwrapper.h"
 #include "../factory.h"
@@ -162,7 +162,7 @@ class AgingClassWrapper< aging::AnodeOverhang > : public AgingClassWrapperBase
          param->GetConfigurationRoot()->GetElementChild( "Options" )->GetElementChild( "Aging" );
         const double agingStepTime = agingNodeOptions->GetElementDoubleValue( "AgingStepTime" );
 
-        boost::shared_ptr< electrical::state::Soc > soc = boost::static_pointer_cast< electrical::state::Soc >(
+        boost::shared_ptr< state::Soc > soc = boost::static_pointer_cast< state::Soc >(
          this->GetStateFactory()->CreateInstance( param->GetElementChild( "Soc" ) ) );
         boost::scoped_ptr< ArgumentTypeObject< double > > argObject( new ArgumentTypeObject< double >() );
         argObject->mSoc = soc;

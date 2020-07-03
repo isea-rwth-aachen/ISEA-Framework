@@ -10,7 +10,7 @@
 #include "../object/const_obj.h"
 #include "../object/lookup_obj1d_with_state.h"
 #include "../object/lookup_obj2d_with_state.h"
-#include "../states/soc.h"
+#include "../state/soc.h"
 #include "mex.h"
 #include <boost/array.hpp>
 #include <stack>
@@ -420,7 +420,7 @@ void ElectricalSimulinkModel< Matrix, T >::GetObjectData( const object::Object< 
          static_cast< const object::LookupObj2dWithState< T > * >( object );
         const lookup::LookupType2D< T > *loopUpType = lookupObj2dWithState->GetLookup().GetLookupType().get();
 
-        if ( dynamic_cast< const electrical::state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
+        if ( dynamic_cast< const state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
         {
             const size_t numberOfRows = loopUpType->GetPointsCol().size();
             rowPoints = mxCreateDoubleMatrix( 1, numberOfRows, mxREAL );

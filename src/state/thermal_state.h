@@ -2,7 +2,7 @@
 #define _THERMAL_STATE_
 
 #include "../exceptions/error_proto.h"
-#include "../states/dgl_state.h"
+#include "../state/dgl_state.h"
 #include <boost/foreach.hpp>
 #include <limits>
 #include <vector>

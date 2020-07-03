@@ -2,7 +2,7 @@
 
 #include "../../misc/StrCont.h"
 #include "../../misc/matrixInclude.h"
-#include "../../thermal/electrical_simulation.h"
+#include "../../electrical/electrical_simulation.h"
 #include "../../thermal/thermal_simulation.h"
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 #include "exception_tester.h"

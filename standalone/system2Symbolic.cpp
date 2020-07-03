@@ -8,8 +8,9 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../src/export/exportSystem.h"
 #include "../src/export/symbolicExport.h"
 #include "../src/misc/symbolicParser.h"
-#include "../src/thermal/electrical_simulation.h"
+#include "../src/electrical/electrical_simulation.h"
 #include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
+#include "standalone/standalone.h"
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -24,9 +25,12 @@ symbolic::StandardExportStruct >, symbolic::SymbolicParser< std::string::const_i
 
 int main( int argc, char *argv[] )
 {
-
-    if ( argc < 2 )
+    std::string xmlfile;
+    standalone::Standalone app( "ISEA-Framework Dot Export Standalone" );
+    app.mApp.add_option( "xml-file", xmlfile, "XML configuration file" )->required();
+    if ( !app.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
+
     typedef ExportSystem< myMatrixType, symbolic::SymbolicExport< std::string::const_iterator, symbolic::StandardExportStruct >,
                           symbolic::SymbolicParser< std::string::const_iterator > >
      ES;
@@ -34,7 +38,7 @@ int main( int argc, char *argv[] )
     try
     {
         parser.reset( new xmlparser::tinyxml2::XmlParserImpl() );
-        parser->ReadFromFile( argv[1] );
+        parser->ReadFromFile( xmlfile.c_str() );
     }
     catch ( std::exception &e )
     {
@@ -63,11 +67,6 @@ int main( int argc, char *argv[] )
         printf( "%s", message );
         return EXIT_FAILURE;
     }
-    catch ( ... )
-    {
-        printf( "Unknown error while creating the equation systems\n" );
-        return EXIT_FAILURE;
-    }
     electricalSimulation->mRootTwoPort->SetCurrent( ::ScalarUnit( "InputCurrent" ) );
     electricalSimulation->UpdateSystem();
     electricalSimulation->UpdateSystemValues();
@@ -86,11 +85,6 @@ int main( int argc, char *argv[] )
     {
         std::cerr << "Error in system export." << std::endl;
         std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-    catch ( ... )
-    {
-        std::cerr << "Unknown error in xml-file." << std::endl;
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

@@ -9,14 +9,11 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <iostream>
 
 // ETC
-#include "surface_soc.h"
 #include "../electrical/twoport.h"
+#include "surface_soc.h"
 
 #include "../misc/macros.h"
 
-
-namespace electrical
-{
 
 namespace state
 {
@@ -26,10 +23,7 @@ SurfaceSoc::SurfaceSoc()
 {
 }
 
-void SurfaceSoc::SetElementsForLookup( std::vector< electrical::TwoPort< myMatrixType > * > vec )
-{
-    mVecElements = vec;
-}
+void SurfaceSoc::SetElementsForLookup( std::vector< electrical::TwoPort< myMatrixType >* > vec ) { mVecElements = vec; }
 
 void SurfaceSoc::UpdateLookUp()
 {
@@ -50,5 +44,3 @@ void SurfaceSoc::SetReverseLookup( boost::shared_ptr< object::Object< double > >
 double SurfaceSoc::GetValue() const { return mCurrentValue; }
 
 }    // Namespace state
-
-}    // Namespace electrical

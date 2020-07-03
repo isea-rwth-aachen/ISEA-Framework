@@ -16,7 +16,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 
-using namespace ::state;
+using namespace state;
 
 void TestXMLExceptions::testXMLParserWrongFilename()
 {

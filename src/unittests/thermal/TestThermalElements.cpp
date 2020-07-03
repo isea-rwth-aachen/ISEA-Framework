@@ -18,7 +18,7 @@ void TestThermalElements::TestThermalElement()
     TS_ASSERT_THROWS_EQUALS( elem.SetElement( 25.0, 0, Cartesian<>( 0.0, 0.0, 0.0 ), -0.1, 0 ), std::runtime_error & e,
                              strcmp( e.what(), "Volume must be zero or bigger than zero.\n" ), 0 );
 
-    boost::shared_ptr< ::state::ThermalState<> > thermalState( new ::state::ThermalState<> );
+    boost::shared_ptr< state::ThermalState<> > thermalState( new state::ThermalState<> );
     thermalState->AddPowerDissipation( 970.0, 0.0 );
     thermalState->ResetPowerDissipation();
     Material<> kupfer( 8920.0, 385.0, 400.0, 300.0, 200.0 );
@@ -76,7 +76,7 @@ void TestThermalElements::TestThermalElement()
 
 void TestThermalElements::TestRectangularElement()
 {
-    boost::shared_ptr< ::state::ThermalState<> > thermalState( new ::state::ThermalState<> );
+    boost::shared_ptr< state::ThermalState<> > thermalState( new state::ThermalState<> );
     thermalState->AddPowerDissipation( 10.0, 0.0 );
     thermalState->ResetPowerDissipation();
     Material<> kupfer( 8920.0, 385.0, 400.0, 300.0, 200.0 );
@@ -145,7 +145,7 @@ void TestThermalElements::TestCylindricElement()
     //#endif
 
 
-    boost::shared_ptr< ::state::ThermalState<> > thermalState( new ::state::ThermalState<> );
+    boost::shared_ptr< state::ThermalState<> > thermalState( new state::ThermalState<> );
     thermalState->AddPowerDissipation( 10.0, 0.0 );
     thermalState->ResetPowerDissipation();
     Material<> kupfer( 8920.0, 385.0, 400.0, 300.0, 200.0 );
@@ -242,7 +242,7 @@ void TestThermalElements::TestCutCylElement()
     //#endif
 
 
-    boost::shared_ptr< ::state::ThermalState<> > thermalState( new ::state::ThermalState<> );
+    boost::shared_ptr< state::ThermalState<> > thermalState( new state::ThermalState<> );
     thermalState->AddPowerDissipation( 20.0, 0.0 );
     thermalState->ResetPowerDissipation();
     thermal::Material<> kupfer( 8920.0, 385.0, 400.0, 410.0, 420.0 );
@@ -334,7 +334,7 @@ void TestThermalElements::TestTriangularElement()
     //#endif
 
 
-    boost::shared_ptr< ::state::ThermalState<> > thermalState( new ::state::ThermalState<> );
+    boost::shared_ptr< state::ThermalState<> > thermalState( new state::ThermalState<> );
     thermalState->AddPowerDissipation( 10.0, 0.0 );
     thermalState->ResetPowerDissipation();
     Material<> kupfer( 8920.0, 385.0, 400.0, 300.0, 200.0 );

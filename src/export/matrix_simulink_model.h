@@ -12,10 +12,11 @@
 #include "../object/const_obj.h"
 #include "../object/lookup_obj1d_with_state.h"
 #include "../object/lookup_obj2d_with_state.h"
-#include "../states/soc.h"
+#include "../state/soc.h"
 
 #include "../electrical/capacity.h"
 #include "../electrical/cellelement.h"
+#include "../electrical/electrical_simulation.h"
 #include "../electrical/ohmicresistance.h"
 #include "../electrical/parallelRCAlg.h"
 #include "../electrical/parallelrc.h"
@@ -29,7 +30,6 @@
 #include "../electrical/zarc.h"
 #include "../electrical/zarcalg.h"
 #include "../system/dae_sys.h"
-#include "../thermal/electrical_simulation.h"
 #include "../thermal/thermal_simulation.h"
 
 #include "../exceptions/error_function.h"
@@ -286,10 +286,9 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
         auto sys = static_cast< systm::DifferentialAlgebraicSystem< Matrix > * >( mElectricalSimulation->mEqSystem.get() );
         auto matA = sys->GetA();
         auto matC = sys->GetC();
-        Matrix x_alg = mElectricalSimulation->mStateSystemGroup.mStateVector.block(
-         0, 0, mElectricalSimulation->mStateSystemGroup.mDglStateSystem.GetEquationCount(), 0 );
 
-        Matrix tmp = matA * mElectricalSimulation->mStateSystemGroup.mStateVector;
+        Matrix tmp = matA * mElectricalSimulation->mStateSystemGroup.mStateVector.block(
+                             0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 1, 1 );
         tmp += matC;
         MakeMatrix( tmp, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/MatrixAxC" ), true );
         if ( a_alg2.n_rows != 0 && a_alg2.n_cols != 0 )
@@ -365,20 +364,18 @@ void MatrixSimulinkModel< Matrix, T >::CreateThermalModel()
                     mThermalSimulation->mThermalSystem->GetThermalElements() )
     {
         const T factor = thermalElement->GetThermalStateFactor();
-        ::state::ThermalState< T > *pointer = const_cast< ::state::ThermalState< T > * >( thermalElement->GetThermalState() );    // TODO: It is here necessary to use the const_cast of evil, because the declaration of map<>::find() does not work for pointers as key types
+        state::ThermalState< T > *pointer = const_cast< state::ThermalState< T > * >( thermalElement->GetThermalState() );    // TODO: It is here necessary to use the const_cast of evil, because the declaration of map<>::find() does not work for pointers as key types
         const size_t index = pointerToIndexMap.find( pointer )->second;
         finiteVolumesByCellIndexAndFactor.push_back( pair< size_t, double >( index, factor ) );
     }
 
     const vector< T > &reciprocalsOfCapacity = mThermalSimulation->mThermalSystem->GetThermalElementFactors();
-    const vector< vector< thermal::IndexedValue< T > > > &conductivityMatrix =
+    const typename thermal::OdeSystemThermal< T >::MatrixT &conductivityMatrix =
      mThermalSimulation->mThermalSystem->GetA_th_Conductivity();
-
 
     mxArray **plhs = 0;
     boost::array< mxArray *, 5 > prhs;
     prhs.at( 0 ) = mxCreateString( mSimulinkModel + "/Thermal" );
-
 
     prhs.at( 1 ) = mxCreateDoubleMatrix( finiteVolumesByCellIndexAndFactor.size(), 2, mxREAL );
     misc::StrCont initialTemperaturesString( "[ " );
@@ -408,18 +405,16 @@ void MatrixSimulinkModel< Matrix, T >::CreateThermalModel()
         mxGetPr( prhs.at( 2 ) )[i] = reciprocalsOfCapacity.at( i );
 
 
-    size_t rows = 0;
-    BOOST_FOREACH ( const vector< thermal::IndexedValue< T > > &conductivityRow, conductivityMatrix )
-        rows += conductivityRow.size();
+    size_t rows = conductivityMatrix.nonZeros();
     prhs.at( 3 ) = mxCreateDoubleMatrix( rows, 3, mxREAL );
 
     size_t index = 0;
-    for ( size_t i = 0; i < conductivityMatrix.size(); ++i )
-        BOOST_FOREACH ( const thermal::IndexedValue< T > &conductivity, conductivityMatrix.at( i ) )
+    for ( size_t i = 0; i < conductivityMatrix.rows(); ++i )
+        for ( Eigen::SparseMatrix< double, Eigen::RowMajor >::InnerIterator it( conductivityMatrix, i ); it; ++it )
         {
             mxGetPr( prhs.at( 3 ) )[index] = i;
-            mxGetPr( prhs.at( 3 ) )[index + rows] = conductivity.mIndex;
-            mxGetPr( prhs.at( 3 ) )[index + rows * 2] = conductivity.mValue;
+            mxGetPr( prhs.at( 3 ) )[index + rows] = it.col();
+            mxGetPr( prhs.at( 3 ) )[index + rows * 2] = it.value();
             ++index;
         }
 
@@ -733,7 +728,7 @@ void MatrixSimulinkModel< Matrix, T >::PlaceElectricalElementWithChildren( const
 {
     misc::StrCont destination = MakeDestination( twoPort );
     boost::array< mxArray *, 1 > plhs;
-    boost::array< mxArray *, 3 > prhs;
+    boost::array< mxArray *, 2 > prhs;
 
     const electrical::Cellelement< Matrix > *cellelement = dynamic_cast< const electrical::Cellelement< Matrix > * >( twoPort );
     bool isWarburg = dynamic_cast< const electrical::WarburgTanh< Matrix > * >( twoPort ) ||
@@ -742,9 +737,7 @@ void MatrixSimulinkModel< Matrix, T >::PlaceElectricalElementWithChildren( const
     {
         prhs.at( 0 ) = mxCreateString( destination );
         prhs.at( 1 ) = mxCreateDoubleScalar( cellelement->GetSoc()->GetInitialCapacity() );
-        prhs.at( 2 ) = mxCreateString( mInitialStateStruct + ".CellElement_" +
-                                       misc::StrCont( cellelement->mCellNumber + 1 ) + ".SoC" );
-        if ( mexCallMATLAB( 1, plhs.data(), 3, prhs.data(), "MatrixCreateCellelement" ) != 0 )
+        if ( mexCallMATLAB( 1, plhs.data(), 2, prhs.data(), "MatrixCreateCellelement" ) != 0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPlacing",
                                                  "electrical element with child 1" );
     }
@@ -774,13 +767,20 @@ void MatrixSimulinkModel< Matrix, T >::PlaceElectricalElementWithChildren( const
         if ( mexCallMATLAB( 0, plhs.data(), 1, prhs.data(), "MatrixConnectCellelement" ) != 0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPlacing",
                                                  "electrical element with child 3" );
+
+        prhs.at( 0 ) = mxCreateString( mSimulinkModel + "/InitialSoC_Vector" );
+        prhs.at( 1 ) = mxCreateString( mInitialStateStruct + ".CellElement_" +
+                                       misc::StrCont( cellelement->mCellNumber + 1 ) + ".SoC" );
+        if ( mexCallMATLAB( 0, plhs.data(), 2, prhs.data(), "MatrixSetInitialSoC" ) != 0 )
+            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPlacing",
+                                                 "electrical element with child 4" );
     }
     else if ( isWarburg )
     {
         prhs.at( 0 ) = mxCreateString( destination );
         if ( mexCallMATLAB( 0, plhs.data(), 1, prhs.data(), "MatrixConnectTwoPortWithChild" ) != 0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPlacing",
-                                                 "electrical element with child 4" );
+                                                 "electrical element with child 5" );
     }
 }
 
@@ -794,7 +794,7 @@ void MatrixSimulinkModel< Matrix, T >::GetObjectData( const object::Object< T > 
          static_cast< const object::LookupObj2dWithState< T > * >( object );
         const lookup::LookupType2D< T > *loopUpType = lookupObj2dWithState->GetLookup().GetLookupType().get();
 
-        if ( dynamic_cast< const electrical::state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
+        if ( dynamic_cast< const state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
         {
             const size_t numberOfRows = loopUpType->GetPointsCol().size();
             rowPoints = mxCreateDoubleMatrix( 1, numberOfRows, mxREAL );
@@ -839,7 +839,7 @@ void MatrixSimulinkModel< Matrix, T >::GetObjectData( const object::Object< T > 
          static_cast< const object::LookupObj1dWithState< T > * >( object )->GetLookup().GetLookupType().get();
 
         const size_t numberOfPoints = lookUpType->GetPoints().size();
-        if ( dynamic_cast< const electrical::state::Soc * >( lookupObj1dWithState->GetState() ) )
+        if ( dynamic_cast< const state::Soc * >( lookupObj1dWithState->GetState() ) )
         {
             rowPoints = mxCreateDoubleMatrix( 1, numberOfPoints, mxREAL );
             for ( size_t i = 0; i < numberOfPoints; ++i )

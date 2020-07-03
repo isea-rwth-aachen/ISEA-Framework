@@ -4,7 +4,7 @@ namespace aging
 {
 AnodeOverhang::AnodeOverhang( const double agingStepTime, const boost::shared_ptr< object::Object< double > >& voltage,
                               const double& activCoef, const double& tauCoef,
-                              const boost::shared_ptr< electrical::state::Soc >& socState,
+                              const boost::shared_ptr< state::Soc >& socState,
                               const double socWhereOffsetIsZero, bool isEnabled )
     : AgingBase( agingStepTime, isEnabled )
     , mVoltage( voltage )
@@ -16,8 +16,8 @@ AnodeOverhang::AnodeOverhang( const double agingStepTime, const boost::shared_pt
     if ( this->mIsEnabled )
     {
         this->mAnodeOffset =
-         ( socWhereOffsetIsZero - this->mSocState->template GetValue< electrical::state::SocGetFormat::PERCENT >() ) /
-         100 * this->mSocState->template GetActualCapacity< electrical::state::SocGetFormat::AS >();
+         ( socWhereOffsetIsZero - this->mSocState->template GetValue< state::SocGetFormat::PERCENT >() ) /
+         100 * this->mSocState->template GetActualCapacity< state::SocGetFormat::AS >();
     }
     else
     {
@@ -27,7 +27,7 @@ AnodeOverhang::AnodeOverhang( const double agingStepTime, const boost::shared_pt
 
 size_t AnodeOverhang::GetType() const { return AgingType::ANODE_OVERHANG; }
 
-const boost::shared_ptr< electrical::state::Soc >& AnodeOverhang::GetSoc() const { return this->mSocState; }
+const boost::shared_ptr< state::Soc >& AnodeOverhang::GetSoc() const { return this->mSocState; }
 
 void AnodeOverhang::CalculateAging( const TwoportState&, double timestep, double scaleFactor )
 {
@@ -48,17 +48,17 @@ void AnodeOverhang::CalculateAging( const TwoportState&, double timestep, double
         double anodeVoltage = anodeVoltageSum / this->mTotalCalculationTime;
         double temperature = temperatureSum / this->mTotalCalculationTime;
         double tau = this->mTauCoef * std::exp( this->mActivCoef / temperature ) * 3600 * 24;
-        double charge = this->mSocState->GetValue< electrical::state::SocGetFormat::AS >();
+        double charge = this->mSocState->GetValue< state::SocGetFormat::AS >();
         if ( charge == 0 )    // If the charge is exactly 0, the overhang has no capacity and no charge can ever flow
         {
             charge = 1.0;
-            this->mSocState->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( charge );
+            this->mSocState->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( charge );
         }
         double overhangVoltage = mVoltage->GetValue();
         double capacity = charge / overhangVoltage;
 
         double additionalCharge = capacity * ( overhangVoltage - anodeVoltage ) * ( 1 - exp( -stepTimeSeconds / tau ) );
-        this->mSocState->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( additionalCharge );
+        this->mSocState->SetStoredEnergy< state::SocSetFormat::DELTA >( additionalCharge );
         this->mAnodeOffset -= additionalCharge;
 
         mTimeValues.clear();

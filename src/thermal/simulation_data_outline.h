@@ -31,7 +31,7 @@ void ThermalModelOutline( const boost::shared_ptr< xmlparser::XmlParameter > &ro
     std::vector< boost::shared_ptr< thermal::ThermalBlock< T > > > heatedBlocks;
     std::vector< boost::shared_ptr< thermal::ThermalBlock< T > > > unheatedBlocks;
     std::vector< boost::shared_ptr< thermal::CoolingBlock< T > > > coolingBlocks;
-    std::vector< std::vector< boost::shared_ptr< ::state::ThermalState< T > > > > thermalStatesOfCellBlocks;
+    std::vector< std::vector< boost::shared_ptr< state::ThermalState< T > > > > thermalStatesOfCellBlocks;
     std::vector< ::probe::ThermalProbe > thermalProbes;
 
     // Create data

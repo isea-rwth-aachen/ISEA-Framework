@@ -123,7 +123,7 @@ end
 
 set_param([destination '/Reciprocals of Thermal Capacities'], 'Gain', mat2str(reciprocalsOfCapacity));
 
-set_param([destination '/FV Temperatures'], 'InitialCondition', InitialTemperaturesOfFiniteVolumes);
+set_param([destination '/InitialTemperatures_Vector/InitialTemperatures_Const'], 'Value', InitialTemperaturesOfFiniteVolumes);
 
 orderedConductivityMatrix = cell(size(finiteVolumesByCellIndexAndFactor, 1), 1);
 for i = 1:size(conductivityMatrix ,1)

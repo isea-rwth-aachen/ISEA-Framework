@@ -12,8 +12,8 @@
 
 // ETC
 
+#include "../../../libraries/tinydir/tinydir.h"
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
-#include "../../misc/tinydir.h"
 
 void TestXmlFiles::TestErrosXmlFiles()
 {

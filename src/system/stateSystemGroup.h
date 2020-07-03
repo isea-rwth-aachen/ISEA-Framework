@@ -75,8 +75,9 @@ void StateSystemGroup< MatrixType >::ResetSystem()
 template < typename MatrixType >
 void StateSystemGroup< MatrixType >::ResetStates()
 {
-    mStateVector.zeros( mStateCount + 1, 1 );
-    mStateVector( mStateCount, 0 ) = 1;
+    mStateVector.resize( mStateCount + 1, 1 );
+    mStateVector.setZero();
+    mStateVector.insert( mStateCount, 0 ) = 1;
 }
 
 /// After all equations have been registered, this method will set the data sizes and calls itself the reset method

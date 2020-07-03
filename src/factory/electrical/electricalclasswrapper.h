@@ -19,9 +19,9 @@
 #include "../factory.h"
 #include "../get_electrical_discretization.h"
 
-#include "../../states/aging_state.h"
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/aging_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 
 #include "../../electrical/anode_element.h"
 #include "../../electrical/capacity.h"
@@ -104,7 +104,7 @@ struct ArgumentTypeElectrical
     size_t mSocDivisorAnode;
     size_t mSocDivisorKathode;
 
-    boost::shared_ptr< electrical::state::Soc > mSoc;
+    boost::shared_ptr< state::Soc > mSoc;
     boost::shared_ptr< electrical::Cellelement< myMatrixType > > mParentCell;
 };
 
@@ -118,11 +118,11 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
      * The three different factories are supplied via parameter and are used for other instances ctor parameters.
      * @param electricalFactory A Factory for class in the ::electrical namespace
      * @param objectFactory A Factory for class in the ::object namespace
-     * @param stateFactory A Factory for class in the ::state namespace
+     * @param stateFactory A Factory for class in the state namespace
      */
     ElectricalClassWrapperBase( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                                 Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                                Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                                Factory< state::State, ArgumentTypeState > *stateFactory )
         : mElectricalFactory( electricalFactory )
         , mObjectFactory( objectFactory )
         , mStateFactory( stateFactory )
@@ -143,8 +143,8 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
     /// Get an ::object::Object Factory.
     Factory< object::Object< double >, ArgumentTypeObject< double > > *GetObjectFactory() { return mObjectFactory; }
 
-    /// Get a ::state::State Factory.
-    Factory< ::state::State, ArgumentTypeState > *GetStateFactory() { return mStateFactory; }
+    /// Get a state::State Factory.
+    Factory< state::State, ArgumentTypeState > *GetStateFactory() { return mStateFactory; }
 
     /// Returns ArgumentType for adjusting ::object::Object creation if cell consist of more than one cell element
     ArgumentTypeObject< double > *SetObjectFactorToArg( const ArgumentTypeElectrical *argElectrical, bool multiply,
@@ -166,7 +166,6 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
 
             if ( argElectrical->mSoc )
                 argObject->mSoc = argElectrical->mSoc;
-
             if ( multiply )
                 argObject->mObjectFactor *= argElectrical->mResistanceFactor;
         }
@@ -208,18 +207,18 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
 
         bool isAnodeElement = param->HasElementAttribute( "class", "AnodeElement" );
 
-        boost::shared_ptr< electrical::state::Soc > socObject;
+        boost::shared_ptr< state::Soc > socObject;
 
         if ( param->HasElementDirectChild( "Soc" ) )
         {
             boost::scoped_ptr< ArgumentTypeState > argState( new ArgumentTypeState() );
             argState->mCapacityFactor = arg->mCapacityFactor;
-            socObject = boost::static_pointer_cast< electrical::state::Soc >(
+            socObject = boost::static_pointer_cast< state::Soc >(
              this->GetStateFactory()->CreateInstance( param->GetElementChild( "Soc" ), argState.get() ) );
         }
         else
         {
-            boost::shared_ptr< electrical::state::Soc > parentSoc = arg->mSoc;
+            boost::shared_ptr< state::Soc > parentSoc = arg->mSoc;
 
             const size_t socDivisor = isAnodeElement ? arg->mSocDivisorAnode : arg->mSocDivisorKathode;
 
@@ -227,7 +226,7 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
             const double parentCellInitialCapacity = parentSoc->GetInitialCapacity<>() / ( 3600 * socDivisor );
             const double parentCellActualCapacity = parentSoc->GetActualCapacity<>() / ( 3600 * socDivisor );
 
-            socObject = boost::make_shared< electrical::state::Soc >( parentCellInitialCapacity, parentCellActualCapacity, parentCellSoc );
+            socObject = boost::make_shared< state::Soc >( parentCellInitialCapacity, parentCellActualCapacity, parentCellSoc );
         }
 
         auto thermalState = arg->mParentCell->GetThermalState();
@@ -273,7 +272,7 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
     private:
     Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *const mElectricalFactory;
     Factory< object::Object< double >, ArgumentTypeObject< double > > *const mObjectFactory;
-    Factory< ::state::State, ArgumentTypeState > *const mStateFactory;
+    Factory< state::State, ArgumentTypeState > *const mStateFactory;
 
     double GetTauForSimplification( const xmlparser::XmlParameter *param )
     {
@@ -313,7 +312,7 @@ class ElectricalClassWrapper : public ElectricalClassWrapperBase< MatrixT >
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -326,7 +325,7 @@ class ElectricalClassWrapper< MatrixT, Capacity > : public ElectricalClassWrappe
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -357,7 +356,7 @@ class ElectricalClassWrapper< MatrixT, OhmicResistance > : public ElectricalClas
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -388,7 +387,7 @@ class ElectricalClassWrapper< MatrixT, ConstantPhaseElement > : public Electrica
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -419,7 +418,7 @@ class ElectricalClassWrapper< MatrixT, Inductance > : public ElectricalClassWrap
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -451,7 +450,7 @@ class ElectricalClassWrapper< MatrixT, VoltageSource > : public ElectricalClassW
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -493,7 +492,7 @@ class ElectricalClassWrapper< MatrixT, ParallelRC > : public ElectricalClassWrap
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -537,7 +536,7 @@ class ElectricalClassWrapper< MatrixT, Rmphn > : public ElectricalClassWrapperBa
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
         , mRCCreater( electricalFactory, objectFactory, stateFactory )
     {
@@ -589,7 +588,7 @@ class ElectricalClassWrapper< MatrixT, SphericalDiffusion > : public ElectricalC
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -670,7 +669,7 @@ class ElectricalClassWrapper< MatrixT, WarburgCotanh > : public ElectricalClassW
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
         // Nedded for HACK_1
@@ -816,7 +815,7 @@ class ElectricalClassWrapper< MatrixT, WarburgTanh > : public ElectricalClassWra
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -905,7 +904,7 @@ class ElectricalClassWrapper< MatrixT, ParallelRCAlg > : public ElectricalClassW
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -939,16 +938,16 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
         , mCellCounter( 0 )
     {
     }
 
-    boost::shared_ptr< electrical::state::SurfaceSoc >
+    boost::shared_ptr< state::SurfaceSoc >
     CreateSurfaceSoc( const xmlparser::XmlParameter *param, const ArgumentTypeState *arg = 0 )
     {
-        typedef electrical::state::SurfaceSoc SurfaceSocState_t;
+        typedef state::SurfaceSoc SurfaceSocState_t;
         return boost::static_pointer_cast< SurfaceSocState_t >(
          this->GetStateFactory()->CreateInstance( param->GetElementChild( "SurfaceSoc" ), arg ) );
     }
@@ -979,8 +978,8 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
 
         auto elecData = this->CreateElectricalData();
 
-        typedef ::state::ThermalState< double > ThermalState_t;
-        typedef electrical::state::Soc SocState_t;
+        typedef state::ThermalState< double > ThermalState_t;
+        typedef state::Soc SocState_t;
 
 
         const bool isHalfcellsimulation = param->HasElementDirectChild( "Anode" );
@@ -1052,7 +1051,7 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
                 reversibleHeat = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "ReversibleHeat" ) );
             }
 
-            boost::shared_ptr< electrical::state::SurfaceSoc > surfaceSoc;
+            boost::shared_ptr< state::SurfaceSoc > surfaceSoc;
 
             // TODO: Should be probably checked if it is set to True or not False
             if ( param->HasElementDirectChild( "SurfaceSoc" ) )
@@ -1135,7 +1134,7 @@ class ElectricalClassWrapper< MatrixT, AnodeElement > : public ElectricalClassWr
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
         , mAnodeElementCounter( 0 )
     {
@@ -1184,7 +1183,7 @@ class ElectricalClassWrapper< MatrixT, CathodeElement > : public ElectricalClass
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1204,7 +1203,7 @@ class ElectricalClassWrapper< MatrixT, Zarc > : public ElectricalClassWrapperBas
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1253,7 +1252,7 @@ class ElectricalClassWrapper< MatrixT, ZarcAlg > : public ElectricalClassWrapper
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1303,7 +1302,7 @@ class ElectricalClassWrapper< MatrixT, ParallelTwoPort > : public ElectricalClas
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1353,7 +1352,7 @@ class ElectricalClassWrapper< MatrixT, SerialTwoPort > : public ElectricalClassW
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1404,7 +1403,7 @@ class ElectricalClassWrapper< MatrixT, None > : public ElectricalClassWrapperBas
     public:
     ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                             Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                            Factory< ::state::State, ArgumentTypeState > *stateFactory )
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
     {
     }
@@ -1426,7 +1425,7 @@ class ElectricalClassWrapperForAging : public ElectricalClassWrapperBase< Matrix
     public:
     ElectricalClassWrapperForAging( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
                                     Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
-                                    Factory< ::state::State, ArgumentTypeState > *stateFactory,
+                                    Factory< state::State, ArgumentTypeState > *stateFactory,
                                     Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort > *agingTwoPortFactory )
         : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
         , mAgingTwoPortFactory( agingTwoPortFactory )

@@ -5,12 +5,13 @@
 * Created By : Friedrich Hust
 _._._._._._._._._._._._._._._._._._._._._.*/
 
+#include "../src/export/exportStructs/texExport.h"
+#include "../src/export/symbolicExport.h"
+#include "../src/misc/symbolicParser.h"
+#include "standalone/standalone.h"
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
-#include "../src/misc/symbolicParser.h"
-#include "../src/export/symbolicExport.h"
-#include "../src/export/exportStructs/texExport.h"
 /*
 extern template struct symbolic::SymbolicParser< std::string::const_iterator >;
 extern template class symbolic::SymbolicExport< std::string::const_iterator, symbolic::TexExportStruct >;
@@ -18,10 +19,11 @@ extern template class symbolic::SymbolicExport< std::string::const_iterator, sym
 
 int main( int argc, char *argv[] )
 {
-    long timeout = 5;
-    if ( argc < 1 )
-        timeout = boost::lexical_cast< long >( argv[2] );
+    standalone::Standalone app( "ISEA-Framework Symbolic To Tex Standalone" );
+    if ( !app.ParseCommandLine( argc, argv ) )
+        return EXIT_FAILURE;
 
+    long timeout = 5;
     using namespace symbolic;
     using boost::spirit::ascii::space;
     std::string input;

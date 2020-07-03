@@ -14,11 +14,13 @@ CyclicalAging::CyclicalAging( const double agingStepTime, const double minBetaCa
     , mChargeThroughputExponentResistance( chargeThroughputExponentResistance )
     , mActualDod( 0.0 )
     , mActualVoltage( 0.0 )
+    , mActualSoc( 0.0 )
     , mTimeSinceLastAgingStep( 0.0 )
 {
     std::vector< std::pair< const char*, double& > > expressionParserContent;
     expressionParserContent.push_back( std::pair< const char*, double& >( "deltaDOD", mActualDod ) );
     expressionParserContent.push_back( std::pair< const char*, double& >( "meanV", mActualVoltage ) );
+    expressionParserContent.push_back( std::pair< const char*, double& >( "meanSOC", mActualSoc ) );
 
     this->mExpressionParserStressFactorCapacity.AddContent( formulaBetaCapacity, expressionParserContent );
     this->mExpressionParserStressFactorResistance.AddContent( formulaBetaResistance, expressionParserContent );
@@ -34,7 +36,7 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
         return;
 
     std::vector< rainflow::Cycle > cycles = rainflow::countCycles( this->mSocValues );
-    double capacity = twoportState.mSocState->template GetActualCapacity< electrical::state::SocGetFormat::AH >();
+    double capacity = twoportState.mSocState->template GetActualCapacity< state::SocGetFormat::AH >();
     double chargeThroughput = 0;    // in Ah
     this->mStressFactorCapacity = 0.0;
     this->mStressFactorResistance = 0.0;
@@ -42,6 +44,7 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
     for ( size_t i = 0; i < cycles.size(); i++ )
     {
         mActualDod = cycles[i].mDepth;
+        mActualSoc = cycles[i].mMeanValue;
         mActualVoltage = GetAverageVoltage( this->mTimeValues[cycles[i].mStartIndex], this->mTimeValues[cycles[i].mEndIndex] );
         double betaCapacity = this->mExpressionParserStressFactorCapacity.GetSolution();
         double betaResistance = this->mExpressionParserStressFactorResistance.GetSolution();

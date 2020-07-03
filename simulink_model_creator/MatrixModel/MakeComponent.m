@@ -26,6 +26,7 @@ add_block('Component/Component', destination, 'Position', position);
 set_param([destination '/RowConst'], 'Value', num2str(row));
 set_param([destination '/ColConst'], 'Value', num2str(col));
 component.(origsystemstr) = component.(origsystemstr) +1;
+symbolicString = InsertApproximations(symbolicString);
 totalDepth = GetTotalDepth(symbolicString);
 global posVector;
 posVector = ones(1, totalDepth);

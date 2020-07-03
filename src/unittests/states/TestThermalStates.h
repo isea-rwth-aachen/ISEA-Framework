@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cxxtest/TestSuite.h>
 #include <set>
-#include "../../states/thermal_state.h"
+#include "../../state/thermal_state.h"
 
 
 

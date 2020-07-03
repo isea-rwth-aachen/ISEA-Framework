@@ -2,7 +2,7 @@ function [] = InitializeMatrixModel(location, numberOfCellelements, dglCount, al
 ClearGlobalCache();
 cleanup;
 
-addpath([ fileparts(which('InitializeMatrixModel')) '..\'] );
+addpath([ fileparts(which('InitializeMatrixModel')) '/../'] );
 load_system('MatrixModel/Component');
 load_system('MatrixModel/MatrixModel');
 load_system('MatrixModel/ElectricalElements');

@@ -19,7 +19,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../aging/aging_twoport.h"
 #include "../../aging/anode_overhang.h"
 #include "../../electrical/cellelement.h"
-#include "../../states/soc.h"
+#include "../../state/soc.h"
 
 namespace observer
 {
@@ -231,7 +231,7 @@ class StdoutFilterAging : public StdoutFilter< T, aging::AgingTwoPort, Preparati
             this->mOutputStream
              << " Fullcycles: "
              << agingState.GetChargeThroughput() /
-                 agingTwoPort->GetTwoPort()->GetSoc()->template GetInitialCapacity< electrical::state::SocGetFormat::AS >()
+                 agingTwoPort->GetTwoPort()->GetSoc()->template GetInitialCapacity< state::SocGetFormat::AS >()
              << std::endl;
 
             // TODO: Make this less terrible

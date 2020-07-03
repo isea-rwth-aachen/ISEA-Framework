@@ -12,8 +12,8 @@
 #include "../electrical/electrical_data_struct.h"
 #include "../expressionparser/expressionparser.h"
 #include "../misc/matrixInclude.h"
-#include "../states/soc.h"
-#include "../states/thermal_state.h"
+#include "../state/soc.h"
+#include "../state/thermal_state.h"
 #include "../visitor/visitor.h"
 
 namespace aging
@@ -31,7 +31,7 @@ enum AgingType
 struct TwoportState
 {
     TwoportState( const boost::shared_ptr< ElectricalDataStruct< double > > &electricalData = nullptr,
-                  const boost::shared_ptr< electrical::state::Soc > &socState = nullptr,
+                  const boost::shared_ptr< state::Soc > &socState = nullptr,
                   const boost::shared_ptr< state::ThermalState< double > > &thermalState = nullptr )
         : mElectricalData( electricalData )
         , mSocState( socState )
@@ -42,7 +42,7 @@ struct TwoportState
     }
 
     boost::shared_ptr< ElectricalDataStruct< double > > mElectricalData;
-    boost::shared_ptr< electrical::state::Soc > mSocState;
+    boost::shared_ptr< state::Soc > mSocState;
     boost::shared_ptr< state::ThermalState< double > > mThermalState;
     double mCellAge;
     double mChargeThroughput;

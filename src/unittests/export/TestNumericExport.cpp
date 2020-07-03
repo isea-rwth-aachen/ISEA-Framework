@@ -30,7 +30,7 @@ void TestNumericExport::testSingleElement()
 #if !defined( __NO_STRING__ )
 
     boost::scoped_ptr< xmlparser::XmlParser > parser( new xmlparser::tinyxml2::XmlParserImpl() );
-    parser->ReadFromFile( "../../scenarios/internal_use_only/RC.xml" );
+    parser->ReadFromFile( "RC.xml" );
     auto root = parser->GetRoot();
     simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false > sim( root, 0, 0, 0, nullptr );
     sim.mRootTwoPort->SetCurrent( 1 );

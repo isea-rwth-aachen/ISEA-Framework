@@ -2,7 +2,7 @@
 #define _FINDSIMULATIONTYPE_
 
 #include "../aging/aging_simulation.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "../thermal/thermal_simulation.h"
 #include "../xmlparser/xmlparameter.h"
 #include <boost/shared_ptr.hpp>

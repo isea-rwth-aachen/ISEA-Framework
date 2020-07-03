@@ -8,7 +8,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #define _NUMERICEXPORT_
 #include "../electrical/twoport_withchild.h"
 #include "../misc/matrixInclude.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "baseExport.h"
 
 /// DESCRIPTION

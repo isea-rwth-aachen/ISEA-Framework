@@ -1,8 +1,8 @@
 #ifndef _TWOPORT_WITH_STATE_
 #define _TWOPORT_WITH_STATE_
 
-#include "../states/soc.h"
-#include "../states/thermal_state.h"
+#include "../state/soc.h"
+#include "../state/thermal_state.h"
 #include "serialtwoport.h"
 
 extern template class electrical::SerialTwoPort< myMatrixType >;
@@ -15,8 +15,8 @@ class TwoPortWithState : public SerialTwoPort< T >
     friend class ::TestTwoPortsWithChildren;
 
     public:
-    TwoPortWithState( const boost::shared_ptr< electrical::state::Soc >& socState,
-                      const boost::shared_ptr< ::state::ThermalState< double > >& thermalState, const bool observable = false,
+    TwoPortWithState( const boost::shared_ptr< state::Soc >& socState,
+                      const boost::shared_ptr< state::ThermalState< double > >& thermalState, const bool observable = false,
                       typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ) );
 
     virtual ~TwoPortWithState(){};
@@ -29,20 +29,20 @@ class TwoPortWithState : public SerialTwoPort< T >
 
     virtual double GetTotalCapacity() const
     {
-        return this->mSoc->template GetActualCapacity< electrical::state::SocGetFormat::AH >();
+        return this->mSoc->template GetActualCapacity< state::SocGetFormat::AH >();
     }
 
     const boost::shared_ptr< state::Soc >& GetSoc() const { return this->mSoc; }
-    const boost::shared_ptr< ::state::ThermalState< double > >& GetThermalState() const { return mThermalState; }
+    const boost::shared_ptr< state::ThermalState< double > >& GetThermalState() const { return mThermalState; }
 
     protected:
-    const boost::shared_ptr< electrical::state::Soc > mSoc;
-    const boost::shared_ptr< ::state::ThermalState< double > > mThermalState;
+    const boost::shared_ptr< state::Soc > mSoc;
+    const boost::shared_ptr< state::ThermalState< double > > mThermalState;
 };
 
 template < typename T >
-TwoPortWithState< T >::TwoPortWithState( const boost::shared_ptr< electrical::state::Soc >& socState,
-                                         const boost::shared_ptr< ::state::ThermalState< double > >& thermalState,
+TwoPortWithState< T >::TwoPortWithState( const boost::shared_ptr< state::Soc >& socState,
+                                         const boost::shared_ptr< state::ThermalState< double > >& thermalState,
                                          const bool observable, typename TwoPort< T >::DataType dataValues )
     : SerialTwoPort< T >( observable, dataValues )
     , mSoc( socState )
@@ -74,7 +74,7 @@ void TwoPortWithState< T >::CalculateStateDependentValues()
 #ifndef _SYMBOLIC_
     // Update the Soc state. Therefore calculate the charge which is stored/released in the previous simulation step
     // period
-    mSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( this->mCurrentValue * this->mStateSystemGroup->mDt );
+    mSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( this->mCurrentValue * this->mStateSystemGroup->mDt );
 #endif
 }
 }    // namespace electrical

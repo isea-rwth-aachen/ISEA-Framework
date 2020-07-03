@@ -14,8 +14,8 @@ template < typename T = myMatrixType >
 class CathodeElement : public ElectrodeElement< T >
 {
     public:
-    CathodeElement( const boost::shared_ptr< electrical::state::Soc >& socObject,
-                    const boost::shared_ptr< ::state::ThermalState< double > >& thermalState, const bool observable = false );
+    CathodeElement( const boost::shared_ptr< state::Soc >& socObject,
+                    const boost::shared_ptr< state::ThermalState< double > >& thermalState, const bool observable = false );
 
     virtual ~CathodeElement(){};
 
@@ -25,8 +25,8 @@ class CathodeElement : public ElectrodeElement< T >
 };
 
 template < typename T >
-CathodeElement< T >::CathodeElement( const boost::shared_ptr< electrical::state::Soc >& socObject,
-                                     const boost::shared_ptr< ::state::ThermalState< double > >& thermalState, const bool observable )
+CathodeElement< T >::CathodeElement( const boost::shared_ptr< state::Soc >& socObject,
+                                     const boost::shared_ptr< state::ThermalState< double > >& thermalState, const bool observable )
     : ElectrodeElement< T >( socObject, thermalState, observable )
 {
 }

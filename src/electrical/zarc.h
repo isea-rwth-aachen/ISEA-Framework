@@ -19,8 +19,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../object/lookup_obj1d.h"
 #include "../object/object.h"
 #include "../operators/vectorOperator.h"
-#include "../states/soc.h"
-#include "../states/thermal_state.h"
+#include "../state/soc.h"
+#include "../state/thermal_state.h"
 
 // friend
 class TestZarc;

@@ -6,7 +6,7 @@
 #include "../aging/aging_base.h"
 #include "../electrical/cellelement.h"
 #include "../electrical/twoport_with_state.h"
-#include "../states/aging_state.h"
+#include "../state/aging_state.h"
 
 namespace aging
 {
@@ -17,11 +17,11 @@ class AgingTwoPort
     AgingTwoPort( const std::vector< boost::shared_ptr< AgingBase > > &agingEffects,
                   const boost::shared_ptr< electrical::TwoPortWithState< MatrixType > > &electricalTwoPort,
                   const boost::shared_ptr< electrical::Cellelement< MatrixType > > &cell,
-                  const boost::shared_ptr< ::state::AgingState > &agingState = nullptr );
+                  const boost::shared_ptr< state::AgingState > &agingState = nullptr );
     virtual void CollectData( const double &timestep );
     virtual void ResetToPointInTime( const double &time );
     virtual void CalculateAging( const double &timestep, const double &scaleFactor );
-    virtual const boost::shared_ptr< ::state::AgingState > &GetAgingState() const;
+    virtual const boost::shared_ptr< state::AgingState > &GetAgingState() const;
     virtual const boost::shared_ptr< electrical::TwoPortWithState< MatrixType > > &GetTwoPort() const;
     virtual const std::vector< boost::shared_ptr< AgingBase > > &GetAgingEffects() const;
     virtual void SetAgingEffects( const std::vector< boost::shared_ptr< AgingBase > > &agingEffects );
@@ -44,7 +44,7 @@ class AgingTwoPort
     boost::shared_ptr< electrical::TwoPortWithState< MatrixType > > mElectricalTwoPort;
     aging::TwoportState mTwoportState;
     aging::TwoportState mCellState;
-    boost::shared_ptr< ::state::AgingState > mAgingState;
+    boost::shared_ptr< state::AgingState > mAgingState;
 
     /// used to calculate the charge throughput
     double mPreviousStoredCharge;
@@ -55,17 +55,17 @@ template < typename MatrixType >
 AgingTwoPort< MatrixType >::AgingTwoPort( const std::vector< boost::shared_ptr< AgingBase > > &agingEffects,
                                           const boost::shared_ptr< electrical::TwoPortWithState< MatrixType > > &electricalTwoPort,
                                           const boost::shared_ptr< electrical::Cellelement< MatrixType > > &cell,
-                                          const boost::shared_ptr< ::state::AgingState > &agingState )
+                                          const boost::shared_ptr< state::AgingState > &agingState )
     : mAgingEffects( agingEffects )
     , mChildren()
     , mElectricalTwoPort( electricalTwoPort )
     , mAgingState( agingState )
-    , mPreviousStoredCharge( mElectricalTwoPort->GetSoc()->template GetValue< electrical::state::SocGetFormat::AS >() )
+    , mPreviousStoredCharge( mElectricalTwoPort->GetSoc()->template GetValue< state::SocGetFormat::AS >() )
     , mChargeThroughputSinceAgingStep( 0.0 )
 {
     if ( !mAgingState )
     {
-        mAgingState = boost::make_shared< ::state::AgingState >( 0, 0 );
+        mAgingState = boost::make_shared< state::AgingState >( 0, 0 );
     }
     BuildTwoportState( *mElectricalTwoPort, *cell );
 };
@@ -155,7 +155,7 @@ void AgingTwoPort< MatrixType >::CalculateAging( const double &timestep, const d
 }
 
 template < typename MatrixType >
-const boost::shared_ptr< ::state::AgingState > &AgingTwoPort< MatrixType >::GetAgingState() const
+const boost::shared_ptr< state::AgingState > &AgingTwoPort< MatrixType >::GetAgingState() const
 {
     return mAgingState;
 }
@@ -181,13 +181,13 @@ void AgingTwoPort< MatrixType >::SetAgingEffects( const std::vector< boost::shar
 template < typename MatrixType >
 void AgingTwoPort< MatrixType >::ApplyAging( const double &timestep, const double &scaleFactor )
 {
-    mElectricalTwoPort->GetSoc()->template SetCapacityFactor< electrical::state::SocSetFormat::ABSOLUT >(
+    mElectricalTwoPort->GetSoc()->template SetCapacityFactor< state::SocSetFormat::ABSOLUT >(
      this->mAgingState->GetCapacityFactor() );
     mElectricalTwoPort->SetResistanceFactor( this->mAgingState->GetResistanceFactor() );
-    mElectricalTwoPort->GetSoc()->template SetOffset< electrical::state::SocSetFormat::ABSOLUT >( this->mAgingState->GetSocOffset() );
+    mElectricalTwoPort->GetSoc()->template SetOffset< state::SocSetFormat::ABSOLUT >( this->mAgingState->GetSocOffset() );
 
-    this->mAgingState->SetChargeThroughput( mChargeThroughputSinceAgingStep * scaleFactor, ::state::AgingStateSetFormat::DELTA );
-    this->mAgingState->SetCellAge( timestep * scaleFactor, ::state::AgingStateSetFormat::DELTA );
+    this->mAgingState->SetChargeThroughput( mChargeThroughputSinceAgingStep * scaleFactor, state::AgingStateSetFormat::DELTA );
+    this->mAgingState->SetCellAge( timestep * scaleFactor, state::AgingStateSetFormat::DELTA );
     mChargeThroughputSinceAgingStep = 0;
     mTwoportState.mCellAge = mAgingState->mCellAge;
     mTwoportState.mChargeThroughput = mAgingState->mChargeThroughput;
@@ -226,64 +226,64 @@ void AgingTwoPort< MatrixType >::CalculateCellCapacity()
     double minVoltage = voltageRange.first;
     double maxVoltage = voltageRange.second;
 
-    boost::shared_ptr< electrical::state::Soc > anodeSoc = cell->GetAnodeElements().front()->GetSoc();
-    boost::shared_ptr< electrical::state::Soc > cathodeSoc = cell->GetCathodeElements().front()->GetSoc();
-    boost::shared_ptr< electrical::state::Soc > cellSoc = cell->GetSoc();
+    boost::shared_ptr< state::Soc > anodeSoc = cell->GetAnodeElements().front()->GetSoc();
+    boost::shared_ptr< state::Soc > cathodeSoc = cell->GetCathodeElements().front()->GetSoc();
+    boost::shared_ptr< state::Soc > cellSoc = cell->GetSoc();
 
-    double storedChargeAnode = anodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
-    double storedChargeCathode = cathodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
-    double anodeChargeUntilMinimum = storedChargeAnode - anodeSoc->GetMinimumValue< ::electrical::state::SocGetFormat::AS >();
+    double storedChargeAnode = anodeSoc->GetValue< state::SocGetFormat::AS >();
+    double storedChargeCathode = cathodeSoc->GetValue< state::SocGetFormat::AS >();
+    double anodeChargeUntilMinimum = storedChargeAnode - anodeSoc->GetMinimumValue< state::SocGetFormat::AS >();
     double cathodeChargeUntilMinimum =
-     storedChargeCathode - cathodeSoc->GetMinimumValue< ::electrical::state::SocGetFormat::AS >();
+     storedChargeCathode - cathodeSoc->GetMinimumValue< state::SocGetFormat::AS >();
 
     // set the charge to the lowest possible value and then increase it until the minimum voltage is reached
     double chargeUntilMinimum = std::min( anodeChargeUntilMinimum, cathodeChargeUntilMinimum );
-    anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeUntilMinimum );
-    cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeUntilMinimum );
+    anodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeUntilMinimum );
+    cathodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeUntilMinimum );
 
     // Add charge to the electrodes until the minimum voltage is reached. Then revert charge to the last value
     // before the voltage was reached and repeat with a smaller charge step.
-    double initialChargeStep = cellSoc->template GetInitialCapacity< electrical::state::SocGetFormat::AS >() / 100;
+    double initialChargeStep = cellSoc->template GetInitialCapacity< state::SocGetFormat::AS >() / 100;
     double minimumChargeStep = 1;
     for ( double chargeStep = initialChargeStep; chargeStep >= minimumChargeStep; chargeStep /= 10 )
     {
         do
         {
-            anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( chargeStep );
-            cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( chargeStep );
+            anodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( chargeStep );
+            cathodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( chargeStep );
         } while ( cell->GetOcvVoltageValue() < minVoltage );
-        anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeStep );
-        cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeStep );
+        anodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeStep );
+        cathodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeStep );
     }
-    double minAnodeCharge = anodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
+    double minAnodeCharge = anodeSoc->GetValue< state::SocGetFormat::AS >();
 
     // set the charge to the highest possible value and then decrease it until the maximum voltage is reached
-    double anodeChargeUntilMaximum = anodeSoc->GetMaximumValue< ::electrical::state::SocGetFormat::AS >() - storedChargeAnode;
-    double cathodeChargeUntilMaximum = cathodeSoc->GetMaximumValue< ::electrical::state::SocGetFormat::AS >() - storedChargeCathode;
+    double anodeChargeUntilMaximum = anodeSoc->GetMaximumValue< state::SocGetFormat::AS >() - storedChargeAnode;
+    double cathodeChargeUntilMaximum = cathodeSoc->GetMaximumValue< state::SocGetFormat::AS >() - storedChargeCathode;
     double chargeUntilMaximum = std::min( anodeChargeUntilMaximum, cathodeChargeUntilMaximum );
-    anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( storedChargeAnode + chargeUntilMaximum );
-    cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( storedChargeCathode + chargeUntilMaximum );
+    anodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode + chargeUntilMaximum );
+    cathodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeCathode + chargeUntilMaximum );
 
     for ( double chargeStep = initialChargeStep; chargeStep >= minimumChargeStep; chargeStep /= 10 )
     {
         do
         {
-            anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeStep );
-            cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( -chargeStep );
+            anodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeStep );
+            cathodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( -chargeStep );
         } while ( cell->GetOcvVoltageValue() > maxVoltage );
-        anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( chargeStep );
-        cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::DELTA >( chargeStep );
+        anodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( chargeStep );
+        cathodeSoc->SetStoredEnergy< state::SocSetFormat::DELTA >( chargeStep );
     }
-    double maxAnodeCharge = anodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
+    double maxAnodeCharge = anodeSoc->GetValue< state::SocGetFormat::AS >();
 
     // restore electrode SOCs and system state
-    anodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( storedChargeAnode );
-    cathodeSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( storedChargeCathode );
+    anodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode );
+    cathodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeCathode );
 
     // finally set the new cell capacity
-    // cellSoc->template SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( storedChargeAnode - minAnodeCharge );
+    // cellSoc->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode - minAnodeCharge );
     this->mAgingState->SetCapacityFactor( ( maxAnodeCharge - minAnodeCharge ) /
-                                          cellSoc->GetInitialCapacity< electrical::state::SocGetFormat::AS >() );
+                                          cellSoc->GetInitialCapacity< state::SocGetFormat::AS >() );
 }
 
 template < typename MatrixType >

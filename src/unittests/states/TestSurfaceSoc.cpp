@@ -13,7 +13,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <boost/shared_ptr.hpp>
 
 //ETC
-#include "../../states/surface_soc.h"
+#include "../../state/surface_soc.h"
 #include "../../electrical/ohmicresistance.h"
 #include "../../electrical/voltagesource.h"
 #include "../../object/const_obj.h"
@@ -22,7 +22,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 void TestSurfaceSoc::testCreation()
 {
     typedef object::ConstObj<double> CObj;
-    electrical::state::SurfaceSoc surfaceSoc;
+    state::SurfaceSoc surfaceSoc;
 
     boost::shared_ptr< CObj> cObj( new CObj( 10.0 ) );
     surfaceSoc.SetReverseLookup(cObj);
@@ -34,7 +34,7 @@ void TestSurfaceSoc::testCreation1DLookup()
 {
     typedef object::LookupObj1D<double> LObj;
     typedef object::ConstObj<double> CObj;
-    electrical::state::SurfaceSoc surfaceSoc;
+    state::SurfaceSoc surfaceSoc;
     std::vector< electrical::TwoPort<myMatrixType> *> vec;
     const double voltageValue = 3.5501;
     const double socData[] = {2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30, 32.5, 35, 37.5, 40, 42.5, 45, 47.5, 50, 52.5, 55, 57.5, 60, 62.5, 65, 67.5, 70, 72.5, 75, 77.5, 80, 82.5, 85, 87.5, 90, 92.5, 95, 97.5, 100};

@@ -4,8 +4,8 @@
 #ifndef XMLPARAMETERRIMPLTINY_H_
 #define XMLPARAMETERRIMPLTINY_H_
 
+#include "../../../libraries/tinyxml2/tinyxml2.h"
 #include "../xmlparameter.h"
-#include "tinyxml2.h"
 
 namespace xmlparser
 {

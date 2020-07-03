@@ -23,16 +23,18 @@
 
 #include "../../electrical/electrical_data_struct.h"
 
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 
 #include "../../object/const_obj.h"
+#include "../../object/expression_obj.h"
 #include "../../object/function_obj1d.h"
 #include "../../object/lookup_obj1d.h"
 #include "../../object/lookup_obj1d_with_state.h"
 #include "../../object/lookup_obj2d.h"
 #include "../../object/lookup_obj2d_with_state.h"
 #include "../../object/multi_obj.h"
+
 
 #include "../../exceptions/error_proto.h"
 #include "../../operators/vectorOperator.h"
@@ -59,7 +61,7 @@ struct ArgumentTypeObject
     boost::shared_ptr< ElectricalDataStruct< ScalarUnit > > mElectricalDataStruct =
      boost::shared_ptr< ElectricalDataStruct< ScalarUnit > >( new ElectricalDataStruct< ScalarUnit > );
 
-    boost::shared_ptr< ::state::State > mSoc;
+    boost::shared_ptr< state::State > mSoc;
     bool mSetReverseLookUp;
 };
 
@@ -78,9 +80,9 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
     /**
      * Classwrapper constructor.
      * The factory is supplied via parameter and is used for other instances ctor parameters.
-     * @param stateFactory A Factory for class in the ::state namespace
+     * @param stateFactory A Factory for class in the state namespace
      */
-    ObjectClassWrapperBase( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapperBase( Factory< state::State, ArgumentTypeState >* stateFactory,
                             Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : mStateFactory( stateFactory )
         , mObjectFactory( objectFactory )
@@ -88,8 +90,8 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
     }
 
     protected:
-    /// Get a ::state::State Factory.
-    Factory< ::state::State, ArgumentTypeState >* GetStateFactory() { return mStateFactory; }
+    /// Get a state::State Factory.
+    Factory< state::State, ArgumentTypeState >* GetStateFactory() { return mStateFactory; }
     Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* GetObjectFactory() { return mObjectFactory; }
 
     void ConvertDouble2ObjectPointer( double address, Object< ValueT >* obj )
@@ -174,7 +176,7 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
     }
 
     private:
-    Factory< ::state::State, ArgumentTypeState >* const mStateFactory;
+    Factory< state::State, ArgumentTypeState >* const mStateFactory;
     Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* const mObjectFactory;
 };
 
@@ -184,7 +186,7 @@ template < typename ValueT, template < typename > class TConcrete >
 class ObjectClassWrapper : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -196,7 +198,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, ConstObj > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -234,7 +236,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, MultiObj > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -310,7 +312,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, LookupObj1D > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -351,7 +353,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, LookupObj1dWithState > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -367,7 +369,7 @@ class ObjectClassWrapper< ValueT, LookupObj1dWithState > : public ObjectClassWra
 
         ArgumentTypeState stateArg;
 
-        boost::shared_ptr< ::state::State > state;
+        boost::shared_ptr< state::State > state;
 
         std::vector< ValueT > lookupData = param->GetElementDoubleVecValue( "LookupData" );
         std::vector< ValueT > measurementPoints = param->GetElementDoubleVecValue( "MeasurementPoints" );
@@ -413,7 +415,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, LookupObj2D > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -456,7 +458,7 @@ template < typename ValueT >
 class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWrapperBase< ValueT >
 {
     public:
-    ObjectClassWrapper( Factory< ::state::State, ArgumentTypeState >* stateFactory,
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
                         Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
         : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
     {
@@ -465,7 +467,7 @@ class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWra
     boost::shared_ptr< Object< ValueT > >
     CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeObject< ValueT >* arg = 0 )
     {
-        boost::shared_ptr< ::state::State > soc;
+        boost::shared_ptr< state::State > soc;
 
         ArgumentTypeState stateArg;
         if ( arg )
@@ -483,7 +485,7 @@ class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWra
 
         const auto rowStateNode = param->GetElementChild( "RowState" );
 
-        boost::shared_ptr< ::state::State > rowstate;
+        boost::shared_ptr< state::State > rowstate;
 
         if ( rowStateNode->HasElementAttribute( "cacheref", "Soc" ) && soc )
             rowstate = soc;
@@ -493,7 +495,7 @@ class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWra
 
         const auto colStateNode = param->GetElementChild( "ColState" );
 
-        boost::shared_ptr< ::state::State > colstate;
+        boost::shared_ptr< state::State > colstate;
 
         if ( colStateNode->HasElementAttribute( "cacheref", "Soc" ) && soc )
             colstate = soc;

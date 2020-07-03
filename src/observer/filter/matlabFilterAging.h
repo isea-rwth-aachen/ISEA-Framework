@@ -25,11 +25,7 @@ class MatlabFilterAging : public MatlabFilter< T, aging::AgingTwoPort, Preparati
     public:
     MatlabFilterAging( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" );
 
-    virtual ~MatlabFilterAging() { WriteToDisk(); }
-
-    virtual void WriteToDisk();
-
-    virtual void MaxSampleReached( size_t nextNumber );
+    virtual ~MatlabFilterAging() { this->WriteToDisk(); }
 
     virtual void PrepareFilter( PreparationType< T > &prePareData );
 
@@ -41,9 +37,6 @@ class MatlabFilterAging : public MatlabFilter< T, aging::AgingTwoPort, Preparati
     virtual void VisitGenericAging( aging::GenericAging &genericAging );
 
     private:
-    void InitializeVectors( const size_t vectorSizes );
-
-    size_t mVectorSizes;
     size_t mCellNumber;
 
     // general
@@ -77,55 +70,41 @@ class MatlabFilterAging : public MatlabFilter< T, aging::AgingTwoPort, Preparati
     std::vector< std::vector< double > > mGenericCapacityFactors;
     std::vector< std::vector< double > > mGenericSocOffsets;
     std::vector< std::vector< double > > mGenericResistanceFactors;
-
-    std::vector< std::pair< std::vector< std::vector< double > > *, std::string > > mMatlabVectors;
 };
 
 template < typename T >
 MatlabFilterAging< T >::MatlabFilterAging( std::string filename, const size_t maxSize, const std::string &filenamePrefix )
     : MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >( filename, maxSize, filenamePrefix )
-    , mVectorSizes( 0 )
 {
+    this->mMatlabMatrices = {{&mCellAgeValues, "CellAge"},
+                             {&mChargeThroughputValues, "ChargeThroughput"},
+                             {&mFullCycles, "FullCycles"},
+                             {&mCapacityFactors, "RelativeCapacity"},
+                             {&mResistanceFactors, "RelativeResistance"},
+                             {&mSocOffsets, "SocOffset"},
+                             {&mCapacityFactorCalendarian, "calendric.CapacityFactor"},
+                             {&mResistanceFactorCalendarian, "calendric.ResistanceFactor"},
+                             {&mAlphaCapacity, "calendric.AlphaCapacity"},
+                             {&mAlphaResistance, "calendric.AlphaResistance"},
+                             {&mSocOffsetCalendarian, "calendric.SocOffset"},
+                             {&mCapacityFactorCyclical, "cyclic.CapacityFactor"},
+                             {&mResistanceFactorCyclical, "cyclic.ResistanceFactor"},
+                             {&mBetaCapacity, "cyclic.BetaCapacity"},
+                             {&mBetaResistance, "cyclic.BetaResistance"},
+                             {&mSocOffsetCyclical, "cyclic.SocOffset"},
+                             {&mAnodeOverhangSocs, "anodeOverhang.AnodeOverhangSoc"},
+                             {&mAnodeOverhangVoltages, "anodeOverhang.AnodeOverhangVoltage"},
+                             {&mAnodeOverhangAnodeOffsets, "anodeOverhang.AnodeSocOffset"},
+                             {&mGenericCapacityFactors, "genericAging.CapacityFactor"},
+                             {&mGenericSocOffsets, "genericAging.SocOffset"},
+                             {&mGenericResistanceFactors, "genericAging.ResistanceFactor"}};
 }
 
 template < typename T >
 void MatlabFilterAging< T >::PrepareFilter( PreparationType< T > &prePareData )
 {
     MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >::PrepareFilter( prePareData );
-    mMatlabVectors = {{&mCellAgeValues, "CellAge"},
-                      {&mChargeThroughputValues, "ChargeThroughput"},
-                      {&mFullCycles, "FullCycles"},
-                      {&mCapacityFactors, "RelativeCapacity"},
-                      {&mResistanceFactors, "RelativeResistance"},
-                      {&mSocOffsets, "SocOffset"},
-                      {&mCapacityFactorCalendarian, "calendric.CapacityFactor"},
-                      {&mResistanceFactorCalendarian, "calendric.ResistanceFactor"},
-                      {&mAlphaCapacity, "calendric.AlphaCapacity"},
-                      {&mAlphaResistance, "calendric.AlphaResistance"},
-                      {&mSocOffsetCalendarian, "calendric.SocOffset"},
-                      {&mCapacityFactorCyclical, "cyclic.CapacityFactor"},
-                      {&mResistanceFactorCyclical, "cyclic.ResistanceFactor"},
-                      {&mBetaCapacity, "cyclic.BetaCapacity"},
-                      {&mBetaResistance, "cyclic.BetaResistance"},
-                      {&mSocOffsetCyclical, "cyclic.SocOffset"},
-                      {&mAnodeOverhangSocs, "anodeOverhang.AnodeOverhangSoc"},
-                      {&mAnodeOverhangVoltages, "anodeOverhang.AnodeOverhangVoltage"},
-                      {&mAnodeOverhangAnodeOffsets, "anodeOverhang.AnodeSocOffset"},
-                      {&mGenericCapacityFactors, "genericAging.CapacityFactor"},
-                      {&mGenericSocOffsets, "genericAging.SocOffset"},
-                      {&mGenericResistanceFactors, "genericAging.ResistanceFactor"}};
-
-    InitializeVectors( prePareData.mNumberOfElements );
-}
-
-template < typename T >
-void MatlabFilterAging< T >::InitializeVectors( const size_t vectorSizes )
-{
-    for ( auto &pair : mMatlabVectors )
-    {
-        pair.first->resize( vectorSizes );
-    }
-    this->mVectorSizes = vectorSizes;
+    this->InitializeMatrices( prePareData.mNumberOfElements );
 }
 
 template < typename T >
@@ -137,8 +116,7 @@ void MatlabFilterAging< T >::ProcessData( const typename FilterT::Data_t &data, 
         const auto &agingState = *agingTwoPort->GetAgingState();
         const double chargeThroughput = agingState.GetChargeThroughput() / 3600;
         const double fullCycles =
-         chargeThroughput /
-         agingTwoPort->GetTwoPort()->GetSoc()->template GetInitialCapacity< ::electrical::state::SocGetFormat::AH >();
+         chargeThroughput / agingTwoPort->GetTwoPort()->GetSoc()->template GetInitialCapacity< state::SocGetFormat::AH >();
 
         mCellAgeValues[i].push_back( agingState.GetCellAge() / 3600 / 24 );
         mChargeThroughputValues[i].push_back( chargeThroughput );
@@ -155,38 +133,6 @@ void MatlabFilterAging< T >::ProcessData( const typename FilterT::Data_t &data, 
         }
     }
     MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >::ProcessData( data, t );
-}
-
-template < typename T >
-void MatlabFilterAging< T >::WriteToDisk()
-{
-    MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >::WriteToDisk();
-
-    for ( auto &pair : mMatlabVectors )
-    {
-        auto &vec = *pair.first;
-        /// remove empty vectors if some AgingTwoPorts don't have all types of AgingEffect
-        vec.erase( std::remove_if( vec.begin(), vec.end(), []( std::vector< double > &v ) { return v.empty(); } ), vec.end() );
-        if ( !vec.empty() )
-        {
-            *this->mMatFile << matlab::MatioData( vec, this->mDataLocation + pair.second );
-        }
-    }
-}
-
-template < typename T >
-void MatlabFilterAging< T >::MaxSampleReached( size_t nextNumber )
-{
-    WriteToDisk();
-    this->mMatFile.reset( new matlab::MatFile( this->MakeFilename( nextNumber ), MAT_ACC_RDWR ) );
-
-    for ( auto &pair : mMatlabVectors )
-    {
-        for ( size_t i = 0; i < mVectorSizes; ++i )
-        {
-            pair.first->at( i ).clear();
-        }
-    }
 }
 
 template < typename T >

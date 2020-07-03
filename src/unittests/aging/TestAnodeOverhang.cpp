@@ -5,11 +5,11 @@
 void TestAnodeOverhang::testNoAging()
 {
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 1.0, -3.0, 0.5 );
-    auto socState = boost::make_shared< electrical::state::Soc >( 10.0, 10.0, 50.0 );
+    auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
     auto voltageObj = boost::make_shared< object::ConstObj< double > >( 3.0 );
-    auto overhangSoc = boost::make_shared< electrical::state::Soc >( 3.0, 3.0, 50.0 );
+    auto overhangSoc = boost::make_shared< state::Soc >( 3.0, 3.0, 50.0 );
     double tauCoef = 5.0;
     double activCoef = 2.3;
     {    // aging is disabled
@@ -42,7 +42,7 @@ void TestAnodeOverhang::testInitialOffset()
     double initialSoc = 60.0;
     double overhangCapacity = 3.0;
     auto voltageObj = boost::make_shared< object::ConstObj< double > >( 3.0 );
-    auto overhangSoc = boost::make_shared< electrical::state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
+    auto overhangSoc = boost::make_shared< state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
     double tauCoef = 5.0;
     double activCoef = 2.3;
     aging::AnodeOverhang aging( 10.0, voltageObj, activCoef, tauCoef, overhangSoc, socWithoutOffset, true );
@@ -57,14 +57,14 @@ void TestAnodeOverhang::testAgingCalculation()
     double initialSoc = 60.0;
     double overhangCapacity = 3.0;
     auto voltageObj = boost::make_shared< object::ConstObj< double > >( 3.0 );
-    auto overhangSoc = boost::make_shared< electrical::state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
+    auto overhangSoc = boost::make_shared< state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
     double tauCoef = 5.0;
     double activCoef = 2.3;
     double offset = ( socWithoutOffset - initialSoc ) / 100 * overhangCapacity * 3600;
     aging::AnodeOverhang aging( 10.0, voltageObj, activCoef, tauCoef, overhangSoc, socWithoutOffset, true );
 
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 1.0, -2.7, 0.5 );
-    auto socState = boost::make_shared< electrical::state::Soc >( 10.0, 10.0, 50.0 );
+    auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
 
@@ -91,14 +91,14 @@ void TestAnodeOverhang::testReset()
     double initialSoc = 60.0;
     double overhangCapacity = 3.0;
     auto voltageObj = boost::make_shared< object::ConstObj< double > >( 3.0 );
-    auto overhangSoc = boost::make_shared< electrical::state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
+    auto overhangSoc = boost::make_shared< state::Soc >( overhangCapacity, overhangCapacity, initialSoc );
     double tauCoef = 5.0;
     double activCoef = 2.3;
     double offset = ( socWithoutOffset - initialSoc ) / 100 * overhangCapacity * 3600;
     aging::AnodeOverhang aging( 10.0, voltageObj, activCoef, tauCoef, overhangSoc, socWithoutOffset, true );
 
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 1.0, -2.7, 0.5 );
-    auto socState = boost::make_shared< electrical::state::Soc >( 10.0, 10.0, 50.0 );
+    auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
 

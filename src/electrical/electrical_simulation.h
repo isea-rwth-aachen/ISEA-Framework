@@ -87,8 +87,8 @@ class ElectricalSimulation
     // Internal data
     boost::shared_ptr< electrical::TwoPort< Matrix > > mRootTwoPort;
     std::vector< boost::shared_ptr< ::electrical::Cellelement< Matrix > > > mCellElements;
-    std::vector< boost::shared_ptr< ::electrical::state::Soc > > mSocStates;
-    std::vector< boost::shared_ptr< ::state::ThermalState< double > > > mThermalStates;
+    std::vector< boost::shared_ptr< state::Soc > > mSocStates;
+    std::vector< boost::shared_ptr< state::ThermalState< double > > > mThermalStates;
     // Electrical system with states
     boost::shared_ptr< systm::GeneralizedSystem< Matrix > > mEqSystem;
     boost::shared_ptr< observer::TwoPortObserver< Matrix > > mObserver;
@@ -140,7 +140,7 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
         factoryBuilder = scopedFactoryBuilder.get();
     }
 
-    factory::Factory< ::state::State, factory::ArgumentTypeState > *stateFactory = factoryBuilder->BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState > *stateFactory = factoryBuilder->BuildStateFactory();
     factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > > *objectFactory =
      factoryBuilder->BuildObjectFactory();
     factory::Factory< electrical::TwoPort< Matrix >, factory::ArgumentTypeElectrical > *electricalFactory =
@@ -211,17 +211,17 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
 
     // Store thermal states, SoC states and cell elements from electrical state factory
     mThermalStates.reserve( stateFactory->GetObjectsOfClass( "ThermalState" ).size() );
-    BOOST_FOREACH ( const boost::shared_ptr< ::state::State > &thermalStateFromFactory, stateFactory->GetObjectsOfClass( "ThermalState" ) )
+    BOOST_FOREACH ( const boost::shared_ptr< state::State > &thermalStateFromFactory, stateFactory->GetObjectsOfClass( "ThermalState" ) )
         mThermalStates.push_back(
-         boost::static_pointer_cast< ::state::ThermalState< double >, ::state::State >( thermalStateFromFactory ) );
+         boost::static_pointer_cast< state::ThermalState< double >, state::State >( thermalStateFromFactory ) );
 
     const size_t numberOfSocObject = stateFactory->GetObjectsOfClass( "Soc" ).size();
     mSocStates.reserve( numberOfSocObject );
     mCapcityValues.resize( numberOfSocObject );
 
-    BOOST_FOREACH ( const boost::shared_ptr< ::state::State > &socStateFromFactory,
+    BOOST_FOREACH ( const boost::shared_ptr< state::State > &socStateFromFactory,
                     stateFactory->GetObjectsOfClass( "Soc" ) )
-        mSocStates.push_back( boost::static_pointer_cast< electrical::state::Soc, ::state::State >( socStateFromFactory ) );
+        mSocStates.push_back( boost::static_pointer_cast< state::Soc, state::State >( socStateFromFactory ) );
 
     mCellElements.reserve( electricalFactory->GetObjectsOfClass( "CellElement" ).size() );
     BOOST_FOREACH ( const boost::shared_ptr< ::electrical::TwoPort< Matrix > > &twoPortFromFactory,
@@ -427,12 +427,12 @@ void ElectricalSimulation< Matrix, T, filterTypeChoice >::ResetStatesToPointOfTi
         const T newSocValue = mSocValuesSteps[index][i] * factor1 + mSocValuesSteps[index + 1][i] * factor2;
         const T deltaCapacityASec =
          ( newSocValue - mSocValuesSteps[mNumberOfSteps - 1][i] ) / 100.0 * mSocStates[i]->GetActualCapacity();
-        mSocStates[i]->SetStoredEnergy< ::electrical::state::SocSetFormat::DELTA >( deltaCapacityASec );
+        mSocStates[i]->SetStoredEnergy< state::SocSetFormat::DELTA >( deltaCapacityASec );
     }
     UpdateSystemValues();
     UpdateSystem();
 
-    BOOST_FOREACH ( boost::shared_ptr< ::state::ThermalState< double > > &thermalState, mThermalStates )
+    BOOST_FOREACH ( boost::shared_ptr< state::ThermalState< double > > &thermalState, mThermalStates )
         thermalState->ResetPowerDissipationToTime( time );
 }
 
@@ -440,14 +440,14 @@ template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::SaveCapacityForLaterReset()
 {
     for ( size_t i = 0; i < mSocStates.size(); ++i )
-        mCapcityValues[i] = mSocStates[i]->template GetValue< ::electrical::state::SocGetFormat::AS >();
+        mCapcityValues[i] = mSocStates[i]->template GetValue< state::SocGetFormat::AS >();
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::LoadCapacityForLaterReset()
 {
     for ( size_t i = 0; i < mSocStates.size(); ++i )
-        mSocStates[i]->template SetStoredEnergy< ::electrical::state::SocSetFormat::ABSOLUT >( mCapcityValues[i] );
+        mSocStates[i]->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( mCapcityValues[i] );
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >

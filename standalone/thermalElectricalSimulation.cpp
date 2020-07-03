@@ -1,12 +1,12 @@
-#include "standalone.h"
+#include "standalone/thermal_electrical_standalone.h"
 
 int main( int argc, char *argv[] )
 {
-    standalone::Standalone thElStandalone( "ISEA-Framework Thermal-Electrical Simulation Standalone" );
+    standalone::ThermalElectricalStandalone thElStandalone( "ISEA-Framework Thermal-Electrical Simulation Standalone" );
     if ( !thElStandalone.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
 
-    thElStandalone.ReadOptions();
+    thElStandalone.ReadXmlOptions();
 
     if ( !thElStandalone.CreateElectricalSimulation() )
         return EXIT_FAILURE;

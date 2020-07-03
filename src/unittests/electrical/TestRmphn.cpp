@@ -21,7 +21,7 @@ extern template class electrical::ParallelRC< myMatrixType >;
 extern template class systm::StateSystemGroup< myMatrixType >;
 extern template class object::Object< double >;
 extern template class object::ConstObj< double >;
-extern template class factory::Factory< ::state::State, ::factory::ArgumentTypeState >;
+extern template class factory::Factory< state::State, ::factory::ArgumentTypeState >;
 extern template class factory::Factory< ::object::Object< double >, ::factory::ArgumentTypeObject< double > >;
 extern template class factory::Factory< ::electrical::TwoPort< myMatrixType >, ::factory::ArgumentTypeElectrical >;
 

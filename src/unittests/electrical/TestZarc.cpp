@@ -44,9 +44,9 @@ std::vector< double > CreateCols()
 
 void TestZarc::testZarcCreation()
 {
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
 
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 10, 10, 0.5 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 10, 10, 0.5 ) );
 
     std::vector< std::vector< double > > mPoints = CreatemPoints();
     std::vector< double > rows = CreateRows();
@@ -66,9 +66,9 @@ void TestZarc::testZarcCreation()
 
 void TestZarc::testZarcOperations()
 {
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
 
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 10, 10, 0.5 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 10, 10, 0.5 ) );
 
     std::vector< std::vector< double > > mPoints = CreatemPoints();
     std::vector< double > rows = CreateRows();

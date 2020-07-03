@@ -93,7 +93,7 @@ void TestTwoPortsWithChildren::testTwoPortWithSoc()
     double current = 0.5;
     double timestep = 0.2;
 
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( capacity, capacity, initialSoc ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( capacity, capacity, initialSoc ) );
     boost::scoped_ptr< systm::StateSystemGroup< myMatrixType > > stateSystemGroup( new systm::StateSystemGroup< myMatrixType >() );
 
     electrical::TwoPortWithState< myMatrixType > port( socState, nullptr );

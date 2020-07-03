@@ -1,12 +1,12 @@
-#include "standalone.h"
+#include "standalone/electrical_standalone.h"
 
 int main( int argc, char *argv[] )
 {
-    standalone::Standalone electricalStandalone( "ISEA-Framework Electrical Simulation Standalone" );
+    standalone::ElectricalStandalone electricalStandalone( "ISEA-Framework Electrical Simulation Standalone" );
     if ( !electricalStandalone.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
 
-    electricalStandalone.ReadOptions();
+    electricalStandalone.ReadXmlOptions();
 
     if ( !electricalStandalone.CreateElectricalSimulation() )
         return EXIT_FAILURE;

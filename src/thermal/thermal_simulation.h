@@ -315,12 +315,12 @@ ThermalSimulation< Matrix, T, filterTypeChoice >::ThermalSimulation(
         else
         {
             *conductivity = {mThermalSystem->GetOdeSystemSize(), std::vector< double >( mThermalSystem->GetOdeSystemSize(), 0 )};
-            auto conMat = mThermalSystem->GetA_th_Conductivity();
+            const auto &conMat = mThermalSystem->GetA_th_Conductivity();
             for ( size_t i = 0; i < mThermalSystem->GetOdeSystemSize(); ++i )
             {
-                for ( size_t j = 0; j < conMat[i].size(); ++j )
+                for ( size_t j = 0; j < mThermalSystem->GetOdeSystemSize(); ++j )
                 {
-                    conductivity->at( i ).at( conMat[i][j].mIndex ) = conMat[i][j].mValue;
+                    conductivity->at( i ).at( j ) = conMat( i, j );
                 }
             }
         }
@@ -367,7 +367,7 @@ bool ThermalSimulation< Matrix, T, filterTypeChoice >::CheckIfSimulationTimeHasE
 template < typename Matrix, typename T, bool filterTypeChoice >
 void ThermalSimulation< Matrix, T, filterTypeChoice >::UpdateAllThermalStatesTemperatures()
 {
-    BOOST_FOREACH ( boost::shared_ptr< ::state::ThermalState< T > > &thermalstate, mThermalStates )
+    BOOST_FOREACH ( boost::shared_ptr< state::ThermalState< T > > &thermalstate, mThermalStates )
         thermalstate->ResetTemperature();
     BOOST_FOREACH ( thermal::ThermalElement< T > *thermalElement, mConnectedThermalElements )
         thermalElement->UpdateThermalStateTemperature();

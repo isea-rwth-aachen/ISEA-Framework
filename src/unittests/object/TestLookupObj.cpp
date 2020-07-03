@@ -12,8 +12,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <boost/shared_ptr.hpp>
 
 // ETC
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 
 #include "../../object/lookup_obj1d.h"
 #include "../../object/lookup_obj1d_with_state.h"
@@ -221,7 +221,7 @@ void TestLookupObj::testLookupObj1WithStatedCreate()
 {
     double capacity = 20.0;
     double status = 20.0;
-    boost::shared_ptr< electrical::state::Soc > testSoc( new electrical::state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
+    boost::shared_ptr< state::Soc > testSoc( new state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
 
     std::vector< double > m1 = Createm1();
     std::vector< double > f1_m = Createf1();
@@ -235,7 +235,7 @@ void TestLookupObj::testLookupObj1WithStatedOperations()
     double capacity = 20.0;
     double status = 20.0;
     double curCap = 0.3 * 3600 * capacity;
-    boost::shared_ptr< electrical::state::Soc > testSoc( new electrical::state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
+    boost::shared_ptr< state::Soc > testSoc( new state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
 
     const double m[] = {-10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120};
     std::vector< double > m1( m, m + 14 );
@@ -243,24 +243,24 @@ void TestLookupObj::testLookupObj1WithStatedOperations()
     object::LookupObj1dWithState< double > lookup( f1_m, m1, testSoc );
     TS_ASSERT_DELTA( lookup(), 0.891, 0.00001 );
 
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
     TS_ASSERT_DELTA( lookup(), 0.869, 0.00001 );
     curCap = 0.9 * 3600 * capacity;
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
     TS_ASSERT_DELTA( lookup(), 0.876, 0.00001 );
     curCap = 1.0 * 3600 * capacity;
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
     TS_ASSERT_DELTA( lookup(), 0.923, 0.00001 );
 
     curCap = 1.1 * 3600 * capacity;
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
-    curCap = testSoc->GetValue< electrical::state::SocGetFormat::AS >();
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
+    curCap = testSoc->GetValue< state::SocGetFormat::AS >();
     TS_ASSERT_DELTA( curCap, 1.1 * 3600 * capacity, 0.00001 );
     TS_ASSERT_DELTA( lookup(), 0.9980, 0.00001 );
 
     curCap = 1.2 * 3600 * capacity;
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
-    curCap = testSoc->GetValue< electrical::state::SocGetFormat::AS >();
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
+    curCap = testSoc->GetValue< state::SocGetFormat::AS >();
     TS_ASSERT_DELTA( curCap, 1.2 * 3600 * capacity, 0.00001 );
     TS_ASSERT_DELTA( lookup(), 0.9980, 0.00001 );
 
@@ -278,8 +278,8 @@ void TestLookupObj::testLookupObj2WithStatedCreate()
     std::vector< double > SOC = CreateSOC();
 
 
-    boost::shared_ptr< electrical::state::Soc > testSoc( new electrical::state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
-    boost::shared_ptr< ::state::ThermalState< double > > testTemp( new ::state::ThermalState< double >( 23.0 ) );
+    boost::shared_ptr< state::Soc > testSoc( new state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
+    boost::shared_ptr< state::ThermalState< double > > testTemp( new state::ThermalState< double >( 23.0 ) );
 
     std::vector< std::vector< double > > Cd = CreateCd();
     object::LookupObj2dWithState< double > test( Cd, Temp, SOC, testTemp, testSoc );
@@ -288,7 +288,7 @@ void TestLookupObj::testLookupObj2WithStatedCreate()
     TS_ASSERT_DELTA( test(), 10800, 0.001 );
 
     curCap = 0.9 * 3600 * capacity;
-    testSoc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( curCap );
+    testSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( curCap );
     TS_ASSERT_DELTA( test(), 6363.30000000000, 0.001 );
     TS_ASSERT_EQUALS( strcmp( test.GetName(), "LookupObj2dWithState" ), 0 );
 }

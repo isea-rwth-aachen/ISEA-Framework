@@ -9,6 +9,7 @@ class TestCyclicalAging : public CxxTest::TestSuite
     void testNoAging();
     void testAgingCalculation();
     void testReset();
+    void testFormulaVariables();
 };
 
 #endif

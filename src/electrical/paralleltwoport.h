@@ -72,7 +72,6 @@ void ParallelTwoPort< T >::SetCurrent( const T current )
 
     for ( size_t i = 1; i < this->mChildren.size(); ++i )
     {
-        cur.resize( current.rows(), current.cols() );
         cur.setZero();
         cur.coeffRef( 0, this->mStateSystemGroup->mDglStateSystem.GetEquationCount() + mUIDs[i - 1] ) = 1;
         this->mChildren[i]->SetCurrent( cur );

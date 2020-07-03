@@ -747,17 +747,17 @@ void MatlabExport< matType, ExportClass, Parser, DEPTH >::CreateStates() const
 
     ( *this->mStream ) << "SOC = ";
     SerializeDataOfFunction( this->mSimulation->mSocStates,
-                             &::electrical::state::Soc::GetValue< ::electrical::state::SocGetFormat::PERCENT > );
+                             &::state::Soc::GetValue< state::SocGetFormat::PERCENT > );
     ( *this->mStream ) << "\n";
 
     ( *this->mStream ) << "CAP = ";
     SerializeDataOfFunction( this->mSimulation->mSocStates,
-                             &::electrical::state::Soc::GetInitialCapacity< ::electrical::state::SocGetFormat::AH > );
+                             &::state::Soc::GetInitialCapacity< state::SocGetFormat::AH > );
     ( *this->mStream ) << "\n";
 
     ( *this->mStream ) << "CAP_CUR = ";
     SerializeDataOfFunction( this->mSimulation->mSocStates,
-                             &::electrical::state::Soc::GetValue< ::electrical::state::SocGetFormat::AS > );
+                             &::state::Soc::GetValue< state::SocGetFormat::AS > );
     ( *this->mStream ) << "\n";
 
     ( *this->mStream ) << "T = ";
@@ -1051,7 +1051,7 @@ void MatlabExport< matType, ExportClass, Parser, DEPTH >::SerializeObjectData( c
         const size_t numberOfCols = loopUpType->GetPointsCol().size();
         const size_t numberOfRows = loopUpType->GetPointsRow().size();
         /// Check if state is SOC
-        if ( dynamic_cast< const electrical::state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
+        if ( dynamic_cast< const state::Soc * >( lookupObj2dWithState->GetStateRow() ) )
         {
 
             ( *this->mStream ) << "[";
@@ -1083,11 +1083,11 @@ void MatlabExport< matType, ExportClass, Parser, DEPTH >::SerializeObjectData( c
             }
             ( *this->mStream ) << "], ";
 
-            auto stateRow = static_cast< const electrical::state::Soc * >( lookupObj2dWithState->GetStateRow() );
+            auto stateRow = static_cast< const state::Soc * >( lookupObj2dWithState->GetStateRow() );
             auto &vecRow = this->mSimulation->mSocStates;
             auto posRow = FindPosition( vecRow, *stateRow ) + 1;
 
-            auto stateCol = static_cast< const ::state::ThermalState< double > * >( lookupObj2dWithState->GetStateCol() );
+            auto stateCol = static_cast< const state::ThermalState< double > * >( lookupObj2dWithState->GetStateCol() );
             auto &vecCol = this->mSimulation->mThermalStates;
             auto posCol = FindPosition( vecCol, *stateCol ) + 1;
 
@@ -1128,11 +1128,11 @@ void MatlabExport< matType, ExportClass, Parser, DEPTH >::SerializeObjectData( c
             }
             ( *this->mStream ) << "], ";
 
-            auto stateCol = static_cast< const electrical::state::Soc * >( lookupObj2dWithState->GetStateCol() );
+            auto stateCol = static_cast< const state::Soc * >( lookupObj2dWithState->GetStateCol() );
             auto &vecCol = this->mSimulation->mSocStates;
             auto posCol = FindPosition( vecCol, *stateCol ) + 1;
 
-            auto stateRow = static_cast< const ::state::ThermalState< double > * >( lookupObj2dWithState->GetStateRow() );
+            auto stateRow = static_cast< const state::ThermalState< double > * >( lookupObj2dWithState->GetStateRow() );
             auto &vecRow = this->mSimulation->mThermalStates;
             auto posRow = FindPosition( vecRow, *stateRow ) + 1;
 
@@ -1185,16 +1185,16 @@ void MatlabExport< matType, ExportClass, Parser, DEPTH >::SerializeObjectData( c
                 ( *this->mStream ) << ", ";
         }
         auto castObje = static_cast< const object::LookupObj1dWithState< double > * >( object );
-        if ( dynamic_cast< const electrical::state::Soc * >( castObje->GetState() ) )
+        if ( dynamic_cast< const state::Soc * >( castObje->GetState() ) )
         {
-            auto state = static_cast< const electrical::state::Soc * >( castObje->GetState() );
+            auto state = static_cast< const state::Soc * >( castObje->GetState() );
             auto &vec = this->mSimulation->mSocStates;
             auto pos = FindPosition( vec, *state );
             ( *this->mStream ) << "], SOC(" + boost::lexical_cast< std::string >( pos + 1 ) + ")";
         }
-        if ( dynamic_cast< const ::state::ThermalState< double > * >( castObje->GetState() ) )
+        if ( dynamic_cast< const state::ThermalState< double > * >( castObje->GetState() ) )
         {
-            auto state = static_cast< const ::state::ThermalState< double > * >( castObje->GetState() );
+            auto state = static_cast< const state::ThermalState< double > * >( castObje->GetState() );
             auto &vec = this->mSimulation->mThermalStates;
             auto pos = FindPosition( vec, *state );
             ( *this->mStream ) << "], T(" + boost::lexical_cast< std::string >( pos + 1 ) + ")";

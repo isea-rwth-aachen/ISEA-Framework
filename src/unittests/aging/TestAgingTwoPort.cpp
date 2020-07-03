@@ -6,7 +6,7 @@ void TestAgingTwoPort::testFactorCalculation()
 {
 #ifdef BUILD_AGING_SIMULATION
     auto thermalState = boost::shared_ptr< state::ThermalState< double > >( new state::ThermalState< double >( 20.0 ) );
-    auto socState = boost::make_shared< electrical::state::Soc >( 10.0, 10.0, 50.0 );
+    auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto cell = boost::make_shared< electrical::Cellelement< myMatrixType > >( thermalState, socState );
     auto aging1 = boost::make_shared< aging::GenericAging >( 1 );
     auto aging2 = boost::make_shared< aging::GenericAging >( 1 );

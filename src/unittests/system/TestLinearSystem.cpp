@@ -24,8 +24,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../electrical/voltagesource.h"
 #include "../../electrical/zarcalg.h"
 #include "../../object/const_obj.h"
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 #include "../../system/stateSystemGroup.h"
 #include "../../system/system.h"
 
@@ -164,8 +164,8 @@ void TestLinearSystem::testSingleAlgCellellement()
         ocvLookupData.at( i ).assign( ocv[i], ocv[i] + 10 );
 
 
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2.05, 2.05, 20 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2.05, 2.05, 20 ) );
 
     boost::shared_ptr< electrical::Cellelement< myMatrixType > > cellelem(
      new electrical::Cellelement< myMatrixType >( tempState, socState ) );

@@ -107,6 +107,7 @@ if(BUILD_UNITTESTS)
       misc/TestFindSimulationTypeThermal.xml
       misc/TestFindSimulationTypeThEl.xml
       misc/TestFindSimulationTypeAging.xml
+      export/RC.xml
       container/structWithContent.mat
       container/structWith2D.mat
       container/emptyStructs.mat)

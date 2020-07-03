@@ -4,23 +4,23 @@
 namespace factory
 {
 
-/// Builds a factory for ::state
+/// Builds a factory for state
 template < typename MatrixT, typename ValueT >
-Factory< ::state::State, ArgumentTypeState > *FactoryBuilder< MatrixT, ValueT >::BuildStateFactory()
+Factory< state::State, ArgumentTypeState > *FactoryBuilder< MatrixT, ValueT >::BuildStateFactory()
 {
     if ( mStateFactory )
         return mStateFactory.get();
 
-    mStateFactory.reset( new Factory< ::state::State, ArgumentTypeState >() );
-    Factory< ::state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
+    mStateFactory.reset( new Factory< state::State, ArgumentTypeState >() );
+    Factory< state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
 
-    stateFactory->AddWrapper( new StateClassWrapper< electrical::state::Soc >( stateFactory ), "Soc" );
-    stateFactory->AddWrapper( new StateClassWrapper< electrical::state::SurfaceSoc >( stateFactory ), "SurfaceSoc" );
-    stateFactory->AddWrapper( new StateClassWrapper< ::state::ThermalState< double > >( stateFactory ),
+    stateFactory->AddWrapper( new StateClassWrapper< state::Soc >( stateFactory ), "Soc" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::SurfaceSoc >( stateFactory ), "SurfaceSoc" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::ThermalState< double > >( stateFactory ),
                               "ThermalState" );
-    stateFactory->AddWrapper( new StateClassWrapper< ::state::ValueStateWrapper< ScalarUnit > >( stateFactory ),
+    stateFactory->AddWrapper( new StateClassWrapper< state::ValueStateWrapper< ScalarUnit > >( stateFactory ),
                               "ElectricalState" );
-    stateFactory->AddWrapper( new StateClassWrapper< ::state::AgingState >( stateFactory ), "AgingState" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::AgingState >( stateFactory ), "AgingState" );
 
     return stateFactory;
 }
@@ -35,7 +35,7 @@ Factory< object::Object< double >, ArgumentTypeObject< double > > *FactoryBuilde
         BuildStateFactory();
 
     mObjectFactory.reset( new Factory< object::Object< double >, ArgumentTypeObject< double > >() );
-    Factory< ::state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
     Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory = this->mObjectFactory.get();
 
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::ConstObj >( stateFactory, objectFactory ),
@@ -66,7 +66,7 @@ Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *FactoryBuilde
         BuildObjectFactory();
 
     mElectricalFactory.reset( new Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical >() );
-    Factory< ::state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
     Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory = this->mObjectFactory.get();
     Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory = this->mElectricalFactory.get();
 

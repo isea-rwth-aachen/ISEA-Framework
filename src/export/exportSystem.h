@@ -14,7 +14,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../electrical/twoport_withchild.h"
 #include "../exceptions/error_proto.h"
 #include "../misc/matrixInclude.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "baseExport.h"
 
 namespace symbolic

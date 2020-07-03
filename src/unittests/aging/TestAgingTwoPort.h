@@ -2,7 +2,7 @@
 #ifndef _TESTAGINGTWOPORT_
 #define _TESTAGINGTWOPORT_
 
-#include "../../states/aging_state.h"
+#include "../../state/aging_state.h"
 #include <cxxtest/TestSuite.h>
 
 class TestAgingTwoPort : public CxxTest::TestSuite
@@ -11,7 +11,7 @@ class TestAgingTwoPort : public CxxTest::TestSuite
     void testFactorCalculation();
 
     private:
-    void assertAllVariables( const boost::shared_ptr< ::state::AgingState > &agingState, double capacityFactor,
+    void assertAllVariables( const boost::shared_ptr< state::AgingState > &agingState, double capacityFactor,
                              double socOffset, double resistanceFactor );
 
     public:

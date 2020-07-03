@@ -1,4 +1,4 @@
-#include "standalone.h"
+#include "standalone/aging_standalone.h"
 
 // Global variables
 std::vector< std::vector< boost::shared_ptr< ThermalState< double > > > > thermalStatesOfCellBlocks;
@@ -57,11 +57,11 @@ void setOutputFilenames( boost::shared_ptr< xmlparser::XmlParameter > rootNode, 
 // Main function
 int main( int argc, char *argv[] )
 {
-    standalone::Standalone agingStandalone( "ISEA-Framework Aging Simulation Standalone" );
+    standalone::AgingStandalone agingStandalone( "ISEA-Framework Aging Simulation Standalone" );
     if ( !agingStandalone.ParseCommandLine( argc, argv ) )
         return EXIT_FAILURE;
 
-    agingStandalone.ReadOptions();
+    agingStandalone.ReadXmlOptions();
 
     setOutputFilenames( agingStandalone.mParser->GetRoot(), 0 );
 
@@ -71,48 +71,57 @@ int main( int argc, char *argv[] )
     agingStandalone.InitializeSimulation();
 
     // Run simulation
-    for ( size_t actualAgingStep = 0; actualAgingStep < agingStandalone.mAgingSteps; ++actualAgingStep )
-    {
-        agingStandalone.SetCollectAgingData( false );    // steady state cycles
-        for ( size_t actualCycle = 0; actualCycle < agingStandalone.mAgingCycles; ++actualCycle )
-        {
-            if ( actualCycle == agingStandalone.mSteadyStateCycles )
-                agingStandalone.SetCollectAgingData( true );
-            if ( actualCycle > 0 )
-            {
-                agingStandalone.StartNewCycle();
-            }
 
-            while ( !agingStandalone.HasElectricalSimulationEnded() )
+    // If the profile is longer than an aging step, ignore the number of cycles and aging steps,
+    // instead simulate the profile once and do aging steps during the profile
+    if ( agingStandalone.GetProfileLength() > agingStandalone.mAgingStepTime * 86400 )
+    {
+        agingStandalone.mSteadyStateCycles = 0;
+        agingStandalone.mAgingCycles = 0;
+        double agingStepTime = agingStandalone.mAgingStepTime * 86400;
+        size_t actualAgingStep = 0;
+        while ( !agingStandalone.HasElectricalSimulationEnded() )
+        {
+            while ( agingStandalone.GetTimeSinceLastAgingStep() < agingStepTime && !agingStandalone.HasElectricalSimulationEnded() )
             {
                 agingStandalone.DoElectricalStep();
                 agingStandalone.DoThermalStep();
                 agingStandalone.CollectAgingData();
+            }
+            agingStandalone.DoAgingStep( actualAgingStep, false );
+            ++actualAgingStep;
+        }
+    }
 
-                /*
-                if ( agingStandalone.mThermalSimulation->mTime >=
-                     agingStandalone.mElectricalSimulation->mSimulationDuration / 1000.0 * timeCounter )
+    // Simulate the profile for the given amount of cycles, then scale up the aging to the aging step time
+    else
+    {
+        for ( size_t actualAgingStep = 0; actualAgingStep < agingStandalone.mAgingSteps; ++actualAgingStep )
+        {
+            agingStandalone.SetCollectAgingData( false );    // steady state cycles
+            for ( size_t actualCycle = 0; actualCycle < agingStandalone.mAgingCycles; ++actualCycle )
+            {
+                if ( actualCycle == agingStandalone.mSteadyStateCycles )
+                    agingStandalone.SetCollectAgingData( true );
+                if ( actualCycle > 0 )
                 {
-                    // Write simulation data to file
-                    ++timeCounter;
-                    ( *agingStandalone.mThermalVisualizer )( agingStandalone.mThermalSimulation->mTime );
-
-                    // Output finite volumes temperatures
-                    AllGridVerticesTemperatures << agingStandalone.mThermalSimulation->mTime;
-                    BOOST_FOREACH ( const boost::shared_ptr< thermal::ThermalElement<> > &elem,
-                                    agingStandalone.mThermalSimulation->mThermalSystem->GetThermalElements() )
-                    {
-                        AllGridVerticesTemperatures << ", " << elem->GetTemperature();
-                    }
-                    AllGridVerticesTemperatures << std::endl;
-
-                    // Output simulation progress to console during program is running
+                    agingStandalone.StartNewCycle();
                 }
-                */
+
+                while ( !agingStandalone.HasElectricalSimulationEnded() )
+                {
+                    agingStandalone.DoElectricalStep();
+                    agingStandalone.DoThermalStep();
+                    agingStandalone.CollectAgingData();
+                }
+            }
+            setOutputFilenames( agingStandalone.mParser->GetRoot(), actualAgingStep + 1 );
+            agingStandalone.DoAgingStep( actualAgingStep );
+            if ( actualAgingStep < agingStandalone.mAgingSteps - 1 )
+            {
+                agingStandalone.ResetThElSimulation();
             }
         }
-        setOutputFilenames( agingStandalone.mParser->GetRoot(), actualAgingStep + 1 );
-        agingStandalone.DoAgingStep( actualAgingStep );
     }
 
     // Sucessful exit

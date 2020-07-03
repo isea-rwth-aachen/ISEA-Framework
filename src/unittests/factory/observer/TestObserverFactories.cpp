@@ -6,8 +6,8 @@
 _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "TestObserverFactories.h"
+#include "../../../../libraries/tinydir/tinydir.h"
 #include "../../../factory/observer/observerfactorybuilder.h"
-#include "../../../misc/tinydir.h"
 #include "../../../xmlparser/tinyxml2/xmlparserimpl.h"
 
 using namespace factory;

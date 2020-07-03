@@ -23,8 +23,8 @@ template < typename T = myMatrixType >
 class ElectrodeElement : public TwoPortWithState< T >
 {
     public:
-    ElectrodeElement( const boost::shared_ptr< electrical::state::Soc >& soc,
-                      const boost::shared_ptr< ::state::ThermalState< double > >& thermalState, const bool observable = false );
+    ElectrodeElement( const boost::shared_ptr< state::Soc >& soc,
+                      const boost::shared_ptr< state::ThermalState< double > >& thermalState, const bool observable = false );
 
     virtual ~ElectrodeElement(){};
 
@@ -41,8 +41,8 @@ class ElectrodeElement : public TwoPortWithState< T >
 };
 
 template < typename T >
-ElectrodeElement< T >::ElectrodeElement( const boost::shared_ptr< electrical::state::Soc >& soc,
-                                         const boost::shared_ptr< ::state::ThermalState< double > >& thermalState, const bool observable )
+ElectrodeElement< T >::ElectrodeElement( const boost::shared_ptr< state::Soc >& soc,
+                                         const boost::shared_ptr< state::ThermalState< double > >& thermalState, const bool observable )
     : TwoPortWithState< T >( soc, thermalState, observable )
 {
 }

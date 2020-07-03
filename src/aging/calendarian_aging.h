@@ -5,7 +5,7 @@
 #define _CALENDARIAN_AGING_
 
 #include "../electrical/cellelement.h"
-#include "../states/thermal_state.h"
+#include "../state/thermal_state.h"
 #include "empirical_aging.h"
 
 namespace aging
@@ -41,10 +41,12 @@ class CalendarianAging : public EmpiricalAging
 
     double mActualVoltage;             // [V]
     double mActualTemperature;         // [K]
+    double mActualSoc;                 // [%/100]
     double mTimeSinceLastAgingStep;    // [s]
     std::vector< double > mTimeValues;
     std::vector< double > mVoltageValues;
     std::vector< double > mTemperatureValues;
+    std::vector< double > mSocValues;
 };
 
 }    // namespace aging

@@ -5,8 +5,8 @@
 
 #include "../aging/aging_twoport.h"
 #include "../factory/factorybuilder_for_aging.h"
-#include "../states/aging_state.h"
-#include "../thermal/electrical_simulation.h"
+#include "../state/aging_state.h"
+#include "../electrical/electrical_simulation.h"
 #include "../thermal/thermal_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparameterimpl.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
@@ -24,8 +24,7 @@ class AgingSimulation
                      boost::shared_ptr< simulation::ThermalSimulation< Matrix, T, filterTypeChoice > > thermalSimulation,
                      const std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > > &cells,
                      double agingStepTime, factory::FactoryBuilderForAging< Matrix, T > *factoryBuilder );
-    std::vector< boost::shared_ptr< ::state::AgingState > > GetAgingStates() const;
-    void UpdateThElSimulationDuration( T duration );
+    std::vector< boost::shared_ptr< state::AgingState > > GetAgingStates() const;
     void ResetObservers();
     void ResetThElStates();
     void CollectCellAgingData();
@@ -81,13 +80,6 @@ AgingSimulation< Matrix, T, filterTypeChoice >::AgingSimulation(
     mAgingObserver =
      CreateAgingObserver< std::vector< boost::shared_ptr< aging::AgingTwoPort< Matrix > > >, Matrix, filterTypeChoice >(
       mAgingTwoPorts, rootXmlNode.get() );
-}
-
-template < typename Matrix, typename T, bool filterTypeChoice >
-void AgingSimulation< Matrix, T, filterTypeChoice >::UpdateThElSimulationDuration( T duration )
-{
-    mElectricalSimulation->UpdateSimulationDuration( duration );
-    mThermalSimulation->UpdateSimulationDuration( duration );
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >

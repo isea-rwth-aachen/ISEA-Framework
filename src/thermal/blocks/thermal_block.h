@@ -7,7 +7,7 @@
 #include "../../geometry/area.h"
 #include "../../geometry/innerArea.h"
 #include "../../geometry/block_geometry.h"
-#include "../../states/thermal_state.h"
+#include "../../state/thermal_state.h"
 #include "../thermal_structs.h"
 
 #include "../../misc/macros.h"
@@ -28,7 +28,7 @@ public:
      * @param[in] emplacementPoint The emplacement point of each block is determined thus: Take the x-, y- and z-coordinates of all edges and combine the lowest x-, y- and z-coordinate into a point
      * @param[in] description A description of position, name and class that can be given out during error handling
      */
-    ThermalBlock(const vector<shared_ptr< ::state::ThermalState<T> > > &thermalStates, const Cartesian<T> &emplacementPoint, const char *description);
+    ThermalBlock(const vector<shared_ptr< state::ThermalState<T> > > &thermalStates, const Cartesian<T> &emplacementPoint, const char *description);
     virtual ~ThermalBlock();
     /**
      *
@@ -41,14 +41,14 @@ public:
                           , vector<vector<IndexedValue<T> > > &conductivityMatrix
                           , vector<IndexedArea<T> > &surfaceAreas
                           , shared_ptr<BlockGeometry<T> > &blockGeometry) const = 0;
-    const vector<shared_ptr< ::state::ThermalState<T> > >& GetThermalStates() const;
+    const vector<shared_ptr< state::ThermalState<T> > >& GetThermalStates() const;
     const Cartesian<T>& GetEmplacementPoint() const;
     const char* GetDescription() const;
     void GetDescription(misc::StrCont &description);
     virtual size_t GetNumberOfThermalElements() const = 0;
     virtual void GetInnerSurfaceAreas(vector<IndexedInnerArea<T> > &innerSurfaceAreas) const;
 protected:
-    const vector<shared_ptr< ::state::ThermalState<T> > > mThermalStates;
+    const vector<shared_ptr< state::ThermalState<T> > > mThermalStates;
     const Cartesian<T> mPassedEmplacementPoint;
     const misc::StrCont mDescription;
 };
@@ -56,7 +56,7 @@ protected:
 
 
 template<typename T>
-ThermalBlock<T>::ThermalBlock(const vector<shared_ptr< ::state::ThermalState<T> > > &thermalStates, const Cartesian<T> &emplacementPoint, const char *description)
+ThermalBlock<T>::ThermalBlock(const vector<shared_ptr< state::ThermalState<T> > > &thermalStates, const Cartesian<T> &emplacementPoint, const char *description)
     : mThermalStates(thermalStates)
     , mPassedEmplacementPoint(emplacementPoint)
     , mDescription(description)
@@ -67,7 +67,7 @@ ThermalBlock<T>::~ThermalBlock()
 {}
 
 template<typename T>
-const vector<shared_ptr< ::state::ThermalState<T> > >& ThermalBlock<T>::GetThermalStates() const
+const vector<shared_ptr< state::ThermalState<T> > >& ThermalBlock<T>::GetThermalStates() const
 {
     return mThermalStates;
 }

@@ -15,7 +15,7 @@
 #include "../../thermal/blocks/triangular_prism_block.h"
 
 #include "../../geometry/cartesian.h"
-#include "../../states/thermal_state.h"
+#include "../../state/thermal_state.h"
 #include "../thermal/materialclasswrapper.h"
 #include "parameter_description.h"
 #include "../../exceptions/error_proto.h"
@@ -30,7 +30,7 @@ struct ArgumentTypeThermalBlock
         : mX( 0 )
         , mY( 0 )
         , mZ( 0 ){};
-    std::vector< boost::shared_ptr< ::state::ThermalState< T > > > mThermalStates;
+    std::vector< boost::shared_ptr< state::ThermalState< T > > > mThermalStates;
     T mX;
     T mY;
     T mZ;
@@ -55,16 +55,16 @@ class BlockClassWrapperBase : public ClassWrapperBase< thermal::ThermalBlock< T 
     Factory< thermal::Material< T > > *GetMaterialFactory() { return mMaterialFactory; }
 
     /// Gets thermal states from argument
-    std::vector< boost::shared_ptr< ::state::ThermalState< T > > >
+    std::vector< boost::shared_ptr< state::ThermalState< T > > >
     MakeThermalStatesVector( const xmlparser::XmlParameter *param, const ArgumentTypeThermalBlock< T > *arg )
     {
-        std::vector< boost::shared_ptr< ::state::ThermalState< T > > > thermalStates;
+        std::vector< boost::shared_ptr< state::ThermalState< T > > > thermalStates;
         if ( arg->mThermalStates.empty() )
         {
-            thermalStates.push_back( boost::shared_ptr< ::state::ThermalState< T > >() );
+            thermalStates.push_back( boost::shared_ptr< state::ThermalState< T > >() );
             if ( param->HasElementDirectChild( "Heat" ) )
             {
-                thermalStates.at( 0 ).reset( new ::state::ThermalState< T > );
+                thermalStates.at( 0 ).reset( new state::ThermalState< T > );
                 thermalStates.at( 0 )->SetFixedPowerDissipation( param->GetElementDoubleValue( "Heat" ) );
             }
         }

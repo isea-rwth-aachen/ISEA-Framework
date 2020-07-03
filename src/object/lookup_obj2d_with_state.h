@@ -8,7 +8,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #define _LOOKUP_OBJ2D_WI_STATE_
 
 // BOOST
-#include "../states/dgl_state.h"
+#include "../state/dgl_state.h"
 #include "lookup_obj2d.h"
 #include <boost/shared_ptr.hpp>
 
@@ -22,11 +22,11 @@ class LookupObj2dWithState : public LookupObj2D< T >
 
     public:
     LookupObj2dWithState( const std::vector< std::vector< T > >& lookupData, const std::vector< T >& measurementPointsRow,
-                          const std::vector< T >& measurementPointsColumn, boost::shared_ptr< ::state::State > stateRow,
-                          boost::shared_ptr< ::state::State > stateCol, lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
+                          const std::vector< T >& measurementPointsColumn, boost::shared_ptr< state::State > stateRow,
+                          boost::shared_ptr< state::State > stateCol, lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
     LookupObj2dWithState( const std::vector< std::vector< T > >& lookupData,
                           const std::vector< T >& measurementPointsRow, const std::vector< T >& measurementPointsColumn,
-                          boost::shared_ptr< ::state::State > stateRow, boost::shared_ptr< ::state::State > stateCol,
+                          boost::shared_ptr< state::State > stateRow, boost::shared_ptr< state::State > stateCol,
                           LookupObj2dWithState< T >* CloneObj, lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
 
     virtual ~LookupObj2dWithState(){};
@@ -37,18 +37,18 @@ class LookupObj2dWithState : public LookupObj2D< T >
     virtual T GetValue( const T val1, const T val2 );
     virtual T operator()( const T val, const T val2 );
 
-    const ::state::State* GetStateRow() const { return mStateRow.get(); }
-    const ::state::State* GetStateCol() const { return mStateCol.get(); }
+    const state::State* GetStateRow() const { return mStateRow.get(); }
+    const state::State* GetStateCol() const { return mStateCol.get(); }
 
-    boost::shared_ptr< ::state::State > GetBoostStateRow() const { return mStateRow; }
-    boost::shared_ptr< ::state::State > GetBoostStateCol() const { return mStateCol; }
+    boost::shared_ptr< state::State > GetBoostStateRow() const { return mStateRow; }
+    boost::shared_ptr< state::State > GetBoostStateCol() const { return mStateCol; }
 
 
     virtual const char* GetName() const;
 
     private:
-    boost::shared_ptr< ::state::State > mStateRow;
-    boost::shared_ptr< ::state::State > mStateCol;
+    boost::shared_ptr< state::State > mStateRow;
+    boost::shared_ptr< state::State > mStateCol;
 
     protected:
 };
@@ -57,8 +57,8 @@ template < typename T >
 LookupObj2dWithState< T >::LookupObj2dWithState( const std::vector< std::vector< T > >& lookupData,
                                                  const std::vector< T >& measurementPointsRow,
                                                  const std::vector< T >& measurementPointsColumn,
-                                                 boost::shared_ptr< ::state::State > stateRow,
-                                                 boost::shared_ptr< ::state::State > stateCol, lookup::LookupType type )
+                                                 boost::shared_ptr< state::State > stateRow,
+                                                 boost::shared_ptr< state::State > stateCol, lookup::LookupType type )
     : LookupObj2D< T >( lookupData, measurementPointsRow, measurementPointsColumn, type )
     , mStateRow( stateRow )
     , mStateCol( stateCol )
@@ -69,8 +69,8 @@ template < typename T >
 LookupObj2dWithState< T >::LookupObj2dWithState( const std::vector< std::vector< T > >& lookupData,
                                                  const std::vector< T >& measurementPointsRow,
                                                  const std::vector< T >& measurementPointsColumn,
-                                                 boost::shared_ptr< ::state::State > /* stateRow */,
-                                                 boost::shared_ptr< ::state::State > /* stateCol */,
+                                                 boost::shared_ptr< state::State > /* stateRow */,
+                                                 boost::shared_ptr< state::State > /* stateCol */,
                                                  LookupObj2dWithState< T >* CloneObj, lookup::LookupType type )
     : LookupObj2D< T >( lookupData, measurementPointsRow, measurementPointsColumn, CloneObj, type )
     , mStateRow( CloneObj->mStateRow )

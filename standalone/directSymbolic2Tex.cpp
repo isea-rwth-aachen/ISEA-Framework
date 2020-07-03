@@ -5,19 +5,25 @@
 * Created By : Friedrich Hust
 _._._._._._._._._._._._._._._._._._._._._.*/
 
+#include "../src/export/exportStructs/texExport.h"
+#include "../src/export/symbolicExport.h"
+#include "standalone/standalone.h"
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
-#include "../src/export/symbolicExport.h"
-#include "../src/export/exportStructs/texExport.h"
 
 extern template class symbolic::SymbolicExport< std::string::const_iterator, symbolic::TexExportStruct >;
 
 
-int main( int /*argc*/, char *[] /*argv*/ )
+int main( int argc, char* argv[] )
 {
     using namespace symbolic;
     using boost::spirit::ascii::space;
+
+    standalone::Standalone app( "ISEA-Framework Direct Symbolic To Tex Standalone" );
+    if ( !app.ParseCommandLine( argc, argv ) )
+        return EXIT_FAILURE;
+
     std::string input;
     std::cin >> input;
 

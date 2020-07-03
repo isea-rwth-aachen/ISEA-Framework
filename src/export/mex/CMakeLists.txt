@@ -11,6 +11,12 @@ if(BUILD_SYMBOLIC)
          "Build mex files to create a matrix model in Simulink" OFF)
 endif()
 
+if(LINUX_TARGET)
+  set(MEX_SUFFIX ".mexa64")
+elseif(WIN_TARGET)
+  set(MEX_SUFFIX ".mexw64")
+endif()
+
 if(BUILD_SIMULINK_MATRIX_MODEL)
   set(NEED_SIMULINK
       ON
@@ -26,7 +32,7 @@ if(BUILD_SIMULINK_MATRIX_MODEL)
       PROPERTIES PREFIX
                  ""
                  SUFFIX
-                 ".mexw64"
+                 ${MEX_SUFFIX}
                  WINDOWS_EXPORT_ALL_SYMBOLS
                  ON
                  RUNTIME_OUTPUT_DIRECTORY

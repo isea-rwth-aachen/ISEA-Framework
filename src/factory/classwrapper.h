@@ -11,7 +11,7 @@
 #include "../xmlparser/xmlparameter.h"
 #include "../misc/cmp_str.h"
 #include "../misc/StrCont.h"
-#include "../states/thermal_state.h"
+#include "../state/thermal_state.h"
 #include <map>
 #include <boost/shared_ptr.hpp>
 

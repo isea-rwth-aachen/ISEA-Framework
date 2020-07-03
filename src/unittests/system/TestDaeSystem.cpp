@@ -25,8 +25,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../electrical/voltagesource.h"
 #include "../../electrical/zarc.h"
 #include "../../object/const_obj.h"
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 #include "../../system/stateSystemGroup.h"
 #include "../../system/system.h"
 
@@ -517,8 +517,8 @@ void TestDaeSystem::testRealZarc()
     const double row[] = {0, 10, 23, 50};
     std::vector< double > vecRow( row, row + 4 );
 
-    boost::shared_ptr< ::state::ThermalState< double > > temp( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > soc( new electrical::state::Soc( 10, 10, 0.5 ) );
+    boost::shared_ptr< state::ThermalState< double > > temp( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > soc( new state::Soc( 10, 10, 0.5 ) );
 
 
     boost::shared_ptr< electrical::SerialTwoPort<> > serial( new electrical::SerialTwoPort<>() );
@@ -688,8 +688,8 @@ void TestDaeSystem::testSingleCellellement()
     double HUGEsampleTime = 0.00000001;
     boost::scoped_ptr< electrical::SerialTwoPort<> > basePort( new electrical::SerialTwoPort<> );
 
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2.05, 2.05, 20 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2.05, 2.05, 20 ) );
 
     boost::shared_ptr< electrical::Cellelement<> > cellelem( new electrical::Cellelement<>( tempState, socState ) );
 
@@ -754,7 +754,7 @@ void TestDaeSystem::testSingleCellellement()
         TS_ASSERT_DELTA( x.coeff( i, 0 ), initialoldstate[i], 0.001 );
     }
 
-    TS_ASSERT_DELTA( socState->GetValue< electrical::state::SocGetFormat::AS >(), 1476, 0.001 );
+    TS_ASSERT_DELTA( socState->GetValue< state::SocGetFormat::AS >(), 1476, 0.001 );
 
     myMatrixType dxdt( REALSTATESIZE + 1, 1 );
 
@@ -778,13 +778,13 @@ void TestDaeSystem::testSingleCellellement()
         TS_ASSERT_DELTA( dxdt.coeff( i, 0 ), intialdxdt[i], 0.001 );
         TS_ASSERT_DELTA( x.coeff( i, 0 ), newoldstate[i], 0.001 );
     }
-    TS_ASSERT_DELTA( socState->GetValue< electrical::state::SocGetFormat::AS >(), 1681, 0.001 );
+    TS_ASSERT_DELTA( socState->GetValue< state::SocGetFormat::AS >(), 1681, 0.001 );
 }
 
 void TestDaeSystem::testSingleCellellementBalancing()
 {
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2.05, 2.05, 20 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2.05, 2.05, 20 ) );
 
     boost::shared_ptr< electrical::Cellelement<> > cellelem( new electrical::Cellelement<>( tempState, socState ) );
     cellelem->AddChild( new electrical::OhmicResistance<>( new object::ConstObj< double >( 3 ) ) );
@@ -845,8 +845,8 @@ void TestDaeSystem::testSingleCellellementBalancing()
 void TestDaeSystem::testMultiCellellementBalancing()
 {
 
-    boost::shared_ptr< ::state::ThermalState< double > > tempState( new ::state::ThermalState< double >( 23 ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 2.05, 2.05, 20 ) );
+    boost::shared_ptr< state::ThermalState< double > > tempState( new state::ThermalState< double >( 23 ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 2.05, 2.05, 20 ) );
 
     boost::shared_ptr< electrical::ParallelTwoPort<> > para( new electrical::ParallelTwoPort<>() );
 

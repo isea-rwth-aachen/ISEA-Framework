@@ -18,7 +18,7 @@
 #include "../../misc/StrCont.h"
 #include "../../misc/cmp_str.h"
 #include "../../probes/thermal_probe.h"
-#include "../../states/thermal_state.h"
+#include "../../state/thermal_state.h"
 #include "../../thermal/blocks/thermal_block.h"
 #include "../../xmlparser/xmlparameter.h"
 #include "../check_positive_int.h"
@@ -61,7 +61,7 @@ class ThermalFactory
                              vector< shared_ptr< ThermalBlock< T > > > &heatedBlocks,
                              vector< shared_ptr< ThermalBlock< T > > > &unheatedBlocks,
                              vector< shared_ptr< CoolingBlock< T > > > &coolingBlocks,
-                             const vector< shared_ptr< ::state::ThermalState< T > > > *thermalStates,
+                             const vector< shared_ptr< state::ThermalState< T > > > *thermalStates,
                              vector< vector< shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks,
                              vector< ::probe::ThermalProbe > *thermalProbes = 0 ) const;
 
@@ -89,7 +89,7 @@ class ThermalFactory
     void ParseRootElement( const shared_ptr< xmlparser::XmlParameter > &param, const Cartesian< T > &origin,
                            list< shared_ptr< ThermalBlock< T > > > &heatedBlocks, list< shared_ptr< ThermalBlock< T > > > &unheatedBlocks,
                            list< shared_ptr< CoolingBlock< T > > > &coolingBlocks, size_t &thermalStatesIndex,
-                           const vector< shared_ptr< ::state::ThermalState< T > > > *thermalStates,
+                           const vector< shared_ptr< state::ThermalState< T > > > *thermalStates,
                            vector< vector< shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks ) const;
     /// Function to populate the thermal Probes in the model
     void CreateThermalProbe( const xmlparser::XmlParameter *param = 0, vector< ::probe::ThermalProbe > *thermalProbes = 0 ) const;
@@ -127,7 +127,7 @@ void ThermalFactory< T >::CreateThermalModel( const shared_ptr< xmlparser::XmlPa
                                               vector< shared_ptr< ThermalBlock< T > > > &heatedBlocks,
                                               vector< shared_ptr< ThermalBlock< T > > > &unheatedBlocks,
                                               vector< shared_ptr< CoolingBlock< T > > > &coolingBlocks,
-                                              const vector< shared_ptr< ::state::ThermalState< T > > > *thermalStates,
+                                              const vector< shared_ptr< state::ThermalState< T > > > *thermalStates,
                                               vector< vector< shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks,
                                               vector< ::probe::ThermalProbe > *thermalProbes ) const
 {
@@ -209,7 +209,7 @@ void ThermalFactory< T >::ParseRootElement( const shared_ptr< xmlparser::XmlPara
                                             list< shared_ptr< ThermalBlock< T > > > &heatedBlocks,
                                             list< shared_ptr< ThermalBlock< T > > > &unheatedBlocks,
                                             list< shared_ptr< CoolingBlock< T > > > &coolingBlocks, size_t &thermalStatesIndex,
-                                            const vector< shared_ptr< ::state::ThermalState< T > > > *thermalStates,
+                                            const vector< shared_ptr< state::ThermalState< T > > > *thermalStates,
                                             vector< vector< shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks ) const
 {
     const char *classname = param->GetElementAttributeCharPtrValue( "class" );
@@ -247,7 +247,7 @@ void ThermalFactory< T >::ParseRootElement( const shared_ptr< xmlparser::XmlPara
                 thermalStatesIndex += numberOfCellElements;
             }
             else
-                arg.mThermalStates.push_back( boost::shared_ptr< ::state::ThermalState< T > >( new ::state::ThermalState< T > ) );
+                arg.mThermalStates.push_back( boost::shared_ptr< state::ThermalState< T > >( new state::ThermalState< T > ) );
 
 
             heatedBlocks.push_back( mBlockFactory->CreateInstance( param->GetElementChild( "ThermalBlock" ), &arg ) );

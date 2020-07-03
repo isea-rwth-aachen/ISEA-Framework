@@ -40,7 +40,7 @@ void TestFactoryLookUpCellElements::TestGetElectricalDiscretization()
 void TestFactoryLookUpCellElements::TestStateFactory()
 {
     factory::FactoryBuilder< myMatrixType, ScalarUnit > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
 
     const char* xmlConfigEmpty =
      "<State class='Soc'>\
@@ -55,12 +55,12 @@ void TestFactoryLookUpCellElements::TestStateFactory()
     factory::ArgumentTypeState arg;
     arg.mCellDiscretization = 3.0;
 
-    boost::shared_ptr< ::state::State > state = stateFactory->CreateInstance( parser.GetRoot(), &arg );
+    boost::shared_ptr< state::State > state = stateFactory->CreateInstance( parser.GetRoot(), &arg );
 #ifdef __EXCEPTIONS__
-    electrical::state::Soc* SocState = dynamic_cast< electrical::state::Soc* >( state.get() );
+    state::Soc* SocState = dynamic_cast< state::Soc* >( state.get() );
     TS_ASSERT( SocState != 0 );
 #else
-    electrical::state::Soc* SocState = static_cast< electrical::state::Soc* >( state.get() );
+    state::Soc* SocState = static_cast< state::Soc* >( state.get() );
 #endif
     TS_ASSERT_DELTA( SocState->GetActualCapacity(), 10.0 * 3600.0 / 3.0, sDelta );
 }
@@ -68,7 +68,7 @@ void TestFactoryLookUpCellElements::TestStateFactory()
 void TestFactoryLookUpCellElements::TestObjectFactory()
 {
     factory::FactoryBuilder< myMatrixType, ScalarUnit > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > >* objectFactory =
      factoryBuilder.BuildObjectFactory();
 
@@ -126,15 +126,15 @@ void TestFactoryLookUpCellElements::TestObjectFactory()
     xmlparser::tinyxml2::XmlParserImpl parser;
     const double socFactor = 10.0 / 4.0 * 3600.0 / 100.0;
 
-    boost::shared_ptr< ::state::State > state;
+    boost::shared_ptr< state::State > state;
     parser.ReadFromMem( xmlConfigThermalState );
     state = stateFactory->CreateInstance( parser.GetRoot(), &argState );
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState =
-     boost::static_pointer_cast< ::state::ThermalState< double > >( state );
+    boost::shared_ptr< state::ThermalState< double > > thermalState =
+     boost::static_pointer_cast< state::ThermalState< double > >( state );
     parser.ReadFromMem( xmlConfigSocState );
     state = stateFactory->CreateInstance( parser.GetRoot(), &argState );
-    boost::shared_ptr< electrical::state::Soc > soc = boost::static_pointer_cast< electrical::state::Soc >( state );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
+    boost::shared_ptr< state::Soc > soc = boost::static_pointer_cast< state::Soc >( state );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
     TS_ASSERT_DELTA( soc->GetValue(), 5.0, sDelta );
 
     parser.ReadFromMem( xmlConfigConstObj );
@@ -149,11 +149,11 @@ void TestFactoryLookUpCellElements::TestObjectFactory()
 
     parser.ReadFromMem( xmlConfigLookupObj1DWithState );
     boost::shared_ptr< Object< double > > obj1DWithState = objectFactory->CreateInstance( parser.GetRoot(), &argObject );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
     TS_ASSERT_DELTA( obj1DWithState->GetValue(), 10.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
     TS_ASSERT_DELTA( obj1DWithState->GetValue(), 20.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
     TS_ASSERT_DELTA( obj1DWithState->GetValue(), 40.0 * 4.0, sDelta );
 
     parser.ReadFromMem( xmlConfigLookupObj2D );
@@ -169,26 +169,26 @@ void TestFactoryLookUpCellElements::TestObjectFactory()
     boost::shared_ptr< Object< double > > obj2DWithState = objectFactory->CreateInstance( parser.GetRoot(), &argObject );
     thermalState->ResetTemperature();
     thermalState->AddTemperature( 1.0, 1.0 );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 11.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 12.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 13.0 * 4.0, sDelta );
     thermalState->ResetTemperature();
     thermalState->AddTemperature( 3.0, 1.0 );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 5.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 21.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 50.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 22.0 * 4.0, sDelta );
-    soc->SetStoredEnergy< electrical::state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
+    soc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( socFactor * 90.0 );
     TS_ASSERT_DELTA( obj2DWithState->GetValue(), 23.0 * 4.0, sDelta );
 }
 
 void TestFactoryLookUpCellElements::TestElectricalFactory()
 {
     factory::FactoryBuilder< myMatrixType, double > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< electrical::TwoPort< myMatrixType >, factory::ArgumentTypeElectrical >* electricalFactory =
      factoryBuilder.BuildElectricalFactory();
 
@@ -533,17 +533,17 @@ void TestFactoryLookUpCellElements::TestThermalFactory()
     std::vector< boost::shared_ptr< thermal::ThermalBlock< double > > > heatedBlocks;
     std::vector< boost::shared_ptr< thermal::ThermalBlock< double > > > unheatedBlocks;
     std::vector< boost::shared_ptr< thermal::CoolingBlock< double > > > coolingBlocks;
-    std::vector< boost::shared_ptr< ::state::ThermalState< double > > > thermalStates(
-     48, boost::shared_ptr< ::state::ThermalState< double > >( new ::state::ThermalState< double > ) );
+    std::vector< boost::shared_ptr< state::ThermalState< double > > > thermalStates(
+     48, boost::shared_ptr< state::ThermalState< double > >( new state::ThermalState< double > ) );
 
     // Create thermal model
     thermalFactory->CreateThermalModel( parser.GetRoot(), heatedBlocks, unheatedBlocks, coolingBlocks, &thermalStates, 0 );
-    std::vector< boost::shared_ptr< ::state::ThermalState< double > > >::iterator it = thermalStates.begin();
+    std::vector< boost::shared_ptr< state::ThermalState< double > > >::iterator it = thermalStates.begin();
 
     TS_ASSERT_EQUALS( thermalStates.size(), 48 );
-    TS_ASSERT_EQUALS( std::vector< boost::shared_ptr< ::state::ThermalState< double > > >( it, it + 24 ),
+    TS_ASSERT_EQUALS( std::vector< boost::shared_ptr< state::ThermalState< double > > >( it, it + 24 ),
                       heatedBlocks.at( 0 )->GetThermalStates() );
-    TS_ASSERT_EQUALS( std::vector< boost::shared_ptr< ::state::ThermalState< double > > >( it + 24, it + 48 ),
+    TS_ASSERT_EQUALS( std::vector< boost::shared_ptr< state::ThermalState< double > > >( it + 24, it + 48 ),
                       heatedBlocks.at( 1 )->GetThermalStates() );
     TS_ASSERT_EQUALS( unheatedBlocks.at( 0 )->GetThermalStates().size(), 1 );
 }

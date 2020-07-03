@@ -36,7 +36,7 @@ using namespace threading;
 void TestMPI::testMPITestParallelResistors()
 {
 #ifdef BOOST_MPI
-    boost::scoped_ptr< factory::Factory< ::state::State > > stateFactory( factory::BuildStateFactory() );
+    boost::scoped_ptr< factory::Factory< state::State > > stateFactory( factory::BuildStateFactory() );
     boost::scoped_ptr< factory::Factory<object::Object<double> > > objectFactory( factory::BuildObjectFactory<double>( stateFactory.get() ) );
     boost::scoped_ptr< factory::Factory<electrical::TwoPort< myMatrixType > > > electricalFactory( factory::BuildElectricalFactory<myMatrixType, double>( objectFactory.get(), stateFactory.get() ) );
 

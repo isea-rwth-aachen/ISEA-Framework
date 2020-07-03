@@ -352,11 +352,11 @@ void TestFactories::TestBlockFactory()
     boost::shared_ptr< ThermalBlock<> > block1Unconnected( blockFactory->CreateInstance( block1Param, &arg ) );
     boost::shared_ptr< ThermalBlock<> > block2Unconnected( blockFactory->CreateInstance( block2Param, &arg ) );
 
-    arg.mThermalStates.push_back( boost::shared_ptr< ::state::ThermalState<> >( new ::state::ThermalState<> ) );
+    arg.mThermalStates.push_back( boost::shared_ptr< state::ThermalState<> >( new state::ThermalState<> ) );
     arg.mThermalStates.at( 0 )->SetFixedPowerDissipation( 2000.0 );
     boost::shared_ptr< ThermalBlock<> > block1Connected( blockFactory->CreateInstance( block1Param, &arg ) );
     arg.mThermalStates.clear();
-    arg.mThermalStates.resize( 24, boost::shared_ptr< ::state::ThermalState<> >( new ::state::ThermalState<> ) );
+    arg.mThermalStates.resize( 24, boost::shared_ptr< state::ThermalState<> >( new state::ThermalState<> ) );
     for ( size_t i = 0; i < 24; ++i )
         arg.mThermalStates.at( i )->SetFixedPowerDissipation( 1000.0 );
     boost::shared_ptr< ThermalBlock<> > block2Connected( blockFactory->CreateInstance( block2Param, &arg ) );
@@ -445,7 +445,7 @@ void TestFactories::TestBlockFactory()
     boost::shared_ptr< xmlparser::XmlParameter > quadraticCellParam( quadraticCellParser.GetRoot() );
 
     arg.mThermalStates.clear();
-    arg.mThermalStates.resize( 6, boost::shared_ptr< ::state::ThermalState<> >( new ::state::ThermalState<> ) );
+    arg.mThermalStates.resize( 6, boost::shared_ptr< state::ThermalState<> >( new state::ThermalState<> ) );
     for ( size_t i = 0; i < 6; ++i )
         arg.mThermalStates.at( i )->SetFixedPowerDissipation( 2000.0 );
     boost::shared_ptr< ThermalBlock<> > quadraticCellBlock( blockFactory->CreateInstance( quadraticCellParam, &arg ) );
@@ -498,7 +498,7 @@ void TestFactories::TestBlockFactory()
     boost::shared_ptr< xmlparser::XmlParameter > hexagonalCellParam( hexagonalCellParser.GetRoot() );
 
     arg.mThermalStates.clear();
-    arg.mThermalStates.resize( 6, boost::shared_ptr< ::state::ThermalState<> >( new ::state::ThermalState<> ) );
+    arg.mThermalStates.resize( 6, boost::shared_ptr< state::ThermalState<> >( new state::ThermalState<> ) );
     for ( size_t i = 0; i < 6; ++i )
         arg.mThermalStates.at( i )->SetFixedPowerDissipation( 2000.0 );
     boost::shared_ptr< ThermalBlock<> > hexagonalCellBlock( blockFactory->CreateInstance( hexagonalCellParam, &arg ) );
@@ -589,7 +589,7 @@ void TestFactories::TestThermalFactory()
 
     vector< ::probe::ThermalProbe > thermalProbes;
 
-    vector< boost::shared_ptr< ::state::ThermalState<> > > thermalStates( 26 );
+    vector< boost::shared_ptr< state::ThermalState<> > > thermalStates( 26 );
     for ( size_t i = 0; i < 26; ++i )
         thermalStates.at( i ).reset( new ThermalState<> );
 

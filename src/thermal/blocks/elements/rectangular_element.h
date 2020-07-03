@@ -23,7 +23,7 @@ public:
                      , const Cartesian<T> &spanVector
                      , T initialTemperatureValue
                      , const Material<T> *material
-                     , ::state::ThermalState<T> *thermalState = 0
+                     , state::ThermalState<T> *thermalState = 0
                      , T thermalStateFactor = 1.0);
     virtual ~RectangularElement();
 private:
@@ -38,7 +38,7 @@ RectangularElement<T>::RectangularElement(const Cartesian<T> &emplacementPoint
                                         , const Cartesian<T> &spanVector
                                         , T initialTemperatureValue
                                         , const Material<T> *material
-                                        , ::state::ThermalState<T> *thermalState
+                                        , state::ThermalState<T> *thermalState
                                         , T thermalStateFactor)
     : mEmplacementPoint(emplacementPoint)
     , mSpanVector(spanVector)

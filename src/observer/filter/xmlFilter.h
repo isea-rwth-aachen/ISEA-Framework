@@ -81,7 +81,7 @@ void XMLFilterAging< T >::ProcessData( const typename FilterT::Data_t & /* data 
 
         boost::shared_ptr< xmlparser::XmlParameter > agingNode;
 
-        ::state::AgingState *agingState;
+        state::AgingState *agingState;
 
         // Get the values from each cell
         for ( size_t i = 0; i < data.size(); ++i )

@@ -20,9 +20,9 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "twoport_with_state.h"
 #include "voltagesource.h"
 
-#include "../states/soc.h"
-#include "../states/surface_soc.h"
-#include "../states/thermal_state.h"
+#include "../state/soc.h"
+#include "../state/surface_soc.h"
+#include "../state/thermal_state.h"
 
 #include "../object/lookup_obj1d_with_state.h"
 #include "../object/lookup_obj2d_with_state.h"
@@ -46,14 +46,14 @@ class Cellelement : public TwoPortWithState< T >
 
     public:
     explicit Cellelement(
-     size_t cellNumber, const boost::shared_ptr< ::state::ThermalState< double > >& thermalState,
-     const boost::shared_ptr< electrical::state::Soc >& socState, const bool observable = false,
+     size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const bool observable = false,
      typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
      boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
 
     explicit Cellelement(
-     const boost::shared_ptr< ::state::ThermalState< double > >& thermalState,
-     const boost::shared_ptr< electrical::state::Soc >& socState, const bool observable = false,
+     const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const bool observable = false,
      typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
      boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
 
@@ -65,7 +65,7 @@ class Cellelement : public TwoPortWithState< T >
     double GetSocStateValue() const;
     double GetSurfaceSocStateValue() const;
 
-    template < electrical::state::SocGetFormat FormatT = electrical::state::SocGetFormat::AH >
+    template < state::SocGetFormat FormatT = state::SocGetFormat::AH >
     double GetCapacity() const;
 
 #ifndef _SYMBOLIC_
@@ -139,8 +139,8 @@ class Cellelement : public TwoPortWithState< T >
 };
 
 template < typename T >
-Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< ::state::ThermalState< double > >& thermalState,
-                               const boost::shared_ptr< electrical::state::Soc >& socState, const bool observable,
+Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState, const bool observable,
                                typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
     : TwoPortWithState< T >( socState, thermalState, observable, dataValues )
     , mSurfaceSocSet( false )
@@ -161,8 +161,8 @@ Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< ::sta
 }
 
 template < typename T >
-Cellelement< T >::Cellelement( const boost::shared_ptr< ::state::ThermalState< double > >& thermalState,
-                               const boost::shared_ptr< electrical::state::Soc >& socState, const bool observable,
+Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState, const bool observable,
                                typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
     : Cellelement< T >( 0, thermalState, socState, observable, dataValues, reversibleHeat )
 {
@@ -172,7 +172,7 @@ Cellelement< T >::Cellelement( const boost::shared_ptr< ::state::ThermalState< d
 template < typename T >
 void Cellelement< T >::LoadInternalData( std::vector< double >& dataVector )
 {
-    this->mSoc->template SetStoredEnergy< ::electrical::state::SocSetFormat::ABSOLUT >( dataVector.back() );
+    this->mSoc->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( dataVector.back() );
     dataVector.pop_back();
 
     TwoPort< T >::LoadInternalData( dataVector );
@@ -212,7 +212,7 @@ double Cellelement< T >::GetSurfaceSocStateValue() const
 }
 
 template < typename T >
-template < electrical::state::SocGetFormat FormatT >
+template < state::SocGetFormat FormatT >
 double Cellelement< T >::GetCapacity() const
 {
     return this->mSoc->template GetActualCapacity< FormatT >();
@@ -434,11 +434,11 @@ void Cellelement< T >::CalculateVoltageRange()
     boost::shared_ptr< state::Soc > anodeSoc = this->mAnodeElements.front()->GetSoc();
     boost::shared_ptr< state::Soc > cathodeSoc = this->mCathodeElements.front()->GetSoc();
 
-    double storedChargeAnode = anodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
-    double storedChargeCathode = cathodeSoc->GetValue< ::electrical::state::SocGetFormat::AS >();
+    double storedChargeAnode = anodeSoc->GetValue< state::SocGetFormat::AS >();
+    double storedChargeCathode = cathodeSoc->GetValue< state::SocGetFormat::AS >();
 
-    double capacityAnode = anodeSoc->GetActualCapacity< ::electrical::state::SocGetFormat::AS >();
-    double capacityCathode = cathodeSoc->GetActualCapacity< ::electrical::state::SocGetFormat::AS >();
+    double capacityAnode = anodeSoc->GetActualCapacity< state::SocGetFormat::AS >();
+    double capacityCathode = cathodeSoc->GetActualCapacity< state::SocGetFormat::AS >();
 
     // maximum charge that can be substracted without either electrode SOC going below 0
     double chargeUntilMinimum = std::min( storedChargeAnode, storedChargeCathode );

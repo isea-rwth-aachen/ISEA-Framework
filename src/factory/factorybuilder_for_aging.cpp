@@ -16,7 +16,7 @@ Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical >* FactoryBuilde
         this->BuildAgingTwoPortFactory();
 
     // replace wrappers for Cellelement and ElectrodeElement so that they call the AgingTwoPort factory
-    Factory< ::state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
     Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory = this->mObjectFactory.get();
     Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical >* electricalFactory = this->mElectricalFactory.get();
     Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* agingTwoPortFactory =
@@ -49,7 +49,7 @@ Factory< aging::AgingBase, ArgumentTypeAging >* FactoryBuilderForAging< MatrixT,
         this->BuildObjectFactory();
 
     this->mAgingFactory.reset( new Factory< aging::AgingBase, ArgumentTypeAging >() );
-    Factory< ::state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
     Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory = this->mObjectFactory.get();
     Factory< aging::AgingBase, ArgumentTypeAging >* agingFactory = this->mAgingFactory.get();
 
@@ -78,7 +78,7 @@ FactoryBuilderForAging< MatrixT, ValueT >::BuildAgingTwoPortFactory()
         this->BuildStateFactory();
 
     this->mAgingTwoPortFactory.reset( new Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >() );
-    Factory< ::state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
+    Factory< state::State, ArgumentTypeState >* stateFactory = this->mStateFactory.get();
     Factory< aging::AgingBase, ArgumentTypeAging >* agingFactory = this->mAgingFactory.get();
     Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* agingTwoPortFactory =
      this->mAgingTwoPortFactory.get();

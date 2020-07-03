@@ -5,10 +5,10 @@
 * Created By : Friedrich Hust
 _._._._._._._._._._._._._._._._._._._._._.*/
 
-#include "../src/misc/CLI11.hpp"
 #include "../src/misc/findSimulationType.h"
 #include "../src/version/version.h"
 #include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
+#include "standalone/standalone.h"
 #include <boost/scoped_ptr.hpp>
 #include <iostream>
 
@@ -20,19 +20,18 @@ void printVersion( int /* count */ )
 
 int main( int argc, char *argv[] )
 {
-    CLI::App app( "ISEA-Framework Verification Standalone" );
-
+    standalone::Standalone app( "ISEA-Framework Verification Standalone" );
     std::string xmlFilename;
     bool printNumCells = false;
     bool printObserverSize = false;
     bool noPrintType = false;
-    app.add_flag_function( "-v,--version", printVersion, "Display version information and exit" )->short_circuit();
-    app.add_option( "xml-file", xmlFilename, "XML configuration file" )->required();
-    app.add_flag( "--num-cells", printNumCells, "Print the number of cells in the configuration" );
-    app.add_flag( "--observed-twoport-size", printObserverSize,
-                  "Print the number of twoports observed by the electrical observer" );
-    app.add_flag( "--no-type", noPrintType, "Don't print the simulation type" );
-    CLI11_PARSE( app, argc, argv );
+    app.mApp.add_option( "xml-file", xmlFilename, "XML configuration file" )->required();
+    app.mApp.add_flag( "--num-cells", printNumCells, "Print the number of cells in the configuration" );
+    app.mApp.add_flag( "--observed-twoport-size", printObserverSize,
+                       "Print the number of twoports observed by the electrical observer" );
+    app.mApp.add_flag( "--no-type", noPrintType, "Don't print the simulation type" );
+    if ( !app.ParseCommandLine( argc, argv ) )
+        return EXIT_FAILURE;
 
     // Parameter 1
     boost::scoped_ptr< xmlparser::XmlParser > parser;

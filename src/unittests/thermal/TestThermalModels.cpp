@@ -103,8 +103,8 @@ void TestThermalModels::TestThermalModel()
     //#endif
 
 
-    vector< shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    vector< shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 20000.0, 0.0 );
     Material<> material( 250.0, 1000.0, 47.0, 50.0, 53.0 );
     /*

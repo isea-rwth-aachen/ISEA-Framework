@@ -40,7 +40,8 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
         , mFilename( filename )
         , mMaxSize( maxSize )
         , mDataLocation( "diga.daten." )
-        , mFilenamePrefix( filenamePrefix ){};
+        , mFilenamePrefix( filenamePrefix )
+        , mMatrixSizes( 0 ){};
 
     virtual ~MatlabFilter() { this->WriteToDisk(); }
 
@@ -56,25 +57,51 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
             mSampleCounter = 0;
         }
     };
+
     virtual void WriteToDisk()
     {
         if ( mTime.empty() )
             return;
         *mMatFile << matlab::MatioData( mTime, this->mDataLocation + "Programmdauer" );
         mTime.clear();
+
+        for ( auto &pair : mMatlabMatrices )
+        {
+            auto &mat = *pair.first;
+            // remove empty rows
+            mat.erase( std::remove_if( mat.begin(), mat.end(), []( std::vector< double > &v ) { return v.empty(); } ),
+                       mat.end() );
+            if ( !mat.empty() )
+            {
+                *this->mMatFile << matlab::MatioData( mat, this->mDataLocation + pair.second );
+            }
+        }
+
+        for ( auto &pair : mMatlabVectors )
+        {
+            auto &vec = *pair.first;
+            if ( !vec.empty() )
+            {
+                *this->mMatFile << matlab::MatioData( vec, this->mDataLocation + pair.second );
+            }
+        }
     };
 
     /// Set the matlab struct that all data is written to, e.g. diga.daten
     virtual void SetDataLocation( const std::string &location ) { this->mDataLocation = location + "."; }
     virtual void SetFilenamePrefix( const std::string &prefix ) { this->mFilenamePrefix = prefix; }
 
-    virtual void MaxSampleReached( size_t nextNumber ) = 0;
+    virtual void MaxSampleReached( size_t nextNumber );
     virtual void PrepareFilter( ArgumentType /*&prepData */ )
     {
         this->mMatFile.reset( new matlab::MatFile( MakeFilename( mCurrentCycle ), MAT_ACC_RDWR ) );
     }
 
     protected:
+    virtual void InitializeMatrices( const size_t vectorSizes );
+
+    std::vector< std::pair< std::vector< std::vector< double > > *, std::string > > mMatlabMatrices;
+    std::vector< std::pair< std::vector< double > *, std::string > > mMatlabVectors;
     std::string mFilename;
     std::vector< double > mTime;
     const size_t mMaxSize = 100000;
@@ -83,6 +110,7 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
     boost::scoped_ptr< matlab::MatFile > mMatFile;
     std::string mDataLocation;
     std::string mFilenamePrefix;
+    size_t mMatrixSizes;
 
     std::string MakeFilename( size_t cycle )
     {
@@ -101,6 +129,36 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
         return path + this->mFilenamePrefix + filenameWithoutExtension + "_" + std::to_string( cycle ) + extension;
     }
 };
+
+template < typename T, template < typename > class TConcrete, typename ArgumentType >
+void MatlabFilter< T, TConcrete, ArgumentType >::InitializeMatrices( const size_t matrixSizes )
+{
+    for ( auto &pair : mMatlabMatrices )
+    {
+        pair.first->resize( matrixSizes );
+    }
+    this->mMatrixSizes = matrixSizes;
+}
+
+template < typename T, template < typename > class TConcrete, typename ArgumentType >
+void MatlabFilter< T, TConcrete, ArgumentType >::MaxSampleReached( size_t nextNumber )
+{
+    WriteToDisk();
+    this->mMatFile.reset( new matlab::MatFile( this->MakeFilename( nextNumber ), MAT_ACC_RDWR ) );
+
+    for ( auto &pair : mMatlabMatrices )
+    {
+        for ( size_t i = 0; i < mMatrixSizes; ++i )
+        {
+            pair.first->at( i ).clear();
+        }
+    }
+
+    for ( auto &pair : mMatlabVectors )
+    {
+        pair.first->clear();
+    }
+}
 
 template < typename T, template < typename > class TConcrete, typename ArgumentType >
 class MatlabFilterBase : public MatlabFilter< T, TConcrete, ArgumentType >
@@ -122,89 +180,14 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
     typedef Filter< T, electrical::TwoPort, PreparationType< T > > FilterT;
 
     public:
-    MatlabFilterBase( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" )
-        : MatlabFilter< T, electrical::TwoPort, PreparationType< T > >( filename, maxSize, filenamePrefix ){};
+    MatlabFilterBase( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" );
 
-    virtual ~MatlabFilterBase() { WriteToDisk(); }
-
-    virtual void WriteToDisk()
-    {
-        MatlabFilter< T, electrical::TwoPort, PreparationType< T > >::WriteToDisk();
-        if ( mCurrentVec.empty() || mVoltageVec.empty() || mPowerVec.empty() || mSocVec.empty() || mTemperatureVec.empty() )
-            return;
-
-        size_t resizer = 0;
-        for ( size_t i = 0; i < mCurrentVec.size(); ++i )
-        {
-            if ( mCurrentVec[i].empty() )
-            {
-                resizer = i;
-                break;
-            }
-        }
-        if ( resizer )
-        {
-            mCurrentVec.resize( resizer );
-            mVoltageVec.resize( resizer );
-            mAnodeVoltageVec.resize( resizer );
-            mAnodePotentialVec.resize( resizer );
-            mCathodeVoltageVec.resize( resizer );
-            mCathodePotentialVec.resize( resizer );
-            mPowerVec.resize( resizer );
-            mSocVec.resize( resizer );
-            mAnodeSocVec.resize( resizer );
-            mCathodeSocVec.resize( resizer );
-            mTemperatureVec.resize( resizer );
-        }
-
-        *this->mMatFile << matlab::MatioData( mCurrentVec, this->mDataLocation + "StromVec" );
-        *this->mMatFile << matlab::MatioData( mVoltageVec, this->mDataLocation + "SpannungVec" );
-        *this->mMatFile << matlab::MatioData( mAnodeVoltageVec, this->mDataLocation + "AnodeVoltageVec" );
-        *this->mMatFile << matlab::MatioData( mAnodePotentialVec, this->mDataLocation + "AnodePotentialVec" );
-        *this->mMatFile << matlab::MatioData( mCathodeVoltageVec, this->mDataLocation + "CathodeVoltageVec" );
-        *this->mMatFile << matlab::MatioData( mCathodePotentialVec, this->mDataLocation + "CathodePotentialVec" );
-        *this->mMatFile << matlab::MatioData( mPowerVec, this->mDataLocation + "ThermischLeistungVec" );
-        *this->mMatFile << matlab::MatioData( mSocVec, this->mDataLocation + "SOCVec" );
-        *this->mMatFile << matlab::MatioData( mAnodeSocVec, this->mDataLocation + "AnodeSOCVec" );
-        *this->mMatFile << matlab::MatioData( mCathodeSocVec, this->mDataLocation + "CathodeSOCVec" );
-        *this->mMatFile << matlab::MatioData( mTemperatureVec, this->mDataLocation + "TemperaturVec" );
-
-        if ( mCurrent.empty() || mVoltage.empty() || mPower.empty() )
-            return;
-
-        *this->mMatFile << matlab::MatioData( mCurrent, this->mDataLocation + "Strom" );
-        *this->mMatFile << matlab::MatioData( mVoltage, this->mDataLocation + "Spannung" );
-        *this->mMatFile << matlab::MatioData( mPower, this->mDataLocation + "ThermischLeistung" );
-    }
-
-    virtual void MaxSampleReached( size_t nextNumber )
-    {
-        WriteToDisk();
-        this->mMatFile.reset( new matlab::MatFile( this->MakeFilename( nextNumber ), MAT_ACC_RDWR ) );
-
-        for ( size_t i = 0; i < mCurrentVec.size(); ++i )
-        {
-            mCurrentVec.at( i ).clear();
-            mVoltageVec.at( i ).clear();
-            mAnodeVoltageVec.at( i ).clear();
-            mAnodePotentialVec.at( i ).clear();
-            mCathodeVoltageVec.at( i ).clear();
-            mCathodePotentialVec.at( i ).clear();
-            mPowerVec.at( i ).clear();
-            mSocVec.at( i ).clear();
-            mAnodeSocVec.at( i ).clear();
-            mCathodeSocVec.at( i ).clear();
-            mTemperatureVec.at( i ).clear();
-        }
-        mCurrent.clear();
-        mVoltage.clear();
-        mPower.clear();
-    }
+    virtual ~MatlabFilterBase() { this->WriteToDisk(); }
 
     virtual void PrepareFilter( PreparationType< T > &prePareData )
     {
         MatlabFilter< T, electrical::TwoPort, PreparationType< T > >::PrepareFilter( prePareData );
-        InitializeVectors( prePareData.mNumberOfElements );
+        this->InitializeMatrices( prePareData.mNumberOfElements );
         mRootPort = prePareData.mRootPort;
         if ( mRootPort )
         {
@@ -257,22 +240,6 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
         MatlabFilter< T, electrical::TwoPort, PreparationType< T > >::ProcessData( data, t );
     }
 
-    private:
-    void InitializeVectors( const size_t vectorSizes )
-    {
-        mCurrentVec.resize( vectorSizes );
-        mVoltageVec.resize( vectorSizes );
-        mAnodeVoltageVec.resize( vectorSizes );
-        mAnodePotentialVec.resize( vectorSizes );
-        mCathodeVoltageVec.resize( vectorSizes );
-        mCathodePotentialVec.resize( vectorSizes );
-        mSocVec.resize( vectorSizes );
-        mAnodeSocVec.resize( vectorSizes );
-        mCathodeSocVec.resize( vectorSizes );
-        mPowerVec.resize( vectorSizes );
-        mTemperatureVec.resize( vectorSizes );
-    };
-
     std::vector< std::vector< double > > mCurrentVec;
     std::vector< std::vector< double > > mVoltageVec;
     std::vector< std::vector< double > > mAnodeVoltageVec;
@@ -291,6 +258,26 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
 };
 
 template < typename T >
+MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >::MatlabFilterBase( std::string filename, const size_t maxSize,
+                                                                                    const std::string &filenamePrefix )
+    : MatlabFilter< T, electrical::TwoPort, PreparationType< T > >( filename, maxSize, filenamePrefix )
+{
+    this->mMatlabMatrices = {{&mCurrentVec, "StromVec"},
+                             {&mVoltageVec, "SpannungVec"},
+                             {&mAnodeVoltageVec, "AnodeVoltageVec"},
+                             {&mAnodePotentialVec, "AnodePotentialVec"},
+                             {&mCathodeVoltageVec, "CathodeVoltageVec"},
+                             {&mCathodePotentialVec, "CathodePotentialVec"},
+                             {&mPowerVec, "ThermischLeistungVec"},
+                             {&mSocVec, "SOCVec"},
+                             {&mAnodeSocVec, "AnodeSOCVec"},
+                             {&mCathodeSocVec, "CathodeSOCVec"},
+                             {&mTemperatureVec, "TemperaturVec"}};
+
+    this->mMatlabVectors = {{&mCurrent, "Strom"}, {&mVoltage, "Spannung"}, {&mPower, "ThermischLeistung"}};
+};
+
+template < typename T >
 class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
     : public MatlabFilter< T, thermal::ThermalElement, ThermalPreperation >
 {
@@ -298,47 +285,9 @@ class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
     typedef Filter< T, thermal::ThermalElement, ThermalPreperation > FilterT;
 
     public:
-    MatlabFilterBase( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" )
-        : MatlabFilter< T, thermal::ThermalElement, ThermalPreperation >( filename, maxSize, filenamePrefix )
-        , mFileNameVertices( "Patch_Vertices.csv" )
-        , mFileNameAreas( "Patch_Areas.csv" )
-        , mFileNameAreasElectrical( "Patch_AreasElectrical.csv" )
-        , mFileNameElectricThermalMapping( "Patch_ElectricThermalMapping.csv" )
-        , mFileNameVolumes( "Patch_Volumes.csv" )
-        , mFileNameVolumeNames( "Patch_VolumeNames.csv" )
-        , mFileNameVolumeMaterials( "Patch_VolumeMaterials.csv" ){};
+    MatlabFilterBase( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" );
 
-    virtual ~MatlabFilterBase() { WriteToDisk(); }
-
-    virtual void WriteToDisk()
-    {
-        MatlabFilter< T, thermal::ThermalElement, ThermalPreperation >::WriteToDisk();
-        if ( !mTemperature.empty() )
-            *this->mMatFile << matlab::MatioData( mTemperature, this->mDataLocation + "Temperature" );
-
-        if ( !mProbesTemperature.empty() )
-            *this->mMatFile << matlab::MatioData( mProbesTemperature, this->mDataLocation + "ThermalProbe" );
-
-        if ( !mCoolingVector.empty() )
-            *this->mMatFile << matlab::MatioData( mCoolingVector, this->mDataLocation + "Cooling" );
-    }
-
-    virtual void MaxSampleReached( size_t nextNumber )
-    {
-        WriteToDisk();
-        // std::swap( this->mMatFile, matlab::MatFile( nextNumber + "_" + this->mFilename, MAT_ACC_RDWR ) );
-        this->mMatFile.reset( new matlab::MatFile( this->MakeFilename( nextNumber ), MAT_ACC_RDWR ) );
-
-        for ( size_t i = 0; i < mTemperature.size(); ++i )
-        {
-            mTemperature[i].clear();
-            mCoolingVector[i].clear();
-        }
-        for ( size_t i = 0; i < mProbesTemperature.size(); ++i )
-        {
-            mProbesTemperature[i].clear();
-        }
-    }
+    virtual ~MatlabFilterBase() { this->WriteToDisk(); }
 
     virtual void PrepareFilter( ThermalPreperation &prepData )
     {
@@ -438,6 +387,23 @@ class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
     std::vector< std::vector< double > > mTemperature;
     std::vector< std::vector< double > > mCoolingVector;
     std::vector< std::vector< double > > mProbesTemperature;
+};
+
+template < typename T >
+MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >::MatlabFilterBase( std::string filename, const size_t maxSize,
+                                                                                      const std::string &filenamePrefix )
+    : MatlabFilter< T, thermal::ThermalElement, ThermalPreperation >( filename, maxSize, filenamePrefix )
+    , mFileNameVertices( "Patch_Vertices.csv" )
+    , mFileNameAreas( "Patch_Areas.csv" )
+    , mFileNameAreasElectrical( "Patch_AreasElectrical.csv" )
+    , mFileNameElectricThermalMapping( "Patch_ElectricThermalMapping.csv" )
+    , mFileNameVolumes( "Patch_Volumes.csv" )
+    , mFileNameVolumeNames( "Patch_VolumeNames.csv" )
+    , mFileNameVolumeMaterials( "Patch_VolumeMaterials.csv" )
+{
+    this->mMatlabMatrices = {{&mTemperature, "Temperature"},
+                             {&mProbesTemperature, "ThermalProbe"},
+                             {&mCoolingVector, "Cooling"}};
 };
 
 template < typename T >

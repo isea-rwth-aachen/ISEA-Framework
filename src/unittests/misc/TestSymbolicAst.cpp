@@ -10,8 +10,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../misc/ast_visitor/symbolicVisitor.h"
 #include "../../misc/ast_visitor/optimizationVisitor.h"
 #include "../../misc/ast_visitor/uniqueTokenizerVisitor.h"
-#include "../../states/soc.h"
-#include "../../states/thermal_state.h"
+#include "../../state/soc.h"
+#include "../../state/thermal_state.h"
 #include "../object/TestLookupObj.h"
 
 void FinalizeOptimization( std::vector< std::string > &input, std::vector< std::string > &result, std::vector< size_t > &counts )
@@ -391,8 +391,8 @@ void TestSymbolicAst::TestRestructuringAstVariables()
 
     std::vector< double > Temp = CreateTemp();
     std::vector< double > SOC = CreateSOC();
-    boost::shared_ptr< electrical::state::Soc > testSoc( new electrical::state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
-    boost::shared_ptr< ::state::ThermalState< double > > testTemp( new ::state::ThermalState< double >( 23.0 ) );
+    boost::shared_ptr< state::Soc > testSoc( new state::Soc( capacity /* [Ah] */, capacity, status /*[%]*/ ) );
+    boost::shared_ptr< state::ThermalState< double > > testTemp( new state::ThermalState< double >( 23.0 ) );
 
     std::vector< double > m1 = Createm1();
     std::vector< double > f1_m = Createf1();

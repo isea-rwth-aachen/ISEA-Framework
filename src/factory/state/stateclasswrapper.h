@@ -22,13 +22,13 @@
 
 #include "../../electrical/electrical_data_struct.h"
 
-#include "../../states/aging_state.h"
-#include "../../states/soc.h"
-#include "../../states/surface_soc.h"
-#include "../../states/thermal_state.h"
-#include "../../states/valueStateWrapper.h"
+#include "../../state/aging_state.h"
+#include "../../state/soc.h"
+#include "../../state/surface_soc.h"
+#include "../../state/thermal_state.h"
+#include "../../state/valueStateWrapper.h"
 
-using namespace ::state;
+using namespace state;
 
 namespace factory
 {
@@ -45,38 +45,38 @@ struct ArgumentTypeState
     double mCapacityFactor;
 };
 
-/// Classwrapper for ::state namespace. This template class has to be
+/// Classwrapper for state namespace. This template class has to be
 /// specialized in order to create an instance of a
 /// particular class.
 template < class ValueT >
 class StateClassWrapperBase : public ClassWrapperBase< State, ArgumentTypeState >
 {
     public:
-    StateClassWrapperBase( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapperBase( Factory< state::State, ArgumentTypeState > *stateFactory )
         : mStateFactory( stateFactory ){};
 
     protected:
-    /// Get a ::state Factory.
-    Factory< ::state::State, ArgumentTypeState > *GetStateFactory() { return mStateFactory; }
+    /// Get a state Factory.
+    Factory< state::State, ArgumentTypeState > *GetStateFactory() { return mStateFactory; }
 
     private:
-    Factory< ::state::State, ArgumentTypeState > *const mStateFactory;
+    Factory< state::State, ArgumentTypeState > *const mStateFactory;
 };
 
 template < class TConcrete >
 class StateClassWrapper : public StateClassWrapperBase< double >
 {
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
 };
 
-/// Classwrapper for electrical::state::Soc
+/// Classwrapper for state::Soc
 template <>
-class StateClassWrapper< electrical::state::Soc > : public StateClassWrapperBase< double >
+class StateClassWrapper< state::Soc > : public StateClassWrapperBase< double >
 {
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
 
     boost::shared_ptr< State > CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeState *arg = 0 )
@@ -95,24 +95,24 @@ class StateClassWrapper< electrical::state::Soc > : public StateClassWrapperBase
 
         if ( !param->HasElementDirectChild( "MinimumValue" ) )
         {
-            return boost::shared_ptr< State >( new ::electrical::state::Soc( initialCapacity, actualCapacity, initialSoc ) );
+            return boost::shared_ptr< State >( new state::Soc( initialCapacity, actualCapacity, initialSoc ) );
         }
         else
         {
             double minimumValue = param->GetElementDoubleValue( "MinimumValue" );
             double maximumValue = param->GetElementDoubleValue( "MaximumValue" );
             return boost::shared_ptr< State >(
-             new ::electrical::state::Soc( initialCapacity, actualCapacity, initialSoc, minimumValue, maximumValue ) );
+             new state::Soc( initialCapacity, actualCapacity, initialSoc, minimumValue, maximumValue ) );
         }
     }
 };
 
-/// Classwrapper for ::state::ThermalState
+/// Classwrapper for state::ThermalState
 template <>
-class StateClassWrapper< ::state::ThermalState< double > > : public StateClassWrapperBase< double >
+class StateClassWrapper< state::ThermalState< double > > : public StateClassWrapperBase< double >
 {
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
     boost::shared_ptr< State > CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeState * /* arg */ = 0 )
     {
@@ -128,34 +128,34 @@ class StateClassWrapper< ::state::ThermalState< double > > : public StateClassWr
         if ( param->HasElementDirectChild( "InitialTemperature" ) )
         {
             double initTemp = param->GetElementDoubleValue( "InitialTemperature" );
-            return boost::shared_ptr< State >( new ::state::ThermalState< double >( initTemp ) );
+            return boost::shared_ptr< State >( new state::ThermalState< double >( initTemp ) );
         }
         else
-            return boost::shared_ptr< State >( new ::state::ThermalState< double >() );
+            return boost::shared_ptr< State >( new state::ThermalState< double >() );
     }
 };
 
-/// Classwrapper for electrical::state::SurfaceSoc
+/// Classwrapper for state::SurfaceSoc
 template <>
-class StateClassWrapper< electrical::state::SurfaceSoc > : public StateClassWrapperBase< double >
+class StateClassWrapper< state::SurfaceSoc > : public StateClassWrapperBase< double >
 {
 
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
     boost::shared_ptr< State > CreateInstance( const xmlparser::XmlParameter * /* param */, const ArgumentTypeState * /* arg */ = 0 )
     {
-        return boost::shared_ptr< State >( new electrical::state::SurfaceSoc() );
+        return boost::shared_ptr< State >( new state::SurfaceSoc() );
     }
 };
 
 /// Classwrapper for state::ValueStateWrapper
 
 template <>
-class StateClassWrapper< ::state::ValueStateWrapper< ScalarUnit > > : public StateClassWrapperBase< double >
+class StateClassWrapper< state::ValueStateWrapper< ScalarUnit > > : public StateClassWrapperBase< double >
 {
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
     boost::shared_ptr< State > CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeState *arg = 0 )
     {
@@ -170,17 +170,17 @@ class StateClassWrapper< ::state::ValueStateWrapper< ScalarUnit > > : public Sta
         if ( stateType.find( "current" ) != std::string::npos )
         {
             return boost::shared_ptr< State >(
-             new ::state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mCurrentValue ) ) );
+             new state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mCurrentValue ) ) );
         }
         else if ( stateType.find( "voltage" ) != std::string::npos )
         {
             return boost::shared_ptr< State >(
-             new ::state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mVoltageValue ) ) );
+             new state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mVoltageValue ) ) );
         }
         else if ( stateType.find( "power" ) != std::string::npos )
         {
             return boost::shared_ptr< State >(
-             new ::state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mPowerValue ) ) );
+             new state::ValueStateWrapper< ScalarUnit >( &( arg->mElectricalDataStruct->mPowerValue ) ) );
         }
         // ERROR
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "UndefinedStateType", stateType.c_str() );
@@ -195,7 +195,7 @@ template <>
 class StateClassWrapper< state::AgingState > : public StateClassWrapperBase< double >
 {
     public:
-    StateClassWrapper( Factory< ::state::State, ArgumentTypeState > *stateFactory )
+    StateClassWrapper( Factory< state::State, ArgumentTypeState > *stateFactory )
         : StateClassWrapperBase< double >( stateFactory ){};
 
     boost::shared_ptr< State > CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeState * /*arg*/ = 0 )

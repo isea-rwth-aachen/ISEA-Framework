@@ -6,7 +6,7 @@
 
 #include "../electrical/cellelement.h"
 #include "../misc/rainflow.h"
-#include "../states/soc.h"
+#include "../state/soc.h"
 #include "empirical_aging.h"
 
 #include <algorithm>
@@ -48,6 +48,7 @@ class CyclicalAging : public EmpiricalAging
 
     double mActualDod;                 // [%/100]
     double mActualVoltage;             // [V]
+    double mActualSoc;                 // [%/100]
     double mTimeSinceLastAgingStep;    // [s]
 
     std::vector< double > mTimeValues;       // [s]

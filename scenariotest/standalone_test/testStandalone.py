@@ -5,10 +5,6 @@ import sys, os
 
 
 def testStandalone(standalone, xmlFiles):
-    if len(sys.argv) < 3:
-        print("Usage: ./testStandalone.py <standalone> <xml>")
-        return 0
-
     success = True
 
     for xml in xmlFiles:
@@ -55,8 +51,8 @@ def testStandalone(standalone, xmlFiles):
 
 def main():
     if (len(sys.argv) < 3):
-        print("Usage: testStandalone <standalone> <xml>")
-        return
+        print("Usage: ./testStandalone.py <standalone> <xml>")
+        return 0
 
     testStandalone(sys.argv[1], sys.argv[2:])
 

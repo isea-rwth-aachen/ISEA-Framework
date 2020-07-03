@@ -234,11 +234,11 @@
         BlockObserver wurde nicht initialisiert.
     </BlockObserverNonInitialized>
 
-    <SocStopCriterionInPercentNegative used="thermal/electrical_simulation.h">
+    <SocStopCriterionInPercentNegative used="electrical/electrical_simulation.h">
         SocStopCriterionInPercent in 'options' in der xml-Datei muss positiv sein.
     </SocStopCriterionInPercentNegative>
 
-    <errorResetStatesToPointOfTimeExecution used="thermal/electrical_simulation.h">
+    <errorResetStatesToPointOfTimeExecution used="electrical/electrical_simulation.h">
         Voraussetzungen für eine korrekte Ausführung von ResetStatesToPointOfTime sind nicht erfüllt.
     </errorResetStatesToPointOfTimeExecution>
 

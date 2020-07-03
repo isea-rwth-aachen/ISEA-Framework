@@ -26,7 +26,7 @@ public:
                    , const Cylindric<T> &deltaVector
                    , T initialTemperatureValue
                    , const Material<T> *material
-                   , ::state::ThermalState<T> *thermalState = 0
+                   , state::ThermalState<T> *thermalState = 0
                    , T thermalStateFactor = 1.0);
     virtual ~CylindricElement();
 private:
@@ -44,7 +44,7 @@ CylindricElement<T>::CylindricElement(const Cartesian<T> &emplacementPoint
                                     , const Cylindric<T> &deltaVector
                                     , T initialTemperatureValue
                                     , const Material<T> *material
-                                    , ::state::ThermalState<T> *thermalState
+                                    , state::ThermalState<T> *thermalState
                                     , T thermalStateFactor)
     : mEmplacementPoint(emplacementPoint)
     , mStartVector(startVector)

@@ -43,7 +43,7 @@ class CutCylElement : public ThermalElement< T >
      */
     CutCylElement( const Cartesian< T > &emplacementPoint, const Cylindric< T > &startVector, const Angle< T > &deltaPhi,
                    T deltaZ, const TwoDim< T > &cutLineEmplacement, const TwoDim< T > &cutLineDirection, T initialTemperatureValue,
-                   const Material< T > *material, ::state::ThermalState< T > *thermalState = 0, T thermalStateFactor = 1.0 );
+                   const Material< T > *material, state::ThermalState< T > *thermalState = 0, T thermalStateFactor = 1.0 );
     virtual ~CutCylElement();
     /// Returns vertex at cut line at (phi==startVector) in local xy-coordinates system with origin at emplacement point
     const TwoDim< T > &GetStraightEdgeVertexStart() const;
@@ -81,7 +81,7 @@ template < typename T >
 CutCylElement< T >::CutCylElement( const Cartesian< T > &emplacementPoint, const Cylindric< T > &startVector,
                                    const Angle< T > &deltaPhi, T deltaZ, const TwoDim< T > &cutLineEmplacement,
                                    const TwoDim< T > &cutLineDirection, T initialTemperatureValue, const Material< T > *material,
-                                   ::state::ThermalState< T > *thermalState, T thermalStateFactor )
+                                   state::ThermalState< T > *thermalState, T thermalStateFactor )
     : mEmplacementPoint( emplacementPoint )
     , mStartVector( startVector )
     , mDeltaPhi( deltaPhi )

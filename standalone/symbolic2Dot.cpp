@@ -5,12 +5,12 @@
 * Created By : Friedrich Hust
 _._._._._._._._._._._._._._._._._._._._._.*/
 
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include "../src/misc/symbolicAst.h"
 #include "../src/misc/ast_visitor/dotVisitor.h"
 #include "../src/misc/ast_visitor/uniqueTokenizerVisitor.h"
+#include "../src/misc/symbolicAst.h"
+#include <cstdlib>
+#include <iostream>
+#include <string>
 
 extern template struct symbolic::SymbolicAst< std::string::const_iterator >;
 extern template struct symbolic::ast::DotVisitor< &std::cout, true >;
@@ -21,6 +21,13 @@ int main( int argc, char *argv[] )
 {
     using namespace symbolic;
     using boost::spirit::ascii::space;
+
+    bool maxDepth = true;
+    standalone::Standalone app( "ISEA-Framework Symbolic To Dot Standalone" );
+    app.mApp.add_option( "max-depth", maxDepth, "MaxDepth option for the dot visitor. Default = true" );
+    if ( !app.ParseCommandLine( argc, argv ) )
+        return EXIT_FAILURE;
+
     std::string input;
     std::cin >> input;
 
@@ -46,30 +53,9 @@ int main( int argc, char *argv[] )
             boost::apply_visitor( visitor_U, emp );
             tmp = visitor_U.mUniqueTokenz;
         }
-        if ( argc != 2 )
-        {
-            symbolic::ast::DotVisitor< &std::cout, true > visitor( tmp );
-            boost::apply_visitor( visitor, emp );
-        }
 
-        if ( argc == 2 )
-        {
-            if ( std::string( argv[1] ) == "1" )
-            {
-                symbolic::ast::DotVisitor< &std::cout, true > visitor( tmp );
-                boost::apply_visitor( visitor, emp );
-            }
-            else if ( std::string( argv[1] ) == "2" || std::string( argv[1] ) == "0" )
-            {
-                symbolic::ast::DotVisitor< &std::cout, false > visitor( tmp );
-                boost::apply_visitor( visitor, emp );
-            }
-            else
-            {
-                std::cerr << "No correct input for argv[1]" << std::endl;
-                std::exit( EXIT_FAILURE );
-            }
-        }
+        symbolic::ast::DotVisitor< &std::cout, maxDepth > visitor( tmp );
+        boost::apply_visitor( visitor, emp );
     }
 
     std::exit( EXIT_SUCCESS );

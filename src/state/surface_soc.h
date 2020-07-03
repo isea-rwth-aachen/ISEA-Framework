@@ -8,9 +8,9 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #define _SURFACE_SOC_
 
 // STD
-#include <vector>
-#include <limits>
 #include <boost/shared_ptr.hpp>
+#include <limits>
+#include <vector>
 
 // ETC
 #include "dgl_state.h"
@@ -24,17 +24,13 @@ namespace electrical
 {
 template < typename T >
 class TwoPort;
-// namespace state { class Soc; }
 };
 
 
-/// DESCRIPTION
-namespace electrical
-{
 namespace state
 {
 /// This class describes the behaviour of the State of Charge depending on the capacity
-class SurfaceSoc : public ::state::State    //:  public Soc
+class SurfaceSoc : public State
 {
     public:
     SurfaceSoc();
@@ -46,7 +42,7 @@ class SurfaceSoc : public ::state::State    //:  public Soc
 
     void SetReverseLookup( boost::shared_ptr< object::Object< double > > reverseLookup );    //< A setter method for the
     // reverse lookup object
-    void SetElementsForLookup( std::vector< electrical::TwoPort< myMatrixType > * > vec );    //< This setter provides a
+    void SetElementsForLookup( std::vector< electrical::TwoPort< myMatrixType >* > vec );    //< This setter provides a
     // list of all twoPorts
     // that are used for
     // calculating the outer
@@ -59,9 +55,8 @@ class SurfaceSoc : public ::state::State    //:  public Soc
 
     private:
     boost::shared_ptr< object::Object< double > > mReverseLookup;
-    std::vector< ::electrical::TwoPort< myMatrixType > * > mVecElements;
+    std::vector< ::electrical::TwoPort< myMatrixType >* > mVecElements;
     double mCurrentValue;
 };
-} /* state */
-}
+}    // namespace state
 #endif /* _SURFACE_SOC_ */

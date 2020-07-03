@@ -43,7 +43,7 @@ class Supercap : public ThermalBlock< T >
     Supercap( const char *description, const Cartesian< T > &emplacementPoint, T length, T innerCellRadius, T outerCellRadius,
               T height, size_t nPhi, size_t nZ, T arcPolygonEdgesLength, const Material< T > *innerCellMaterial,
               const Material< T > *outerCellMaterial, const Material< T > *fillMaterial, T initialTemperature,
-              const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+              const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
               size_t electricalDiscretizationPhi = 1, size_t electricalDiscretizationZ = 1 );
     virtual ~Supercap();
     void CreateData( vector< shared_ptr< ThermalElement< T > > > &thermalElements,
@@ -92,7 +92,7 @@ template < typename T >
 Supercap< T >::Supercap( const char *description, const Cartesian< T > &emplacementPoint, T length, T innerCellRadius, T outerCellRadius,
                          T height, size_t nPhi, size_t nZ, T arcPolygonEdgesLength, const Material< T > *innerCellMaterial,
                          const Material< T > *outerCellMaterial, const Material< T > *fillMaterial,
-                         T initialTemperature, const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+                         T initialTemperature, const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
                          size_t electricalDiscretizationPhi, size_t electricalDiscretizationZ )
     : ThermalBlock< T >( thermalStates, emplacementPoint, description )
     , mRadialEmplacementPoint( emplacementPoint + Cartesian< T >( 0.5 * length, 0.5 * length, 0.0 ) )

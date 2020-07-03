@@ -3,18 +3,12 @@
 #include <string>
 
 // ETC
-#include "../src/misc/CLI11.hpp"
 #include "../src/misc/StrCont.h"
 #include "../src/misc/matrixInclude.h"
-#include "../src/thermal/electrical_simulation.h"
+#include "../src/electrical/electrical_simulation.h"
 #include "../src/version/version.h"
 #include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
-
-void printVersion( int /* count */ )
-{
-    printf( "Version: %s\n", VERSION_NUMBER );
-    throw CLI::Success();
-}
+#include "standalone/standalone.h"
 
 extern template class electrical::TwoPort< myMatrixType >;
 extern template class simulation::ElectricalSimulation< myMatrixType, double, true >;
@@ -22,13 +16,11 @@ extern template class simulation::ElectricalSimulation< myMatrixType, double, fa
 
 int main( int argc, char *argv[] )
 {
-    CLI::App app( "ISEA-Framework check total capacity" );
-
     std::string xmlFilename;
-    std::string currentFilename;
-    app.add_flag_function( "-v,--version", printVersion, "Display version information and exit" )->short_circuit();
-    app.add_option( "xml-file", xmlFilename, "XML configuration file" )->required();
-    CLI11_PARSE( app, argc, argv );
+    standalone::Standalone app( "ISEA-Framework check total capacity" );
+    app.mApp.add_option( "xml-file", xmlFilename, "XML configuration file" )->required();
+    if ( !app.ParseCommandLine( argc, argv ) )
+        return EXIT_FAILURE;
 
     // Parameter 1
     boost::scoped_ptr< xmlparser::XmlParser > parser;
@@ -41,12 +33,6 @@ int main( int argc, char *argv[] )
     {
         printf( "At 1. parameter: xml-file\n" );
         printf( "%s\n", e.what() );
-        return EXIT_FAILURE;
-    }
-    catch ( ... )
-    {
-        printf( "At 1. parameter: xml-file\n" );
-        printf( "Unidentified error\n" );
         return EXIT_FAILURE;
     }
 
@@ -76,11 +62,6 @@ int main( int argc, char *argv[] )
         const char *message = e.what();
         printf( "Error while creating the equation systems\n" );
         printf( "%s", message );
-        return EXIT_FAILURE;
-    }
-    catch ( ... )
-    {
-        printf( "Unknown error while creating the equation systems\n" );
         return EXIT_FAILURE;
     }
 

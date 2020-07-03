@@ -14,7 +14,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../export/spiceExport.h"
 #include "../misc/fast_copy_matrix.h"
 #include "../observer/filter/filter.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
 
 #ifndef _SYMBOLIC_

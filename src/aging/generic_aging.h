@@ -2,7 +2,7 @@
 #define _GENERIC_AGING__
 
 #include "../electrical/cellelement.h"
-#include "../states/thermal_state.h"
+#include "../state/thermal_state.h"
 #include "../visitor/visitor.h"
 #include "aging_base.h"
 

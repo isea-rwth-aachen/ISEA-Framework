@@ -12,8 +12,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "../../../states/soc.h"
-#include "../../../states/thermal_state.h"
+#include "../../../state/soc.h"
+#include "../../../state/thermal_state.h"
 
 #include "../../../system/dae_sys.h"
 #include "../../../system/stateSystemGroup.h"
@@ -67,7 +67,7 @@ void TestElectricalFactory::StatePropagationTest1() const
 {
 #ifndef _SYMBOLIC_
     factory::FactoryBuilder< MatrixT, ScalarUnit > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState > *stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState > *stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > > *objectFactory =
      factoryBuilder.BuildObjectFactory();
 

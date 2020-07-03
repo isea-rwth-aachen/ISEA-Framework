@@ -38,7 +38,7 @@ void TestOdeSystemThermal::TestOdeSystem2RectangularBlocks()
         vector< vector< IndexedValue< double > > > conductivityMatrix( 1 );
         vector< vector< TaylorData< double > > > coolingDataVector;
         vector< vector< TaylorData< double > > > dirichletDataVector( 1 );
-        vector< shared_ptr< ::state::ThermalState< double > > > thermalStates;
+        vector< shared_ptr< state::ThermalState< double > > > thermalStates;
 
         TS_ASSERT_THROWS_EQUALS( OdeSystemThermal<> system( thermalElements, conductivityMatrix, coolingDataVector,
                                                             dirichletDataVector, convection, radiation, 25.0, thermalStates ),
@@ -99,11 +99,11 @@ void TestOdeSystemThermal::TestOdeSystem2RectangularBlocks()
         shared_ptr< Radiation<> > radiation;
 
 
-        vector< shared_ptr< ::state::ThermalState<> > > thermalStates = vector< shared_ptr< ::state::ThermalState<> > >( 1 );
-        thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
-        vector< shared_ptr< ::state::ThermalState<> > > unconnectedThermalStates =
-         vector< shared_ptr< ::state::ThermalState<> > >( 1 );
-        unconnectedThermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+        vector< shared_ptr< state::ThermalState<> > > thermalStates = vector< shared_ptr< state::ThermalState<> > >( 1 );
+        thermalStates.at( 0 ).reset( new state::ThermalState<> );
+        vector< shared_ptr< state::ThermalState<> > > unconnectedThermalStates =
+         vector< shared_ptr< state::ThermalState<> > >( 1 );
+        unconnectedThermalStates.at( 0 ).reset( new state::ThermalState<> );
         vector< shared_ptr< Material<> > > materials = vector< shared_ptr< Material<> > >( 1 );
         materials.at( 0 ).reset( new Material<>( 1.0, 1.0, 1.0, 1.0, 1.0 ) );
         vector< shared_ptr< Cooling<> > > coolings = vector< shared_ptr< Cooling<> > >( 1 );
@@ -119,8 +119,8 @@ void TestOdeSystemThermal::TestOdeSystem2RectangularBlocks()
         TS_ASSERT( testPreservingData.mCoolings == coolings );
     }
 
-    vector< shared_ptr< ::state::ThermalState<> > > thermalStates( 1 );
-    thermalStates.at( 0 ).reset( new ::state::ThermalState<> );
+    vector< shared_ptr< state::ThermalState<> > > thermalStates( 1 );
+    thermalStates.at( 0 ).reset( new state::ThermalState<> );
     thermalStates.at( 0 )->AddPowerDissipation( 1000.0, 0.0 );
     Material<> material( 250.0, 1000.0, 50.0, 50.0, 50.0 );
     RectangularBlock<> block1( "descriptionText", Cartesian<>( 0.0, 0.0, 0.0 ), 0.8, 0.6, 0.2, 4, 3, 2, &material, 27.0 );

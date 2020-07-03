@@ -36,18 +36,6 @@ TimeBetweenFramesInSec = -1, jeden Zeitschritt <br/>
 TimeBetweenFramesInSec > x, Output immer nachdem mindestens x Sekunden verstrichen sind<br/>
 MaxNumberOfFrames = 0 und TimeBetweenFramesInSec > 0, schreibt nur Anfangs- und Endzustand der Simulation<br/>
 
-Simulink
-===============
-Falls Simulink benutzt wird, gibt es drei optionale Knoten, die kompilierte Mindestgrößen für die folgenden Datenfelder festlegen:
-- <**MaxStateSize**>: Maximale Anzahl der Zustände, die dem Gleichungslöser übergeben werden. Wird benötigt bei rein elektrischer, rein thermischer und gekoppelt elektrisch/thermischer Simulation (default 2000).
-- <**MaxOutputSize**>: Maximale Anzahl der elektrischen Größen, die sichtbar (observable-Attribut) sind. Wird benötigt bei rein elektrischer und gekoppelt elektrisch/thermischer Simulation (default 500).
-- <**MaxNumberOfCells**>: Maximale Anzahl der Zellen. Wird benötigt bei rein thermischer und elektrisch/thermischer Simulation (default 100).
-
-Die kompilierte Größe ist das Maximum aus diesen Werten und den Werten, die für die erste initialisierte xml-Datei benötigt werden:
-Wenn ein benötigter Knoten nicht existiert, nimmt die Software einen Default-Wert an.
-
-
-
 \~English
 Global options can be set within the <**Options**>-node. According to the simulation type, following options can be set:
 

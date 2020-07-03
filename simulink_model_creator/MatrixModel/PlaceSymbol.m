@@ -61,9 +61,6 @@ elseif(IsOperator(symbolicString, 'SQU'))
     add_line(destination, [blockName '/1'], connectTo, 'autorouting', 'on');
     set_param([destination '/' blockName], 'Operator', 'square');
     PlaceSymbol(destination, splitString1, depth - 1, [blockName '/1']);
-elseif(IsOperator(symbolicString, 'TANH'))
-    splitString1= ['SUB(1,DIV(2,ADD(POW(2.718,MUL(2,' splitString1(2:end) ')),1)))'];
-    PlaceSymbol(destination, splitString1, depth , connectTo);
 elseif(IsOperator(symbolicString, 'POW'))
     blockName = ['Pow' num2str(depth) '_' num2str(height)];
     add_block('simulink/Math Operations/Math Function', [destination '/' blockName], 'Position', position);

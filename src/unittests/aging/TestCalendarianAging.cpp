@@ -5,7 +5,7 @@
 void TestCalendarianAging::testNoAging()
 {
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >();
-    auto socState = boost::make_shared< electrical::state::Soc >( 10.0, 10.0, 50.0 );
+    auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
     {    // calculation time of zero seconds
@@ -44,7 +44,7 @@ void TestCalendarianAging::testAgingCalculation()
     aging::CalendarianAging aging( steptime, 0, 0, "0.0001 * (V + T - 300)", "0.00015 * (V + T - 300)", initialCap,
                                    initialRes, true, exponent );
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, 3.8, 0 );
-    auto socState = boost::make_shared< electrical::state::Soc >( totalCap, totalCap, soc );
+    auto socState = boost::make_shared< state::Soc >( totalCap, totalCap, soc );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 300 - 273.15 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
     aging.CollectData( tpState, tpState, 3.0 );
@@ -75,7 +75,7 @@ void TestCalendarianAging::testReset()
     aging::CalendarianAging aging( steptime, 0, 0, "0.0001 * (V + T - 300)", "0.00015 * (V + T - 300)", initialCap,
                                    initialRes, true, exponent );
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, 3.8, 0 );
-    auto socState = boost::make_shared< electrical::state::Soc >( totalCap, totalCap, soc );
+    auto socState = boost::make_shared< state::Soc >( totalCap, totalCap, soc );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 300 - 273.15 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
 
@@ -110,4 +110,37 @@ void TestCalendarianAging::testReset()
     TS_ASSERT_DELTA( aging.GetCapacityFactor(), cap, 1e-6 );
     TS_ASSERT_DELTA( aging.GetSocOffset(), socOffset, 1e-6 );
     TS_ASSERT_DELTA( aging.GetResistanceFactor(), res, 1e-6 );
+}
+
+void TestCalendarianAging::testFormulaVariables()
+{
+    double voltage = 3.5;
+    double soc = 0.73;
+    double temperature = 300.0;    // [K]
+    auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, voltage, 0 );
+    auto socState = boost::make_shared< state::Soc >( 1.0, 1.0, soc * 100 );
+    auto thermalState = boost::make_shared< state::ThermalState< double > >( temperature - 273.15 );
+    aging::TwoportState tpState( electricalData, socState, thermalState );
+
+    {
+        aging::CalendarianAging aging( 1.0, 0, 0, "V", "V", 1.0, 1.0, true, 1.0 );
+        aging.CollectData( tpState, tpState, 5.0 );
+        aging.CalculateAging( tpState, 5.0, 1.0 );
+        TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), voltage, 1e-6 );
+        TS_ASSERT_DELTA( aging.GetStressFactorResistance(), voltage, 1e-6 );
+    }
+    {
+        aging::CalendarianAging aging( 1.0, 0, 0, "T", "T", 1.0, 1.0, true, 1.0 );
+        aging.CollectData( tpState, tpState, 5.0 );
+        aging.CalculateAging( tpState, 5.0, 1.0 );
+        TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), temperature, 1e-6 );
+        TS_ASSERT_DELTA( aging.GetStressFactorResistance(), temperature, 1e-6 );
+    }
+    {
+        aging::CalendarianAging aging( 1.0, 0, 0, "SOC", "SOC", 1.0, 1.0, true, 1.0 );
+        aging.CollectData( tpState, tpState, 5.0 );
+        aging.CalculateAging( tpState, 5.0, 1.0 );
+        TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), soc, 1e-6 );
+        TS_ASSERT_DELTA( aging.GetStressFactorResistance(), soc, 1e-6 );
+    }
 }

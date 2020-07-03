@@ -47,7 +47,7 @@ class HexagonalCellBlock : public ThermalBlock< T >
     HexagonalCellBlock( const char *description, const Cartesian< T > &emplacementPoint, T length, T radiusCell,
                         T height, size_t nRhoCell, size_t nPhi, size_t nZ, T arcPolygonEdgesLength,
                         const Material< T > *cellMaterial, const Material< T > *fillMaterial, T initialTemperature,
-                        const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+                        const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
                         size_t electricalDiscretizationPhi = 1, size_t electricalDiscretizationZ = 1 );
     virtual ~HexagonalCellBlock();
     void CreateData( vector< shared_ptr< ThermalElement< T > > > &thermalElements,
@@ -96,7 +96,7 @@ HexagonalCellBlock< T >::HexagonalCellBlock( const char *description, const Cart
                                              T radiusCell, T height, size_t nRhoCell, size_t nPhi, size_t nZ,
                                              T arcPolygonEdgesLength, const Material< T > *cellMaterial,
                                              const Material< T > *fillMaterial, T initialTemperature,
-                                             const vector< shared_ptr< ::state::ThermalState< T > > > &thermalStates,
+                                             const vector< shared_ptr< state::ThermalState< T > > > &thermalStates,
                                              size_t electricalDiscretizationPhi, size_t electricalDiscretizationZ )
     : ThermalBlock< T >( thermalStates, emplacementPoint, description )
     , mRadialEmplacementPoint( emplacementPoint + Cartesian< T >( length, sqrt( 0.75 ) * length, 0.0 ) )

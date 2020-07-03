@@ -48,7 +48,7 @@ void TestElectricalFactory::TestStateInjectionForParallelRCLookup() const
 {
 #ifndef _SYMBOLIC_
     factory::FactoryBuilder< myMatrixType, ScalarUnit > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > >* objectFactory =
      factoryBuilder.BuildObjectFactory();
     std::string name = this->CreateConfigurationForTwoPort();
@@ -84,7 +84,7 @@ void TestElectricalFactory::TestStateInjectionForZarcLookup() const
 {
 #ifndef _SYMBOLIC_
     factory::FactoryBuilder< myMatrixType, ScalarUnit > factoryBuilder;
-    factory::Factory< ::state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
+    factory::Factory< state::State, factory::ArgumentTypeState >* stateFactory = factoryBuilder.BuildStateFactory();
     factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > >* objectFactory =
      factoryBuilder.BuildObjectFactory();
     std::string name = this->CreateConfigurationForTwoPort();
@@ -439,7 +439,7 @@ void TestElectricalFactory::TestFactroyCellElementReversibleHeat() const
 void TestElectricalFactory::TestAgingStateCreation() const
 {
     /*
-    boost::scoped_ptr< factory::Factory< ::state::State, factory::ArgumentTypeState > > stateFactory(
+    boost::scoped_ptr< factory::Factory< state::State, factory::ArgumentTypeState > > stateFactory(
     factory::BuildStateFactory() );
     boost::scoped_ptr< factory::Factory< object::Object< double >, factory::ArgumentTypeObject< double > > >
     objectFactory(
@@ -512,7 +512,7 @@ void TestElectricalFactory::TestAgingStateCreation() const
      factory::BuildElectricalFactory< myMatrixType, double >( objectFactory.get(), stateFactory.get(),
     agingFactory.get() ) );
 
-    auto agingStateFromArg = boost::make_shared< ::state::AgingState >( 0.17, 0.23, 0.13, 0.0, 0.31, 16, 19 );
+    auto agingStateFromArg = boost::make_shared< state::AgingState >( 0.17, 0.23, 0.13, 0.0, 0.31, 16, 19 );
     boost::scoped_ptr< factory::ArgumentTypeElectrical > arg( new factory::ArgumentTypeElectrical() );
     arg->mAgingStates.push_back( agingStateFromArg );
 

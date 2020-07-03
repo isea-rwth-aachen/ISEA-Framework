@@ -334,8 +334,8 @@ void TestElectricalElement::testCellelementWithReversibleHeat()
 {
     const double Temp( 47 );
     const ScalarUnit current = 10;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, 1.0, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, 1.0, 50 ) );
 
     std::vector< double > lookupData = {-0.000996075, -0.000594878, -0.000098689, -0.000067029, -0.000132195,
                                         -0.000198293, -0.000166013, 0.000066405,  0.000166788,  0.000199215,
@@ -368,8 +368,8 @@ void TestElectricalElement::testCellelementWithoutReverisbleHeat()
 {
     const double Temp( 47 );
     const ScalarUnit current = 10;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, 1.0, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, 1.0, 50 ) );
 
     electrical::Cellelement< myMatrixType > test( thermalState, socState, true,
                                                   electrical::TwoPort< myMatrixType >::DataType( new ElectricalDataStruct< ScalarUnit > ) );
@@ -390,8 +390,8 @@ void TestElectricalElement::testTotalCapacitySingleCell()
 {
     const double Temp( 47 );
     const double capacityInAh = 1.0;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, capacityInAh, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, capacityInAh, 50 ) );
 
     electrical::Cellelement< myMatrixType > test( thermalState, socState, true,
                                                   electrical::TwoPort< myMatrixType >::DataType( new ElectricalDataStruct< ScalarUnit > ) );
@@ -403,8 +403,8 @@ void TestElectricalElement::testTotalCapacitySerial()
 {
     const double Temp( 47 );
     const double capacityInAh = 1.0;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, capacityInAh, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, capacityInAh, 50 ) );
 
     // Serial twoport
     electrical::SerialTwoPort< myMatrixType > sport;
@@ -431,9 +431,9 @@ void TestElectricalElement::testTotalCapacitySerialUnequalCapacity()
     const double Temp( 47 );
     const double capacityInAh = 1.0;
     const double capacityInAh2 = 0.9;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, capacityInAh, 50 ) );
-    boost::shared_ptr< electrical::state::Soc > socState2( new electrical::state::Soc( 0.9, capacityInAh2, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, capacityInAh, 50 ) );
+    boost::shared_ptr< state::Soc > socState2( new state::Soc( 0.9, capacityInAh2, 50 ) );
 
     // Serial twoport
     electrical::SerialTwoPort< myMatrixType > sport;
@@ -461,9 +461,9 @@ void TestElectricalElement::testTotalCapacityParallelCapacity()
     const double capacityInAh = 1.0;
     const double capacityInAh2 = 0.9;
     const double totalCapacityinAh = capacityInAh + capacityInAh2;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, capacityInAh, 50 ) );
-    boost::shared_ptr< electrical::state::Soc > socState2( new electrical::state::Soc( 0.9, capacityInAh2, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, capacityInAh, 50 ) );
+    boost::shared_ptr< state::Soc > socState2( new state::Soc( 0.9, capacityInAh2, 50 ) );
 
     // Serial twoport
     electrical::ParallelTwoPort< myMatrixType > pport;
@@ -490,9 +490,9 @@ void TestElectricalElement::testTotalCapacitySerialChildWithoutCapacity()
     const double Temp( 47 );
     const double capacityInAh = 1.0;
     const double capacityInAh2 = 0.9;
-    boost::shared_ptr< ::state::ThermalState< double > > thermalState( new ::state::ThermalState< double >( Temp ) );
-    boost::shared_ptr< electrical::state::Soc > socState( new electrical::state::Soc( 1.0, capacityInAh, 50 ) );
-    boost::shared_ptr< electrical::state::Soc > socState2( new electrical::state::Soc( 0.9, capacityInAh2, 50 ) );
+    boost::shared_ptr< state::ThermalState< double > > thermalState( new state::ThermalState< double >( Temp ) );
+    boost::shared_ptr< state::Soc > socState( new state::Soc( 1.0, capacityInAh, 50 ) );
+    boost::shared_ptr< state::Soc > socState2( new state::Soc( 0.9, capacityInAh2, 50 ) );
     boost::shared_ptr< object::ConstObj< double > > obj( new object::ConstObj< double >( 10.0 ) );
 
     // Serial twoport

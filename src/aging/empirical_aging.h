@@ -2,7 +2,7 @@
 #define _EMPIRICAL_AGING_
 
 #include "../electrical/cellelement.h"
-#include "../states/soc.h"
+#include "../state/soc.h"
 #include "aging_base.h"
 
 namespace aging

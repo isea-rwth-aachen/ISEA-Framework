@@ -7,6 +7,8 @@ The aging simulation uses discrete aging steps. At first, the thermal-electrical
 
 Because the time scale of the aging simulation is much larger than that of the electrical simulation, the aging is scaled up to a larger time step. The XML file used for the simulation specifies a number of calculation cycles and an aging step time. The number of calculation cycles determines how often the given current or power profile is simulated before each aging step. The aging simulation assumes that the thermal-electrical behavior is the same for the rest of the aging step time.
 
+Starting in version 2.19.0, the aging simulation supports current or power profiles that are longer than the aging step time. In this case, the number of aging steps, calculation cycles and steady state cycles given in the XML file are ignored. Instead the entire profile is simulated once and an aging step occurs every time the aging step time has passed. Since the entire steptime was simulated, no scaling factor is applied to the aging calculation.
+
 Example
 =======
 
@@ -103,9 +105,9 @@ These options for the aging simulation must be added in <Configuration><Options>
 
 XML Tag                                 | Type          | Unit      | Explanation                                                                                 
 ----------------------------------------|---------------|-----------|----------------------------------------------------------------------------------------
-CalculationCycles                       | int > 0       |           | Number of times the current or power profile is simulated before each aging step
-SteadyStateCycles                       | int >= 0      |           | Number of cycles that are simulated without collecting data for aging before the cycles specified in CalculationCycles are simulated
-AgingSteps                              | int > 0       |           | Number of aging steps
+CalculationCycles                       | int > 0       |           | Number of times the current or power profile is simulated before each aging step. Optional, default = 1.
+SteadyStateCycles                       | int >= 0      |           | Number of cycles that are simulated without collecting data for aging before the cycles specified in CalculationCycles are simulated. Optional, default = 0.
+AgingSteps                              | int > 0       |           | Number of aging steps. Optional, default = 1.
 AgingStepTime                           | double > 0    | day       | Duration of each aging step
 
 Observer
@@ -143,8 +145,8 @@ FormulaCapacity                         | string        |           | Formula us
 FormulaResistance                       | string        |           | Formula used to calculate the value of alpha. The symbols V and T can be used for the cell's voltage and temperature
 MinAlphaCapacity                        | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinAlphaResistance                      | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
-InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional.
-InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional.
+InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
+InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 
 Cyclic Aging
 ---------------
@@ -159,8 +161,8 @@ FormulaCapacity                         | string        |           | Formula us
 FormulaResistance                       | string        |           | Formula used to calculate the value of beta. The symbols meanV and deltaDOD can be used for the cell's average voltage and depth of discharge
 MinBetaCapacity                         | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinBetaResistance                       | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
-InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional.
-InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional.
+InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
+InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 
 Anode Overhang
 ---------------

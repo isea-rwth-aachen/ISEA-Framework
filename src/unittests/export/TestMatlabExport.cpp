@@ -20,7 +20,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../export/matlabExport.h"
 #include "../../export/symbolicExport.h"
 #include "../../misc/symbolicParser.h"
-#include "../../thermal/electrical_simulation.h"
+#include "../../electrical/electrical_simulation.h"
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 
 #include <sstream>

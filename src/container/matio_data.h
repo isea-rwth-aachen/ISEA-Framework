@@ -8,15 +8,16 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #ifndef _DS1006
 
-#include <vector>
-#include <string>
-#include <stdexcept>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 // ETC
-#include "matio.h"
 #include "../exceptions/error_proto.h"
+
+#include <matio.h>
 
 // Forward declartion
 struct matvar_t;
@@ -91,7 +92,7 @@ struct MatioData
     boost::shared_ptr< MatioData > mReturnMember;
 };
 
-} /* matlab */
+}    // namespace matlab
 
 #endif /* _DS1006 */
 #endif /* _MATIO_DATA_ */

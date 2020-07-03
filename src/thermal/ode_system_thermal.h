@@ -1,16 +1,18 @@
 #ifndef _ODE_SYSTEM_THERMAL_
 #define _ODE_SYSTEM_THERMAL_
 
-#include <vector>
-#include <map>
-#include <list>
-#include <cmath>
-#include <boost/shared_ptr.hpp>
-#include "blocks/elements/thermal_element.h"
-#include "boundaryConditions/default_convection.h"
-#include "boundaryConditions/cooling.h"
-#include "thermal_structs.h"
 #include "../exceptions/error_proto.h"
+#include "blocks/elements/thermal_element.h"
+#include "boundaryConditions/cooling.h"
+#include "boundaryConditions/default_convection.h"
+#include "thermal_structs.h"
+#include <boost/shared_ptr.hpp>
+#include <cmath>
+#include <list>
+#include <map>
+#include <vector>
+
+#include <eigen3/Eigen/Sparse>
 
 class TestOdeSystemThermal;
 class TestSimulation;
@@ -30,30 +32,6 @@ class OdeSystemThermal
     friend class ::TestSimulation;
 
 #ifndef _MATLAB_
-/*    struct UpdateLoopFunctor: public threading::ThreadedForLoop::LoopFunctorInterface
-    {
-        UpdateLoopFunctor(OdeSystemThermal<T> &thermalSystem, T time, T dt)
-            : mThermalSystem(thermalSystem), mTime(time), mDt(dt) {}
-        void Iterate(size_t i)
-        {
-            mThermalSystem.UpdateLoop(i, mTime, mDt);
-        }
-        OdeSystemThermal<T> &mThermalSystem;
-        T mTime;
-        T mDt;
-    };
-    struct DxdtLoopFunctor: public threading::ThreadedForLoop::LoopFunctorInterface
-    {
-        DxdtLoopFunctor(OdeSystemThermal<T> &thermalSystem, const vector<T> &x, vector<T> &dxdt)
-            : mThermalSystem(thermalSystem), mX(x), mDxdt(dxdt) {}
-        void Iterate(size_t i)
-        {
-            mThermalSystem.DxdtLoop(i, mX, mDxdt);
-        }
-        OdeSystemThermal<T> &mThermalSystem;
-        const vector<T> &mX;
-        vector<T> &mDxdt;
-    };*/
 #endif
     public:
     struct BoundarySourceData
@@ -61,6 +39,9 @@ class OdeSystemThermal
         ALIGNED_TO_64_BYTE T mA_th;    // Slope
         ALIGNED_TO_64_BYTE T mC_th;    // Offset
     };
+
+    using MatrixT = Eigen::SparseMatrix< T, Eigen::RowMajor >;
+
     /**
      * @param[in] dirichletDataVector Vector containing the data for all dirichlet boundary conditions
      * @param[in] coolingDataVector Vector containing the data for all coolings
@@ -68,16 +49,14 @@ class OdeSystemThermal
      * @param[in] thermalStates,unconnectedThermalStates,materials,coolings These need to be present during simulation
      * and may be stored here if desired
      */
-    OdeSystemThermal( vector< shared_ptr< ThermalElement< T > > > &thermalElements,
-                      vector< vector< IndexedValue< T > > > &conductivityMatrix, vector< vector< TaylorData< T > > > &coolingDataVector,
-                      const vector< vector< TaylorData< T > > > &dirichletDataVector,
-                      const vector< shared_ptr< DefaultConvection< T > > > &defaultConvection,
-                      const shared_ptr< Radiation< T > > defaultRadiation, T airTemperature,
-                      vector< shared_ptr< ::state::ThermalState< T > > > thermalStates,
-                      vector< shared_ptr< ::state::ThermalState< T > > > unconnectedThermalStates =
-                       vector< shared_ptr< ::state::ThermalState< T > > >(),
-                      vector< shared_ptr< Material< T > > > materials = vector< shared_ptr< Material< T > > >(),
-                      vector< shared_ptr< Cooling< T > > > coolings = vector< shared_ptr< Cooling< T > > >() );
+    OdeSystemThermal(
+     vector< shared_ptr< ThermalElement< T > > > &thermalElements, vector< vector< IndexedValue< T > > > &conductivityMatrix,
+     vector< vector< TaylorData< T > > > &coolingDataVector, const vector< vector< TaylorData< T > > > &dirichletDataVector,
+     const vector< shared_ptr< DefaultConvection< T > > > &defaultConvection, const shared_ptr< Radiation< T > > defaultRadiation,
+     T airTemperature, vector< shared_ptr< state::ThermalState< T > > > thermalStates,
+     vector< shared_ptr< state::ThermalState< T > > > unconnectedThermalStates = vector< shared_ptr< state::ThermalState< T > > >(),
+     vector< shared_ptr< Material< T > > > materials = vector< shared_ptr< Material< T > > >(),
+     vector< shared_ptr< Cooling< T > > > coolings = vector< shared_ptr< Cooling< T > > >() );
     virtual ~OdeSystemThermal();
     /// Needs to be called every time before equation solver interface function is used, updates mC_th_*, mA_th_* and
     /// optionally sets air temperature
@@ -86,14 +65,12 @@ class OdeSystemThermal
     void operator()( const vector< T > &x, vector< T > &dxdt, const double /* t */ );
     /// One iteration of loop used in Update()
     void UpdateLoop( size_t i, T time, T dt );
-    /// One iteration of loop used in operator()
-    void DxdtLoop( size_t i, const vector< T > &x, vector< T > &dxdt );
     void GetTemperatureVector( vector< T > &temperatureVector ) const;
     void SetTemperatureVector( const vector< T > &temperatureVector );
     void ResetAirTemperature( T newAirTemperature );
     inline size_t GetOdeSystemSize() const;
     const vector< shared_ptr< ThermalElement< T > > > &GetThermalElements() const;
-    const vector< vector< IndexedValue< T > > > &GetA_th_Conductivity() const;
+    const MatrixT &GetA_th_Conductivity() const;
     const vector< T > &GetThermalElementFactors() const;
     const vector< shared_ptr< DefaultConvection< T > > > &GetConvection() const;
     const shared_ptr< Radiation< T > > &GetRadiation() const;
@@ -105,7 +82,7 @@ class OdeSystemThermal
 
     private:
     vector< shared_ptr< ThermalElement< T > > > mThermalElements;
-    vector< vector< IndexedValue< T > > > mA_th_Conductivity;
+    MatrixT mA_th_Conductivity;
     vector< vector< TaylorData< T > > > mCoolingDataVector;
     const vector< shared_ptr< DefaultConvection< T > > > mConvection;
     const shared_ptr< Radiation< T > > mRadiation;
@@ -116,15 +93,10 @@ class OdeSystemThermal
     vector< T > mThermalElementFactors;               ///<Stores reciprocals of the total capacity of thermal elements
     const size_t mOdeSystemSize;
 
-    vector< shared_ptr< ::state::ThermalState< T > > > mThermalStates;
-    vector< shared_ptr< ::state::ThermalState< T > > > mUnconnectedThermalStates;
+    vector< shared_ptr< state::ThermalState< T > > > mThermalStates;
+    vector< shared_ptr< state::ThermalState< T > > > mUnconnectedThermalStates;
     vector< shared_ptr< Material< T > > > mMaterials;
     vector< shared_ptr< Cooling< T > > > mCoolings;
-
-#ifndef _MATLAB_
-// Threading
-// shared_ptr<threading::ThreadedForLoop> mThreadedForLoop;
-#endif
 };
 
 
@@ -135,8 +107,8 @@ OdeSystemThermal< T >::OdeSystemThermal( vector< shared_ptr< ThermalElement< T >
                                          const vector< vector< TaylorData< T > > > &dirichletDataVector,
                                          const vector< shared_ptr< DefaultConvection< T > > > &defaultConvection,
                                          const shared_ptr< Radiation< T > > defaultRadiation, T airTemperature,
-                                         vector< shared_ptr< ::state::ThermalState< T > > > thermalStates,
-                                         vector< shared_ptr< ::state::ThermalState< T > > > unconnectedThermalStates,
+                                         vector< shared_ptr< state::ThermalState< T > > > thermalStates,
+                                         vector< shared_ptr< state::ThermalState< T > > > unconnectedThermalStates,
                                          vector< shared_ptr< Material< T > > > materials,
                                          vector< shared_ptr< Cooling< T > > > coolings )
     : mConvection( defaultConvection )
@@ -149,17 +121,32 @@ OdeSystemThermal< T >::OdeSystemThermal( vector< shared_ptr< ThermalElement< T >
     , mUnconnectedThermalStates( unconnectedThermalStates )
     , mMaterials( materials )
     , mCoolings( coolings )
-#ifndef _MATLAB_
-//    , mThreadedForLoop(new threading::ThreadedForLoop())
-#endif
 {
     if ( thermalElements.size() != conductivityMatrix.size() || thermalElements.size() != coolingDataVector.size() ||
          thermalElements.size() != dirichletDataVector.size() )
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "thermalElementEqualSize" );
 
     mThermalElements.swap( thermalElements );
-    mA_th_Conductivity.swap( conductivityMatrix );
     mCoolingDataVector.swap( coolingDataVector );
+
+    size_t conductivitySize = conductivityMatrix.size();
+    std::vector< size_t > rowEntries;
+    rowEntries.reserve( conductivitySize );
+    for ( size_t row = 0; row < conductivitySize; ++row )
+    {
+        rowEntries.push_back( conductivityMatrix[row].size() );
+    }
+    mA_th_Conductivity.resize( conductivitySize, conductivitySize );
+    if ( conductivitySize > 0 )    // calling reserve causes a segfault if coductivitySize == 0, which happens in the unittests
+        mA_th_Conductivity.reserve( rowEntries );
+    for ( size_t row = 0; row < conductivitySize; ++row )
+    {
+        for ( const IndexedValue< T > &iv : conductivityMatrix[row] )
+        {
+            mA_th_Conductivity.insert( row, iv.mIndex ) = iv.mValue;
+        }
+    }
+    mA_th_Conductivity.makeCompressed();
 
     for ( size_t i = 0; i < mMatrixDirichlet.size(); ++i )
     {
@@ -198,25 +185,23 @@ OdeSystemThermal< T >::~OdeSystemThermal()
 template < typename T >
 void OdeSystemThermal< T >::Update( T time, T dt )
 {
-    //#ifndef _MATLAB_
-    //    UpdateLoopFunctor loopFunctor(*this, time, dt);
-    //    mThreadedForLoop->DoLoop(loopFunctor, mOdeSystemSize);
-    //#else
     for ( size_t i = 0; i < mOdeSystemSize; ++i )
         UpdateLoop( i, time, dt );
-    //#endif
 }
 
 template < typename T >
 void OdeSystemThermal< T >::operator()( const vector< T > &x, vector< T > &dxdt, const double /* t */ )
 {
-    //#ifndef _MATLAB_
-    //    DxdtLoopFunctor loopFunctor(*this, x, dxdt);
-    //    mThreadedForLoop->DoLoop(loopFunctor, mOdeSystemSize);
-    //#else
+    Eigen::Map< const Eigen::Matrix< T, Eigen::Dynamic, Eigen::Dynamic > > xMap( &x[0], x.size(), 1 );
+    Eigen::Map< Eigen::Matrix< T, Eigen::Dynamic, Eigen::Dynamic > > dxdtMap( &dxdt[0], x.size(), 1 );
+    dxdtMap = mA_th_Conductivity * xMap;
     for ( size_t i = 0; i < mOdeSystemSize; ++i )
-        DxdtLoop( i, x, dxdt );
-    //#endif
+    {
+        const T cooling = mMatrixBoundarySource[i].mA_th * x[i] + mMatrixBoundarySource[i].mC_th;
+        dxdt[i] += cooling;
+        dxdt[i] *= mThermalElementFactors[i];
+        mThermalElements[i]->SetCoolingValue( cooling );
+    }
 }
 
 template < typename T >
@@ -277,27 +262,6 @@ void OdeSystemThermal< T >::UpdateLoop( size_t i, T time, T dt )
 }
 
 template < typename T >
-void OdeSystemThermal< T >::DxdtLoop( size_t i, const vector< T > &x, vector< T > &dxdt )
-{
-    dxdt[i] = 0.0;
-
-    for ( typename vector< IndexedValue< T > >::const_iterator it = mA_th_Conductivity[i].begin();
-          it != mA_th_Conductivity[i].end(); ++it )
-    {
-        // TODO: Given that mA_th_Conductivity is a symmetric matrix, consider making it a half matrix and optimize
-        // its
-        // evaluation here
-        dxdt[i] += it->mValue * x[it->mIndex];
-    }
-
-    const T cooling = mMatrixBoundarySource[i].mA_th * x[i] + mMatrixBoundarySource[i].mC_th;
-
-    dxdt[i] += cooling;
-    dxdt[i] *= mThermalElementFactors[i];
-    mThermalElements[i]->SetCoolingValue( cooling );
-}
-
-template < typename T >
 void OdeSystemThermal< T >::GetTemperatureVector( vector< T > &temperatureVector ) const
 {
     temperatureVector.resize( mOdeSystemSize );
@@ -331,7 +295,7 @@ const vector< shared_ptr< ThermalElement< T > > > &OdeSystemThermal< T >::GetThe
 }
 
 template < typename T >
-const vector< vector< IndexedValue< T > > > &OdeSystemThermal< T >::GetA_th_Conductivity() const
+const typename OdeSystemThermal< T >::MatrixT &OdeSystemThermal< T >::GetA_th_Conductivity() const
 {
     return mA_th_Conductivity;
 }
@@ -365,5 +329,5 @@ const vector< vector< TaylorData< T > > > &OdeSystemThermal< T >::GetCoolingData
 {
     return mCoolingDataVector;
 }
-}
+}    // namespace thermal
 #endif

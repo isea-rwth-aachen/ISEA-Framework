@@ -4,7 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include "../../../geometry/cartesian.h"
 #include "../../materials/material.h"
-#include "../../../states/thermal_state.h"
+#include "../../../state/thermal_state.h"
 #include "../../../geometry/area.h"
 #include "../../thermal_structs.h"
 
@@ -39,7 +39,7 @@ class ThermalElement
     /// Returns true if this instance has a thermal state (connection to electrical model), otherwise false
     bool HasThermalState() const;
     double GetThermalStateFactor() const { return mThermalStateFactor; }
-    const ::state::ThermalState< T >* GetThermalState() const { return mThermalState; }
+    const state::ThermalState< T >* GetThermalState() const { return mThermalState; }
     /// Gets the heat Value that is provided by cooling e.g. convection
     T GetCoolingValue() const { return mCoolingValue; };
     /// Gets the heat Value that is provided by cooling e.g. convection
@@ -61,7 +61,7 @@ class ThermalElement
      * @param[in] thermalStateFactor Heat power dissipation from thermalState is multiplied by this factor
      */
     void SetElement( T initialTemperatureValue, const Material< T >* material, const Cartesian< T >& gridVertex,
-                     T volume, ::state::ThermalState< T >* thermalState = 0, T thermalStateFactor = 1.0 );
+                     T volume, state::ThermalState< T >* thermalState = 0, T thermalStateFactor = 1.0 );
 
     private:
     T mInitialTemperature;
@@ -70,7 +70,7 @@ class ThermalElement
     const Material< T >* mMaterial;
     Cartesian< T > mGridVertex;
     T mVolume;
-    ::state::ThermalState< T >* mThermalState;
+    state::ThermalState< T >* mThermalState;
     double mThermalStateFactor;
 };
 
@@ -94,7 +94,7 @@ ThermalElement< T >::~ThermalElement()
 
 template < typename T >
 void ThermalElement< T >::SetElement( T initialTemperatureValue, const Material< T >* material, const Cartesian< T >& gridVertex,
-                                      T volume, ::state::ThermalState< T >* thermalState, T thermalStateFactor )
+                                      T volume, state::ThermalState< T >* thermalState, T thermalStateFactor )
 {
     mInitialTemperature = initialTemperatureValue;
     mTemperature = initialTemperatureValue;

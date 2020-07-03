@@ -28,7 +28,7 @@ class AgingTwoPortClassWrapperBase : public ClassWrapperBase< aging::AgingTwoPor
     public:
     AgingTwoPortClassWrapperBase( Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* agingTwoPortFactory,
                                   Factory< aging::AgingBase, ArgumentTypeAging >* agingFactory,
-                                  Factory< ::state::State, ArgumentTypeState >* stateFactory )
+                                  Factory< state::State, ArgumentTypeState >* stateFactory )
         : mAgingTwoPortFactory( agingTwoPortFactory )
         , mAgingFactory( agingFactory )
         , mStateFactory( stateFactory )
@@ -38,7 +38,7 @@ class AgingTwoPortClassWrapperBase : public ClassWrapperBase< aging::AgingTwoPor
     protected:
     Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* const mAgingTwoPortFactory;
     Factory< aging::AgingBase, ArgumentTypeAging >* const mAgingFactory;
-    Factory< ::state::State, ArgumentTypeState >* const mStateFactory;
+    Factory< state::State, ArgumentTypeState >* const mStateFactory;
 };
 
 /// General class wrapper for AgingTwoPort that needs to be specialized
@@ -61,7 +61,7 @@ class AgingTwoPortClassWrapper< MatrixT, aging::AgingTwoPort > : public AgingTwo
     public:
     AgingTwoPortClassWrapper( Factory< aging::AgingTwoPort< MatrixT >, ArgumentTypeAgingTwoPort >* agingTwoPortFactory,
                               Factory< aging::AgingBase, ArgumentTypeAging >* agingFactory,
-                              Factory< ::state::State, ArgumentTypeState >* stateFactory )
+                              Factory< state::State, ArgumentTypeState >* stateFactory )
         : AgingTwoPortClassWrapperBase< MatrixT >( agingTwoPortFactory, agingFactory, stateFactory )
     {
     }
@@ -78,7 +78,7 @@ class AgingTwoPortClassWrapper< MatrixT, aging::AgingTwoPort > : public AgingTwo
                                                  "AgingTwoPortClassWrapper<AgingTwoPort>::CreateInstance" );
 
         boost::shared_ptr< electrical::TwoPortWithState< MatrixT > > electricalTP = arg->mElectricalTwoPort;
-        boost::shared_ptr< ::state::AgingState > agingState = boost::make_shared< ::state::AgingState >();
+        boost::shared_ptr< state::AgingState > agingState = boost::make_shared< state::AgingState >();
 
         std::vector< boost::shared_ptr< xmlparser::XmlParameter > > agingNodes;
         std::vector< boost::shared_ptr< aging::AgingBase > > agingEffects;
@@ -89,7 +89,7 @@ class AgingTwoPortClassWrapper< MatrixT, aging::AgingTwoPort > : public AgingTwo
         {
             auto cell = static_cast< electrical::Cellelement< MatrixT >* >( electricalTP.get() );
             if ( param->HasElementDirectChild( "AgingState" ) )
-                agingState = boost::static_pointer_cast< ::state::AgingState >(
+                agingState = boost::static_pointer_cast< state::AgingState >(
                  this->mStateFactory->CreateInstance( param->GetElementChild( "AgingState" ) ) );
             if ( cell->HasHalfcells() )
             {

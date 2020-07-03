@@ -9,7 +9,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 // BOOST
 #include <boost/shared_ptr.hpp>
 
-#include "../states/dgl_state.h"
+#include "../state/dgl_state.h"
 #include "lookup_obj1d.h"
 
 /// This namespace contains all classes which define the behaviour of different classes
@@ -21,12 +21,12 @@ class LookupObj1dWithState : public LookupObj1D< T >
 {
     public:
     LookupObj1dWithState( const ::std::vector< T >& lookupData, const ::std::vector< T >& measurementPoints,
-                          boost::shared_ptr< ::state::State > state, lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
+                          boost::shared_ptr< state::State > state, lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
     LookupObj1dWithState( const ::std::vector< T >& lookupData, const ::std::vector< T >& measurementPoints,
-                          boost::shared_ptr< ::state::State > state, LookupObj1dWithState* CloneObj,
+                          boost::shared_ptr< state::State > state, LookupObj1dWithState* CloneObj,
                           lookup::LookupType type = lookup::LINEAR_INTERPOLATION );
     LookupObj1dWithState( const char* name, const ::std::vector< T >& lookupData, const ::std::vector< T >& measurementPoints,
-                          boost::shared_ptr< ::state::State > state, LookupObj1dWithState* CloneObj );
+                          boost::shared_ptr< state::State > state, LookupObj1dWithState* CloneObj );
     virtual ~LookupObj1dWithState(){};
     virtual T GetValue() const;      ///< Return the last done lookup
     virtual T operator()() const;    ///< Return the last done lookup
@@ -34,20 +34,20 @@ class LookupObj1dWithState : public LookupObj1D< T >
     virtual T operator()( const T val );
     virtual T GetValue( const T val );
 
-    const ::state::State* GetState() const { return mState.get(); }
-    boost::shared_ptr< ::state::State > GetBoostState() const { return mState; }
+    const state::State* GetState() const { return mState.get(); }
+    boost::shared_ptr< state::State > GetBoostState() const { return mState; }
 
     virtual const char* GetName() const;
 
     private:
-    boost::shared_ptr< ::state::State > mState;
+    boost::shared_ptr< state::State > mState;
 
     protected:
 };
 
 template < typename T >
 LookupObj1dWithState< T >::LookupObj1dWithState( const ::std::vector< T >& lookupData, const ::std::vector< T >& measurementPoints,
-                                                 boost::shared_ptr< ::state::State > state, lookup::LookupType type )
+                                                 boost::shared_ptr< state::State > state, lookup::LookupType type )
     : LookupObj1D< T >( lookupData, measurementPoints, type )
     , mState( state )
 {
@@ -56,7 +56,7 @@ LookupObj1dWithState< T >::LookupObj1dWithState( const ::std::vector< T >& looku
 
 template < typename T >
 LookupObj1dWithState< T >::LookupObj1dWithState( const ::std::vector< T >& lookupData, const ::std::vector< T >& measurementPoints,
-                                                 boost::shared_ptr< ::state::State > /* state */,
+                                                 boost::shared_ptr< state::State > /* state */,
                                                  LookupObj1dWithState* CloneObj, lookup::LookupType type )
     : LookupObj1D< T >( lookupData, measurementPoints, CloneObj, type )
     , mState( CloneObj->mState )

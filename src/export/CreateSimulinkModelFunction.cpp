@@ -2,7 +2,7 @@
 
 #include "CreateSimulinkModelFunction.h"
 #include "../misc/matrixInclude.h"
-#include "../thermal/electrical_simulation.h"
+#include "../electrical/electrical_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
 #include "circuit_simulink_model.h"
 #include "matrix_simulink_model.h"

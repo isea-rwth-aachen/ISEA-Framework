@@ -7,15 +7,13 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "soc.h"
 
-namespace electrical
-{
 namespace state
 {
 
 
 Soc::Soc( const double initialCapacity, const double actualCapacity, const double actualSoc, const double minimumValue,
           const double maximumValue )
-    : ::state::State()
+    : State()
     , mInitialCapacity( initialCapacity * 3600 )
     , mActualCapacity( actualCapacity * 3600 )
     , mActualSoc( actualSoc / 100 )
@@ -28,9 +26,10 @@ Soc::Soc( const double initialCapacity, const double actualCapacity, const doubl
 
 double Soc::GetValue() const { return this->GetValue<>(); }
 
-void Soc::ResetToInitialValue() { mActualSoc = mInitialValue - mOffset; }
+const double& Soc::GetValueRef() const { return this->mActualSoc; }
+
+void Soc::ResetToInitialValue() { mActualSoc = mInitialValue; }
 
 double Soc::GetCapacityFactor() const { return this->mActualCapacity / this->mInitialCapacity; }
 
 }    // Namespace state
-}    // Namespace electrical
