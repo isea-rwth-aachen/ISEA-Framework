@@ -1,3 +1,7 @@
+Version 2.21.2
+===========
+- Fix a bug in the simulink converter that leads to incorrect voltages over rmphn elements
+
 Version 2.21.1
 ===========
 - Move RC.xml from scenarios to the unittests folder

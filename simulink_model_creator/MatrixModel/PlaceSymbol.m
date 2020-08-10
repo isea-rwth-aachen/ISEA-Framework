@@ -11,10 +11,14 @@ end
 posVector(depth) = posVector(depth) + 1;
 
 currentDepth = 0;
+argStart = 0;
 splitPoint = size(symbolicString, 2);
 for i = 1:size(symbolicString, 2)
     if symbolicString(i) == '('
         currentDepth = currentDepth + 1;
+        if argStart == 0
+            argStart = i + 1;
+        end
     elseif symbolicString(i) == ')'
         currentDepth = currentDepth - 1;
     elseif currentDepth == 1 && symbolicString(i) == ','
@@ -22,8 +26,11 @@ for i = 1:size(symbolicString, 2)
         break;
     end
 end
-splitString1 = symbolicString(5:(splitPoint - 1));
-splitString2 = symbolicString((splitPoint + 1):(size(symbolicString, 2) - 1));
+
+if argStart > 0
+    splitString1 = symbolicString(argStart:(splitPoint - 1));
+    splitString2 = symbolicString((splitPoint + 1):(size(symbolicString, 2) - 1));
+end
 
 if(IsOperator(symbolicString, 'NEG'))
     blockName = ['Neg' num2str(depth) '_' num2str(height)];
@@ -68,6 +75,12 @@ elseif(IsOperator(symbolicString, 'POW'))
     set_param([destination '/' blockName], 'Operator', 'pow');
     PlaceSymbol(destination, splitString1, depth - 1, [blockName '/1']);
     PlaceSymbol(destination, splitString2, depth - 1, [blockName '/2']);
+elseif(IsOperator(symbolicString, 'TANH'))
+    blockName = ['Tanh' num2str(depth) '_' num2str(height)];
+    add_block('simulink/Math Operations/Trigonometric Function', [destination '/' blockName], 'Position', position);
+    add_line(destination, [blockName '/1'], connectTo, 'autorouting', 'on');
+    set_param([destination '/' blockName], 'Operator', 'tanh');
+    PlaceSymbol(destination, splitString1, depth - 1, [blockName '/1']);
 elseif(IsValidDouble(symbolicString))
     blockName = ['Const' num2str(depth) '_' num2str(height)];
     add_block('simulink/Sources/Constant', [destination '/' blockName], 'Position', position);
