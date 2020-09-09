@@ -1,16 +1,14 @@
 #include "TestExpressionObj.h"
 #include "../../object/expression_obj.h"
+#include "../../state/valueStateWrapper.h"
+#include <boost/make_shared.hpp>
 
 void TestExpressionObj::testExpressionObj()
 {
     double x = 10.0;
-    exprtk::expression< double > expr;
-    exprtk::symbol_table< double > symbol_table;
-    symbol_table.add_variable( "x", x, false );
-    expr.register_symbol_table( symbol_table );
-    exprtk::parser< double > parser;
-    parser.compile( "x + 3", expr );
-    object::ExpressionObject< double > obj( expr );
+    auto state = boost::make_shared< state::ValueStateWrapper< double > >( &x );
+    std::vector< object::ExpressionObject< double >::ParameterT > parameters{{"x", state}};
+    object::ExpressionObject< double > obj( "x + 3", parameters );
     TS_ASSERT_DELTA( obj.GetValue(), x + 3.0, 1e-6 );
     TS_ASSERT_DELTA( obj(), x + 3.0, 1e-6 );
     x = 2.0;

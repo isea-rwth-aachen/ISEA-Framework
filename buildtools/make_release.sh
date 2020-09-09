@@ -25,6 +25,7 @@ function PrintHelp
     PrintMessage "-w\t\tIf on linux, build a release for windows."
     PrintMessage "-b <builddir>\t\tSpecify the build dir. Default is \"build\""
     PrintMessage "-c\t\tOnly configure, do not start the build process."
+    PrintMessage "-j <n>\t\tUse n threads for building. Default is 20."
 }
 
 function RunCMake
@@ -64,7 +65,8 @@ function main
     WIN_TARGET=0
     ONLY_CONFIGURE=0
     BUILDDIR=build
-    while getopts "hwb:c" opt; do
+    THREADS=20
+    while getopts "hwb:cj:" opt; do
         case "$opt" in
         h)  PrintHelp
             exit 0
@@ -74,6 +76,8 @@ function main
         b)  BUILDDIR=$OPTARG
             ;;
         c)  ONLY_CONFIGURE=1
+            ;;
+        j)  THREADS=$OPTARG
             ;;
         esac
     done
@@ -113,9 +117,9 @@ function main
     then
         if [ $WIN_HOST -eq 1 ]
         then
-            cmake --build $BUILDDIR --target all
+            cmake --build $BUILDDIR
         else
-            cmake --build $BUILDDIR --target all -- -j 20
+            cmake --build $BUILDDIR --target all -- -j ${THREADS}
         fi
     fi
 }

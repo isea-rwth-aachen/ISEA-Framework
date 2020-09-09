@@ -10,9 +10,9 @@ namespace electrical
 template class electrical::TwoPort< myMatrixType >;
 #ifdef _EIGEN_
 template <>
-ScalarUnit ReturnFirstElement( Eigen::SparseMatrix< double, RowMajor > &mat )
+ScalarUnit ReturnFirstElement( Eigen::SparseMatrix< double, Eigen::RowMajor > &mat )
 {
     return mat.coeff( 0, 0 );
 }
 #endif /* _EIGEN_ */
-}
+}    // namespace electrical

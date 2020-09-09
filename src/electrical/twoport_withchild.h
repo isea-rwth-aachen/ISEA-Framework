@@ -45,10 +45,15 @@ class TwoPortWithChild : public TwoPort< T >
     virtual TwoPort< T >* at( const size_t index );            ///< method to access the children with boundary check
     virtual const boost::shared_ptr< TwoPort< T > >& shared_at( const size_t index ) const;    ///< method to access the children with boundary check
 
-    size_t size() const;    ///< Return the amount of children
-
     virtual const TwoPort< T >* operator[]( const size_t index ) const;    ///< method to access the children without boundary check
     virtual const TwoPort< T >* at( const size_t index ) const;    ///< method to access the children with boundary check
+
+    /// return iterator to first child to enable iteration over the child vector
+    const typename std::vector< boost::shared_ptr< TwoPort< T > > >::const_iterator begin() const;
+    /// return iterator past the last child to enable iteration over the child vector
+    const typename std::vector< boost::shared_ptr< TwoPort< T > > >::const_iterator end() const;
+
+    size_t size() const;    ///< Return the amount of children
 
     virtual void SetSystem( systm::StateSystemGroup< T >* stateSystemGroup );
 
@@ -167,6 +172,18 @@ template < typename T >
 const TwoPort< T >* TwoPortWithChild< T >::at( const size_t index ) const
 {
     return mChildren.at( index ).get();
+}
+
+template < typename T >
+const typename std::vector< boost::shared_ptr< TwoPort< T > > >::const_iterator TwoPortWithChild< T >::begin() const
+{
+    return mChildren.begin();
+}
+
+template < typename T >
+const typename std::vector< boost::shared_ptr< TwoPort< T > > >::const_iterator TwoPortWithChild< T >::end() const
+{
+    return mChildren.end();
 }
 
 template < typename T >

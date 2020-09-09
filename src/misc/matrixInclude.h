@@ -29,8 +29,8 @@ typedef arma::Mat< double > myMatrixType;
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseLU>
 
-using namespace Eigen;
-typedef Eigen::SparseMatrix< double, RowMajor > myMatrixType;
+// using namespace Eigen;
+typedef Eigen::SparseMatrix< double, Eigen::RowMajor > myMatrixType;
 
 #include "../container/eigen_wrapper.h"
 #elif _SYMBOLIC_
@@ -42,7 +42,7 @@ typedef Eigen::SparseMatrix< double, RowMajor > myMatrixType;
 #include <eigen3/Eigen/LU>
 #include <eigen3/Eigen/Sparse>
 #include <eigen3/Eigen/SparseLU>
-using namespace Eigen;
+// using namespace Eigen;
 
 typedef Eigen::SparseMatrix< symbolic::Symbolic< double >, Eigen::RowMajor > myMatrixType;
 #include "../container/eigen_wrapper.h"
@@ -69,8 +69,9 @@ MatrixType &CopyTopToMatrixLeft( MatrixType &target, const MatrixType &source, s
 
 #ifdef _EIGEN_
 template <>
-Eigen::SparseMatrix< double, RowMajor > &CopyTopToMatrixLeft( Eigen::SparseMatrix< double, RowMajor > &target,
-                                                              const Eigen::SparseMatrix< double, RowMajor > &source, size_t length );
+Eigen::SparseMatrix< double, Eigen::RowMajor > &
+CopyTopToMatrixLeft( Eigen::SparseMatrix< double, Eigen::RowMajor > &target,
+                     const Eigen::SparseMatrix< double, Eigen::RowMajor > &source, size_t length );
 #endif
 
 #ifndef _SYMBOLIC_

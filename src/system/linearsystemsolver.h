@@ -68,7 +68,7 @@ double LinearSystemSolver< T >::Solve()
 
 #ifdef _EIGEN_
 template <>
-double LinearSystemSolver< Eigen::SparseMatrix< double, RowMajor > >::Solve();
+double LinearSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve();
 #endif /* _EIGEN_ */
 
 

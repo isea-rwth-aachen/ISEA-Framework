@@ -292,7 +292,7 @@ typedef symbolic::Symbolic< double > _Scalar;
 #elif _EIGEN_
 typedef double _Scalar;
 #endif
-typedef SparseMatrix< _Scalar, RowMajor > MatrixType;
+typedef Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > MatrixType;
 
 /// Class for creating a Differential Algebraic System from a electric circuit
 template <>
@@ -300,7 +300,7 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
 {
     public:
     DifferentialAlgebraicSystem( StateSystemGroup< MatrixType >* stateSystemGroup )
-        : GeneralizedSystem< SparseMatrix< _Scalar, RowMajor > >()
+        : GeneralizedSystem< Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > >()
         , mStateSystemGroup( stateSystemGroup )
         , mDglStateSystem( &stateSystemGroup->mDglStateSystem )
         , mAlgStateSystem( &stateSystemGroup->mAlgStateSystem )
@@ -326,14 +326,14 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
 
         // CalculateInitialStateFromCurrentState
         const MatrixType& xDgl = mStateSystemGroup->mStateVector.topRows( dglUIDCount );
-        SparseMatrix< _Scalar, ColMajor > b = ( mAlg1MatrixA * xDgl );
-        b += SparseMatrix< _Scalar, ColMajor >( mAlgStateSystem->GetEquationSystemCVector() );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = ( mAlg1MatrixA * xDgl );
+        b += Eigen::SparseMatrix< _Scalar, Eigen::ColMajor >( mAlgStateSystem->GetEquationSystemCVector() );
         b *= -1;
 
         b.makeCompressed();
         mAlg2MatrixA.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
 
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
@@ -341,12 +341,12 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
 
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
         mStateSystemGroup->mStateVector.middleRows( dglUIDCount, algUIDCount ) = ret;
     }
@@ -368,10 +368,10 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         if ( algUIDCount == 0 )
             return;
 
-        SparseMatrix< _Scalar, ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
         b.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
 
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
@@ -379,17 +379,17 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
 
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
         dxdt.bottomRows( algUIDCount ) = ret;
     }
 
-    void operator()( const MatrixType& x, Eigen::Matrix< _Scalar, Dynamic, 1 >& dxdt, const double /* t */ )
+    void operator()( const MatrixType& x, Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 >& dxdt, const double /* t */ )
     {
         dxdt.setZero();
 
@@ -398,7 +398,7 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         const MatrixType& dglMatrixA = mDglStateSystem->GetEquationSystemAMatrix();
         const MatrixType& dglVectorC = mDglStateSystem->GetEquationSystemCVector();
 
-        SparseMatrix< _Scalar, RowMajor > dxdt_dgl = dglMatrixA * x;
+        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > dxdt_dgl = dglMatrixA * x;
         dxdt_dgl += dglVectorC;
 
         dxdt.topRows( dglUIDCount ) = dxdt_dgl;
@@ -406,10 +406,10 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         if ( algUIDCount == 0 )
             return;
 
-        SparseMatrix< _Scalar, ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
         b.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
 
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
@@ -417,12 +417,12 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
 
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
         dxdt.bottomRows( algUIDCount ) = ret;
     }
@@ -438,7 +438,7 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
             x2.coeffRef( i, 0 ) = x( i, 0 );
 
         dxdt.resize( x.n_rows, x.n_cols );
-        Eigen::Matrix< _Scalar, Dynamic, 1 > dxdt2( dxdt.n_rows, dxdt.n_cols );
+        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > dxdt2( dxdt.n_rows, dxdt.n_cols );
 
         // Do the job
         operator()( x2, dxdt2, 0 );
@@ -453,11 +453,11 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         const size_t stateCount = mStateSystemGroup->GetStateCount();
 
         // Store x into temporary states
-        SparseMatrix< _Scalar, RowMajor > tmpX( stateCount, 1 );
+        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > tmpX( stateCount, 1 );
         misc::FastCopyMatrix( tmpX, &x[0], stateCount );
 
         // Calculate dxdt
-        SparseMatrix< _Scalar, RowMajor > tmpDxdt( stateCount, 1 );
+        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > tmpDxdt( stateCount, 1 );
         operator()( tmpX, tmpDxdt, 0.0 );
 
         // Store result back into dxdt
@@ -505,14 +505,14 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
 
         // CalculateInitialStateFromCurrentState
         const MatrixType& xDgl = mStateSystemGroup->mStateVector.topRows( dglUIDCount );
-        SparseMatrix< _Scalar, ColMajor > b = ( Alg1MatrixA );
-        b = b * SparseMatrix< _Scalar, ColMajor >( mDglStateSystem->GetEquationSystemAMatrix() );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = ( Alg1MatrixA );
+        b = b * Eigen::SparseMatrix< _Scalar, Eigen::ColMajor >( mDglStateSystem->GetEquationSystemAMatrix() );
         b *= -1;
 
         b.makeCompressed();
         Alg2MatrixA.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
 
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
@@ -520,15 +520,15 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
-        SparseMatrix< _Scalar, RowMajor > returnMatrix( dglUIDCount + algUIDCount, dglUIDCount + algUIDCount );
+        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > returnMatrix( dglUIDCount + algUIDCount, dglUIDCount + algUIDCount );
 
-        SparseMatrix< _Scalar, ColMajor > matAdgl = SparseMatrix< _Scalar, ColMajor >( matADGL );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > matAdgl = Eigen::SparseMatrix< _Scalar, Eigen::ColMajor >( matADGL );
         returnMatrix.topRows( matADGL.rows() ) = matAdgl;
         returnMatrix.bottomRows( ret.rows() ) = ret;
 
@@ -554,14 +554,14 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
 
         // CalculateInitialStateFromCurrentState
         const MatrixType& xDgl = mStateSystemGroup->mStateVector.topRows( dglUIDCount );
-        SparseMatrix< _Scalar, ColMajor > b = ( Alg1MatrixA );
-        b = b * SparseMatrix< _Scalar, ColMajor >( mDglStateSystem->GetEquationSystemCVector() );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = ( Alg1MatrixA );
+        b = b * Eigen::SparseMatrix< _Scalar, Eigen::ColMajor >( mDglStateSystem->GetEquationSystemCVector() );
         b *= -1;
 
         b.makeCompressed();
         Alg2MatrixA.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
 
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
@@ -569,17 +569,17 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
 
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
         const size_t statecount( mStateSystemGroup->GetStateCount() );
-        SparseMatrix< _Scalar, RowMajor > returnMatrix( statecount, 1 );
+        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > returnMatrix( statecount, 1 );
 
-        SparseMatrix< _Scalar, ColMajor > matcdgl = SparseMatrix< _Scalar, ColMajor >( matCDGL );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > matcdgl = Eigen::SparseMatrix< _Scalar, Eigen::ColMajor >( matCDGL );
         returnMatrix.topRows( matCDGL.rows() ) = matcdgl;
         returnMatrix.bottomRows( ret.rows() ) = ret;
 
@@ -602,22 +602,22 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         if ( mAlg2MatrixA.nonZeros() == 0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AlgNotInvertable" );
 
-        SparseMatrix< _Scalar, ColMajor > b = mAlgStateSystem->GetEquationSystemCVector();
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = mAlgStateSystem->GetEquationSystemCVector();
         b.makeCompressed();
 
-        SparseLU< SparseMatrix< _Scalar, ColMajor > > solver;
+        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
         // Compute the ordering permutation vector from the structural pattern of A
         solver.analyzePattern( mAlg2MatrixA );
         // Compute the numerical factorization
         solver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
-        ComputationInfo o;
-        if ( Success != ( o = solver.info() ) )
+        Eigen::ComputationInfo o;
+        if ( Eigen::Success != ( o = solver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                                  solver.lastErrorMessage().c_str() );
 
-        SparseMatrix< _Scalar, ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
 
         mStateSystemGroup->mStateVector.middleRows( dglUIDCount, algUIDCount ) = -ret;
     }

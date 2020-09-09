@@ -24,7 +24,7 @@ double ScalarMul( const myMatrixType &rowMatrix, const myMatrixType &colMatrix )
 namespace internal
 {
 template <>
-struct default_digits10_impl< symbolic::Symbolic< OutType >, false, false >;
+struct default_digits10_impl< ::symbolic::Symbolic< OutType >, false, false >;
 }
 
 #endif /* _SYMBOLIC_ */

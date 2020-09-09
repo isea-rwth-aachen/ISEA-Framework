@@ -5,25 +5,20 @@
 namespace aging
 {
 CyclicalAging::CyclicalAging( const double agingStepTime, const double minBetaCapacity, const double minBetaResistance,
-                              const std::string& formulaBetaCapacity, const std::string& formulaBetaResistance,
+                              const boost::shared_ptr< object::Object< double > >& alphaCapacity,
+                              const boost::shared_ptr< object::Object< double > >& alphaResistance,
                               const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
                               const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance )
-    : EmpiricalAging( agingStepTime, minBetaCapacity, minBetaResistance, formulaBetaCapacity, formulaBetaResistance,
+    : EmpiricalAging( agingStepTime, minBetaCapacity, minBetaResistance, alphaCapacity, alphaResistance,
                       initialCapacityFactor, initialResistanceFactor, isEnabled )
     , mChargeThroughputExponentCapacity( chargeThroughputExponentCapacity )
     , mChargeThroughputExponentResistance( chargeThroughputExponentResistance )
     , mActualDod( 0.0 )
     , mActualVoltage( 0.0 )
     , mActualSoc( 0.0 )
+    , mActualCurrent( 0.0 )
     , mTimeSinceLastAgingStep( 0.0 )
 {
-    std::vector< std::pair< const char*, double& > > expressionParserContent;
-    expressionParserContent.push_back( std::pair< const char*, double& >( "deltaDOD", mActualDod ) );
-    expressionParserContent.push_back( std::pair< const char*, double& >( "meanV", mActualVoltage ) );
-    expressionParserContent.push_back( std::pair< const char*, double& >( "meanSOC", mActualSoc ) );
-
-    this->mExpressionParserStressFactorCapacity.AddContent( formulaBetaCapacity, expressionParserContent );
-    this->mExpressionParserStressFactorResistance.AddContent( formulaBetaResistance, expressionParserContent );
 }
 
 size_t CyclicalAging::GetType() const { return AgingType::CYCLICAL; }
@@ -41,18 +36,23 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
     this->mStressFactorCapacity = 0.0;
     this->mStressFactorResistance = 0.0;
 
-    for ( size_t i = 0; i < cycles.size(); i++ )
+    for ( const rainflow::Cycle& cycle : cycles )
     {
-        mActualDod = cycles[i].mDepth;
-        mActualSoc = cycles[i].mMeanValue;
-        mActualVoltage = GetAverageVoltage( this->mTimeValues[cycles[i].mStartIndex], this->mTimeValues[cycles[i].mEndIndex] );
-        double betaCapacity = this->mExpressionParserStressFactorCapacity.GetSolution();
-        double betaResistance = this->mExpressionParserStressFactorResistance.GetSolution();
+        double cycleStart = this->mTimeValues[cycle.mStartIndex];
+        double cycleEnd = this->mTimeValues[cycle.mEndIndex];
+        double cycleChargeThroughput = cycle.mDepth * capacity * cycle.mCycleCount;
+
+        mActualDod = cycle.mDepth;
+        mActualSoc = cycle.mMeanValue;
+        // convert CTP to As and double it to get the integral over the absolute value of the current
+        mActualCurrent = ( cycleChargeThroughput * 2 * 3600 ) / ( cycleEnd - cycleStart );
+        mActualVoltage = GetAverageVoltage( cycleStart, cycleEnd );
+        double betaCapacity = this->mCapacityStressFactor->GetValue();
+        double betaResistance = this->mResistanceStressFactor->GetValue();
         if ( betaCapacity < this->mMinStressFactorCapacity )
             betaCapacity = this->mMinStressFactorCapacity;
         if ( betaResistance < this->mMinStressFactorResistance )
             betaResistance = this->mMinStressFactorResistance;
-        double cycleChargeThroughput = mActualDod * capacity * cycles[i].mCycleCount;
         this->mStressFactorCapacity += betaCapacity * cycleChargeThroughput;
         this->mStressFactorResistance += betaResistance * cycleChargeThroughput;
         chargeThroughput += cycleChargeThroughput;

@@ -3,6 +3,7 @@ add_custom_target(framework)
 # list of directories inside src that should not be included
 set(UNINCLUDE
     ${UNINCLUDE}
+    ${PROJECT_SOURCE_DIR}/src/cinterface/
     ${PROJECT_SOURCE_DIR}/src/unittest
     ${PROJECT_SOURCE_DIR}/src/simulink_mock/
     ${PROJECT_SOURCE_DIR}/src/thermal/executable
@@ -17,7 +18,6 @@ set(NUMERIC_UNINCLUDE ${NUMERIC_UNINCLUDE})
 
 set(SYMBOLIC_UNINCLUDE
     ${SYMBOLIC_UNINCLUDE}
-    ${PROJECT_SOURCE_DIR}/src/cinterface/
     ${PROJECT_SOURCE_DIR}/src/export/baseExport
     ${PROJECT_SOURCE_DIR}/src/export/electrical_simulink_model
     ${PROJECT_SOURCE_DIR}/src/export/esbVisualizer
@@ -123,8 +123,8 @@ endforeach(f ${TMP_SOURCE})
 if(BUILD_NUMERIC)
   set(libname_NUMERIC ISEAFrameNumeric)
   add_library(${libname_NUMERIC} ${NUMERIC_SOURCE} ${NUMERIC_HEADERS})
-  target_link_libraries(${libname_NUMERIC} ${COMMON_LIBRARIES}
-                        ${NUMERIC_LIBRARIES})
+  target_link_libraries(${libname_NUMERIC} PUBLIC ${COMMON_LIBRARIES}
+                        ${NUMERIC_LIBRARIES} ${MATIO_LIBRARIES})
   target_compile_definitions(${libname_NUMERIC} PUBLIC ${COMMON_DEFINITIONS}
                              ${NUMERIC_DEFINITIONS})
   add_dependencies(framework ${libname_NUMERIC})
@@ -133,7 +133,7 @@ endif()
 if(BUILD_SYMBOLIC)
   set(libname_SYMBOLIC ISEAFrameSymbolic)
   add_library(${libname_SYMBOLIC} ${SYMBOLIC_SOURCE} ${SYMBOLIC_HEADERS})
-  target_link_libraries(${libname_SYMBOLIC} ${COMMON_LIBRARIES}
+  target_link_libraries(${libname_SYMBOLIC} PUBLIC ${COMMON_LIBRARIES}
                         ${SYMBOLIC_LIBRARIES})
   target_compile_definitions(${libname_SYMBOLIC} PUBLIC ${COMMON_DEFINITIONS}
                              ${SYMBOLIC_DEFINITIONS})

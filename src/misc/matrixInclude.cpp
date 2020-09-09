@@ -9,9 +9,11 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #ifdef _EIGEN_
 template <>
-Eigen::SparseMatrix<double, RowMajor>& CopyTopToMatrixLeft(Eigen::SparseMatrix<double, RowMajor> &target, const Eigen::SparseMatrix<double, RowMajor> &source, size_t  length)
+Eigen::SparseMatrix< double, Eigen::RowMajor > &
+CopyTopToMatrixLeft( Eigen::SparseMatrix< double, Eigen::RowMajor > &target,
+                     const Eigen::SparseMatrix< double, Eigen::RowMajor > &source, size_t length )
 {
-    target.topRows(length) = source;
+    target.topRows( length ) = source;
     return target;
 }
 #endif

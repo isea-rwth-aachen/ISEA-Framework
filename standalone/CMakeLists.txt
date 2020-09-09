@@ -10,9 +10,12 @@ if(WIN_TARGET AND LINUX_HOST)
   endforeach()
 endif()
 
+find_package(MATIO REQUIRED)
+
 file(GLOB_RECURSE SOURCEFILES standalone/*.cpp)
 add_library(ISEAFrameStandalone STATIC EXCLUDE_FROM_ALL ${SOURCEFILES})
-target_link_libraries(ISEAFrameStandalone ISEAFrameNumeric ${BOOST_TARGETS})
+target_link_libraries(ISEAFrameStandalone ISEAFrameNumeric ${BOOST_TARGETS}
+                      matio::matio)
 
 if(BUILD_NUMERIC)
   option(BUILD_VISUALIZER "Build a quick visualizer executable" OFF)

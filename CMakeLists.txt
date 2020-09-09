@@ -5,8 +5,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 cmake_policy(SET CMP0009 NEW)
 set(ISEAFrameVERSION_MAJOR 2)
-set(ISEAFrameVERSION_MINOR 21)
-set(ISEAFramePATCH_LEVEL 2)
+set(ISEAFrameVERSION_MINOR 22)
+set(ISEAFramePATCH_LEVEL 0)
 set(ISEAFrameNAME "Refactor")
 set(ARCH_TYPE
     "64"
@@ -21,6 +21,7 @@ option(CREATE_RELEASE_DIRS
        OFF)
 option(BUILD_FOR_RT "Build a version for the realtime system" OFF)
 option(USE_BOOST_THREADS "Use multithreading for the thermal model" OFF)
+option(USE_EXCEPTIONS "Use exceptions" ON)
 set(MATIRX_IMPLEMENTATION
     Eigen
     CACHE STRING "Choose matrix implementation")
@@ -66,13 +67,13 @@ if(WIN_HOST)
 
   if(USE_SIMULINK)
     set(MATLAB_INCLUDE_DIR
-        "C:/Program Files/matlab/R2018b/extern/include"
+        "C:/Program Files/matlab/R2019b/extern/include"
         CACHE STRING "Path to matlab header files")
     set(SIMULINK_INCLUDE_DIR
-        "C:/Program Files/matlab/R2018b/simulink/include"
+        "C:/Program Files/matlab/R2019b/simulink/include"
         CACHE STRING "Path to simulink header files")
     set(MATLAB_LINK_DIR
-        "C:/Program Files/matlab/R2018b/extern/lib/win64/microsoft"
+        "C:/Program Files/matlab/R2019b/extern/lib/win64/microsoft"
         CACHE STRING "Path to matlab library files")
 
   endif(USE_SIMULINK)
@@ -80,12 +81,17 @@ else()
   if(${USE_DEBUG_GDB})
     add_compile_options(-ggdb)
   endif()
+  add_link_options("-Wl,-rpath=./")
+  add_compile_options(-fPIC)
 endif()
 
 if(BUILD_FOR_RT)
   set(USE_BOOST_THREADS
       OFF
       CACHE BOOL "Use multithreading for the thermal model" FORCE)
+  set(USE_EXCEPTIONS
+      OFF
+      CACHE BOOL "Use exceptions" FORCE)
 
   set(NUMERIC_DEFINITIONS
       ${NUMERIC_DEFINITIONS}
@@ -136,9 +142,13 @@ if(BUILD_FOR_RT)
       -DBOOST_NO_SFINAE_EXPR
       -DBOOST_NO_TWO_PHASE_NAME_LOOKUP
       -D__NO_STRING__)
-else()
-  set(COMMON_DEFINITIONS ${COMMON_DEFINITIONS} __EXCEPTIONS__)
 endif()
+
+if(USE_EXCEPTIONS)
+  set(COMMON_DEFINITIONS ${COMMON_DEFINITIONS} __EXCEPTIONS__)
+else()
+  set(COMMON_DEFINITIONS ${COMMON_DEFINITIONS} BOOST_NO_EXCEPTIONS)
+endif(USE_EXCEPTIONS)
 
 if(USE_BOOST_THREADS)
   set(NUMERIC_DEFINITIONS ${NUMERIC_DEFINITIONS} -DBOOST_THREAD
@@ -162,43 +172,10 @@ find_package(Boost REQUIRED)
 
 set(COMMON_LIBRARIES ${COMMON_LIBRARIES} Boost::boost)
 
-find_package(MATIO REQUIRED)
-set(COMMON_LIBRARIES ${COMMON_LIBRARIES} ${MATIO_LIBRARIES})
-
 find_package(Threads REQUIRED)
 set(COMMON_LIBRARIES ${COMMON_LIBRARIES} Threads::Threads)
 
 set(COMMON_LIBRARIES ${COMMON_LIBRARIES} tinyxml2)
-
-if(USE_SIMULINK)
-  set(MATLAB_INCLUDE_DIR
-      /usr/local/MATLAB/R2019b/extern/include
-      CACHE STRING "Path to matlab header files")
-  set(SIMULINK_INCLUDE_DIR
-      /usr/local/MATLAB/R2019b/simulink/include
-      CACHE STRING "Path to simulink header files")
-  set(MATLAB_LINK_DIR
-      /usr/local/MATLAB/R2019b/bin/glnxa64
-      CACHE STRING "Path to matlab library files")
-
-  if(WIN_HOST)
-    set(SIMULINK_LIBRARIES libmex libmx libmat libmwlapack libmwblas libeng)
-  else()
-    set(SIMULINK_LIBRARIES mex mx mwlapack mwblas eng)
-  endif()
-
-  add_library(Simulink INTERFACE IMPORTED)
-  target_include_directories(Simulink INTERFACE ${MATLAB_INCLUDE_DIR}
-                                                ${SIMULINK_INCLUDE_DIR})
-  target_link_directories(Simulink INTERFACE ${MATLAB_LINK_DIR})
-  target_link_libraries(Simulink INTERFACE ${SIMULINK_LIBRARIES})
-  set(COMMON_LIBRARIES ${COMMON_LIBRARIES} Simulink)
-
-  if(LINUX_TARGET)
-    add_compile_options(-fPIC)
-  endif()
-
-endif(USE_SIMULINK)
 
 # used by subdirectories to copy DLLs for windows to the binary output dir when
 # building the target
@@ -215,7 +192,8 @@ endfunction(copy_windows_files_to_dir)
 function(add_release_files target files_to_copy)
   if(CREATE_RELEASE_DIRS)
     add_custom_command(
-      TARGET ${target} POST_BUILD
+      TARGET ${target}
+      POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${files_to_copy}
               $<TARGET_PROPERTY:${target},RUNTIME_OUTPUT_DIRECTORY>)
   endif()
@@ -229,12 +207,4 @@ add_subdirectory(standalone)
 add_subdirectory(src/export/mex)
 add_subdirectory(src/unittests)
 add_subdirectory(doxygen)
-
-# check if external dependencies have been added in the subdirectories
-if(NEED_SIMULINK)
-  set(USE_SIMULINK
-      ON
-      CACHE BOOL "link to simulink libraries" FORCE)
-endif()
-
-mark_as_advanced(USE_SIMULINK)
+add_subdirectory(src/cinterface)

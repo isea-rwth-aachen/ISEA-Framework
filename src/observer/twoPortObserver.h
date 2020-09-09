@@ -40,7 +40,10 @@ class TwoPortObserver : public Observer< T, electrical::TwoPort, PreparationType
 
     typename FilterT::Data_t& GetObservedTwoPortsPtr() { return mObservedTwoPortsPtr; };
 
-    std::vector< boost::shared_ptr< electrical::TwoPort< T > > >& GetObservedTwoPorts() { return mObservableTwoPorts; };
+    const std::vector< boost::shared_ptr< electrical::TwoPort< T > > >& GetObservedTwoPorts()
+    {
+        return mObservableTwoPorts;
+    };
     void SetRoot( const boost::shared_ptr< electrical::TwoPort< T > >& root ) { mRootPort = root; };
 
     void ResetObserver( const boost::shared_ptr< electrical::TwoPort< T > >& root );

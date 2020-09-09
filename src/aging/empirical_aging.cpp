@@ -1,20 +1,20 @@
 #include "empirical_aging.h"
 namespace aging
 {
-EmpiricalAging::EmpiricalAging( const double agingStepTime, const double minStressFactorCapacity,
-                                const double minStressFactorResistance, const std::string& formulaStressFactorCapacity,
-                                const std::string& formulaStressFactorResistance, const double initialCapacityFactor,
-                                const double initialResistanceFactor, const bool isEnabled )
+EmpiricalAging::EmpiricalAging( const double agingStepTime, const double minStressFactorCapacity, const double minStressFactorResistance,
+                                const boost::shared_ptr< object::Object< double > >& capacityStressFactor,
+                                const boost::shared_ptr< object::Object< double > >& resistanceStressFactor,
+                                const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled )
     : AgingBase( agingStepTime, isEnabled )
     , mCapacityFactor( initialCapacityFactor )
     , mResistanceFactor( initialResistanceFactor )
     , mChargeLoss( 0.0 )
     , mMinStressFactorCapacity( minStressFactorCapacity )
     , mMinStressFactorResistance( minStressFactorResistance )
-    , mFormulaStressFactorCapacity( formulaStressFactorCapacity )
-    , mFormulaStressFactorResistance( formulaStressFactorResistance )
     , mStressFactorCapacity( 0.0 )
     , mStressFactorResistance( 0.0 )
+    , mCapacityStressFactor( capacityStressFactor )
+    , mResistanceStressFactor( resistanceStressFactor )
 {
 }
 

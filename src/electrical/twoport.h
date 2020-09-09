@@ -186,7 +186,7 @@ inline ScalarUnit ReturnFirstElement( T& mat )
 
 #ifdef _EIGEN_
 template <>
-ScalarUnit ReturnFirstElement( Eigen::SparseMatrix< double, RowMajor >& mat );
+ScalarUnit ReturnFirstElement( Eigen::SparseMatrix< double, Eigen::RowMajor >& mat );
 #endif
 
 template < typename T >

@@ -11,6 +11,14 @@
 
 #include <algorithm>
 
+class TestCyclicalAging;
+
+namespace factory
+{
+template < typename T >
+class AgingClassWrapper;
+}
+
 namespace aging
 {
 
@@ -18,10 +26,14 @@ namespace aging
 /// cell
 class CyclicalAging : public EmpiricalAging
 {
+    friend factory::AgingClassWrapper< CyclicalAging >;
+    friend TestCyclicalAging;
+
     public:
     /// Constructor
     CyclicalAging( const double agingStepTime, const double minBetaCapacity, const double minBetaResistance,
-                   const std::string& formulaBetaCapacity, const std::string& formulaBetaResistance,
+                   const boost::shared_ptr< object::Object< double > >& alphaCapacity,
+                   const boost::shared_ptr< object::Object< double > >& alphaResistance,
                    const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
                    const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance );
 
@@ -49,6 +61,7 @@ class CyclicalAging : public EmpiricalAging
     double mActualDod;                 // [%/100]
     double mActualVoltage;             // [V]
     double mActualSoc;                 // [%/100]
+    double mActualCurrent;             // [A]
     double mTimeSinceLastAgingStep;    // [s]
 
     std::vector< double > mTimeValues;       // [s]

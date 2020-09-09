@@ -1,25 +1,37 @@
-#FROM https://github.com/cvjena/nice-core/blob/master/cmake/FindMATIO.cmake
+# BASED ON https://github.com/cvjena/nice-core/blob/master/cmake/FindMATIO.cmake
 # Find the MATIO headers and library.
 #
-#  MATIO_INCLUDE_DIRS - where to find matio.h, etc.
-#  MATIO_LIBRARIES    - List of libraries.
-#  MATIO_FOUND        - True if matio found.
+# MATIO_INCLUDE_DIRS - where to find matio.h, etc. MATIO_LIBRARIES    - List of
+# libraries. MATIO_FOUND        - True if matio found.
 
-FIND_PATH(MATIO_INCLUDE_DIR NAMES matio.h PATHS ${FRAMEWORK_EXTENSION_FOLDER}/include/ $ENV{HOME}/include)
-FIND_LIBRARY(MATIO_LIBRARY NAMES matio${ARCH_TYPE} libmatio${ARCH_TYPE} matio libmatio PATHS ${FRAMEWORK_EXTENSION_FOLDER}/lib/ $ENV{HOME}/lib)
+find_path(
+  MATIO_INCLUDE_DIR
+  NAMES matio.h
+  PATHS ${FRAMEWORK_EXTENSION_FOLDER}/include/
+        ${FRAMEWORK_EXTENSION_FOLDER}/include/matio $ENV{HOME}/include)
+find_library(
+  MATIO_LIBRARY
+  NAMES matio${ARCH_TYPE} libmatio${ARCH_TYPE} matio libmatio
+  PATHS ${FRAMEWORK_EXTENSION_FOLDER}/lib/ $ENV{HOME}/lib)
 
-MARK_AS_ADVANCED(MATIO_INCLUDE_DIR)
-MARK_AS_ADVANCED(MATIO_LIBRARY)
+mark_as_advanced(MATIO_INCLUDE_DIR)
+mark_as_advanced(MATIO_LIBRARY)
 
-# handle the QUIETLY and REQUIRED arguments and set MATIO_FOUND to TRUE if 
-# all listed variables are TRUE
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(MATIO DEFAULT_MSG MATIO_LIBRARY MATIO_INCLUDE_DIR)
+# handle the QUIETLY and REQUIRED arguments and set MATIO_FOUND to TRUE if all
+# listed variables are TRUE
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(MATIO DEFAULT_MSG MATIO_LIBRARY
+                                  MATIO_INCLUDE_DIR)
 
-IF(MATIO_FOUND)
-  SET(MATIO_LIBRARIES ${MATIO_LIBRARY} ${HDF5_LIBRARIES})
-  SET(MATIO_INCLUDE_DIRS ${MATIO_INCLUDE_DIR} ${HDF5_INCLUDE_DIR})
-ELSE(MATIO_FOUND)
-  SET(MATIO_LIBRARIES)
-  SET(MATIO_INCLUDE_DIRS)
-ENDIF(MATIO_FOUND)
+if(MATIO_FOUND)
+  set(MATIO_LIBRARIES ${MATIO_LIBRARY} ${HDF5_LIBRARIES})
+  set(MATIO_INCLUDE_DIRS ${MATIO_INCLUDE_DIR})
+  add_library(matio::matio UNKNOWN IMPORTED)
+  set_target_properties(
+    matio::matio
+    PROPERTIES IMPORTED_LOCATION "${MATIO_LIBRARY}"
+               INTERFACE_INCLUDE_DIRECTORIES "${MATIO_INCLUDE_DIRS}")
+else(MATIO_FOUND)
+  set(MATIO_LIBRARIES)
+  set(MATIO_INCLUDE_DIRS)
+endif(MATIO_FOUND)

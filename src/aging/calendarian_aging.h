@@ -8,6 +8,14 @@
 #include "../state/thermal_state.h"
 #include "empirical_aging.h"
 
+class TestCalendarianAging;
+
+namespace factory
+{
+template < typename T >
+class AgingClassWrapper;
+}
+
 namespace aging
 {
 
@@ -15,12 +23,15 @@ namespace aging
 /// underlying cell
 class CalendarianAging : public EmpiricalAging
 {
+    friend factory::AgingClassWrapper< CalendarianAging >;
+    friend TestCalendarianAging;
+
     public:
     /// Constructor
     CalendarianAging( const double agingStepTime, const double minAlphaCapacity, const double minAlphaResistance,
-                      const std::string& formulaAlphaCapacity, const std::string& formulaAlphaResistance,
-                      const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
-                      const double timeExponent );
+                      const boost::shared_ptr< object::Object< double > >& alphaCapacity,
+                      const boost::shared_ptr< object::Object< double > >& alphaResistance, const double initialCapacityFactor,
+                      const double initialResistanceFactor, const bool isEnabled, const double timeExponent );
 
     /// Derived from AgingBase
     virtual size_t GetType() const;

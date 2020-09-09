@@ -23,14 +23,14 @@ double ScalarMul( const myMatrixType &rowMatrix, const myMatrixType &colMatrix )
 
 
 template <>
-struct NumTraits< symbolic::Symbolic< double > >
-    : GenericNumTraits< symbolic::Symbolic< double > >    // permits to get the epsilon, dummy_precision, lowest,
-                                                          // highest
-                                                          // functions
+struct NumTraits< ::symbolic::Symbolic< double > >
+    : GenericNumTraits< ::symbolic::Symbolic< double > >    // permits to get the epsilon, dummy_precision, lowest,
+                                                            // highest
+                                                            // functions
 {
-    typedef symbolic::Symbolic< double > Real;
-    typedef symbolic::Symbolic< double > NonInteger;
-    typedef symbolic::Symbolic< double > Nested;
+    typedef ::symbolic::Symbolic< double > Real;
+    typedef ::symbolic::Symbolic< double > NonInteger;
+    typedef ::symbolic::Symbolic< double > Nested;
     enum
     {
         IsComplex = 0,
@@ -46,7 +46,7 @@ struct NumTraits< symbolic::Symbolic< double > >
 namespace internal
 {
 template <>
-struct default_digits10_impl< symbolic::Symbolic< double >, false, false >
+struct default_digits10_impl< ::symbolic::Symbolic< double >, false, false >
 {
     static int run() { return 0; }
 };
@@ -60,18 +60,18 @@ template < typename _Scalar, int _Options, typename _StorageIndex >
 Eigen::SparseMatrix< _Scalar, _Options, _StorageIndex > solve( Eigen::SparseMatrix< _Scalar, _Options, _StorageIndex > matrixA,
                                                                Eigen::SparseMatrix< _Scalar, _Options, _StorageIndex > vectorC )
 {
-    Eigen::SparseMatrix< _Scalar, ColMajor, _StorageIndex > vecC = vectorC;
+    Eigen::SparseMatrix< _Scalar, Eigen::ColMajor, _StorageIndex > vecC = vectorC;
     Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor, _StorageIndex > > solver;
     solver.analyzePattern( matrixA );
     solver.factorize( matrixA );
 
-    ComputationInfo o;
-    if ( Success != ( o = solver.info() ) )
+    Eigen::ComputationInfo o;
+    if ( Eigen::Success != ( o = solver.info() ) )
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
                                              solver.lastErrorMessage().c_str() );
 
 
-    SparseMatrix< _Scalar, ColMajor > ret = solver.solve( vecC );
+    Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( vecC );
     return ret;
 };
 

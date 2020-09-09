@@ -16,13 +16,13 @@ template class systm::ConstantStepDglSystemSolver< myMatrixType >;
 
 #ifdef _EIGEN_
 template <>
-double ConstantStepDglSystemSolver< SparseMatrix< double, RowMajor > >::Solve()
+double ConstantStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve()
 {
     daeSystem->PrepareEquationSystem();
 
     size_t realStates = this->mStateVector.rows() - 1;
 
-    SparseMatrix< double, RowMajor > dxdt( realStates, 1 );
+    Eigen::SparseMatrix< double, Eigen::RowMajor > dxdt( realStates, 1 );
     daeSystem->operator()( this->mStateVector.topRows( realStates ), dxdt, 0 );
 
     this->mStateVector.topRows( realStates ) += dxdt * this->mDt;

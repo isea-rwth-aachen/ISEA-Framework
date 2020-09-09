@@ -19,6 +19,10 @@ if ~isfield( component, origsystemstr )
 end
 componentCounter = component.(origsystemstr);
 
+if (symbolicString == "")
+    symbolicString = '0';
+end
+
 % componentCounter = size(GetAllComponents(system), 1);
 position = [60 min(32767-60, 60+componentCounter*120) 120 min(32767,120+componentCounter*120)];
 destination = [system '/Component' num2str(componentCounter)];

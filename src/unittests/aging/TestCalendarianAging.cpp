@@ -1,5 +1,7 @@
 #include "TestCalendarianAging.h"
 #include "../../aging/calendarian_aging.h"
+#include "../../object/expression_obj.h"
+#include "../../state/valueStateWrapper.h"
 #include <boost/make_shared.hpp>
 
 void TestCalendarianAging::testNoAging()
@@ -8,8 +10,10 @@ void TestCalendarianAging::testNoAging()
     auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
+    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams;
+    const auto obj = boost::make_shared< object::ExpressionObject< double > >( "0.0001", objParams );
     {    // calculation time of zero seconds
-        aging::CalendarianAging aging( 10, 0, 0, "0.0001", "0.0001", 1, 1, true, 1 );
+        aging::CalendarianAging aging( 10, 0, 0, obj, obj, 1, 1, true, 1 );
         aging.CalculateAging( tpState, 3.0, 1.0 );
         TS_ASSERT_EQUALS( aging.GetCapacityFactor(), 1.0 );
         TS_ASSERT_EQUALS( aging.GetSocOffset(), 0.0 );
@@ -23,7 +27,7 @@ void TestCalendarianAging::testNoAging()
         TS_ASSERT_EQUALS( aging.GetResistanceFactor(), 1.0 );
     }
     {    // aging disabled
-        aging::CalendarianAging aging( 10, 0, 0, "0.0001", "0.0001", 1, 1, false, 1 );
+        aging::CalendarianAging aging( 10, 0, 0, obj, obj, 1, 1, false, 1 );
         aging.CollectData( tpState, tpState, 10 );
         aging.CalculateAging( tpState, 3.0, 1.0 );
 
@@ -41,8 +45,20 @@ void TestCalendarianAging::testAgingCalculation()
     double exponent = 0.8;
     double totalCap = 10.0;
     double soc = 50.0;
-    aging::CalendarianAging aging( steptime, 0, 0, "0.0001 * (V + T - 300)", "0.00015 * (V + T - 300)", initialCap,
-                                   initialRes, true, exponent );
+
+    auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
+                                                                                     {"T", temperatureValueState},
+                                                                                     {"SOC", socValueState}};
+    const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (V + T - 300)", objParams );
+    const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (V + T - 300)", objParams );
+
+    aging::CalendarianAging aging( steptime, 0, 0, objCap, objRes, initialCap, initialRes, true, exponent );
+    *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
+    *temperatureValueState = state::ValueStateWrapper< double >( &aging.mActualTemperature );
+    *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, 3.8, 0 );
     auto socState = boost::make_shared< state::Soc >( totalCap, totalCap, soc );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 300 - 273.15 );
@@ -72,8 +88,21 @@ void TestCalendarianAging::testReset()
     double exponent = 0.8;
     double totalCap = 10.0;
     double soc = 50.0;
-    aging::CalendarianAging aging( steptime, 0, 0, "0.0001 * (V + T - 300)", "0.00015 * (V + T - 300)", initialCap,
-                                   initialRes, true, exponent );
+
+    auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
+                                                                                     {"T", temperatureValueState},
+                                                                                     {"SOC", socValueState}};
+    const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (V + T - 300)", objParams );
+    const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (V + T - 300)", objParams );
+
+    aging::CalendarianAging aging( steptime, 0, 0, objCap, objRes, initialCap, initialRes, true, exponent );
+    *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
+    *temperatureValueState = state::ValueStateWrapper< double >( &aging.mActualTemperature );
+    *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
+
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, 3.8, 0 );
     auto socState = boost::make_shared< state::Soc >( totalCap, totalCap, soc );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 300 - 273.15 );
@@ -121,23 +150,40 @@ void TestCalendarianAging::testFormulaVariables()
     auto socState = boost::make_shared< state::Soc >( 1.0, 1.0, soc * 100 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( temperature - 273.15 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
-
+    auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
+                                                                                     {"T", temperatureValueState},
+                                                                                     {"SOC", socValueState}};
     {
-        aging::CalendarianAging aging( 1.0, 0, 0, "V", "V", 1.0, 1.0, true, 1.0 );
+        const auto obj = boost::make_shared< object::ExpressionObject< double > >( "V", objParams );
+        aging::CalendarianAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0 );
+        *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
+        *temperatureValueState = state::ValueStateWrapper< double >( &aging.mActualTemperature );
+        *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
         aging.CollectData( tpState, tpState, 5.0 );
         aging.CalculateAging( tpState, 5.0, 1.0 );
         TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), voltage, 1e-6 );
         TS_ASSERT_DELTA( aging.GetStressFactorResistance(), voltage, 1e-6 );
     }
     {
-        aging::CalendarianAging aging( 1.0, 0, 0, "T", "T", 1.0, 1.0, true, 1.0 );
+        const auto obj = boost::make_shared< object::ExpressionObject< double > >( "T", objParams );
+        aging::CalendarianAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0 );
+        *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
+        *temperatureValueState = state::ValueStateWrapper< double >( &aging.mActualTemperature );
+        *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
         aging.CollectData( tpState, tpState, 5.0 );
         aging.CalculateAging( tpState, 5.0, 1.0 );
         TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), temperature, 1e-6 );
         TS_ASSERT_DELTA( aging.GetStressFactorResistance(), temperature, 1e-6 );
     }
     {
-        aging::CalendarianAging aging( 1.0, 0, 0, "SOC", "SOC", 1.0, 1.0, true, 1.0 );
+        const auto obj = boost::make_shared< object::ExpressionObject< double > >( "SOC", objParams );
+        aging::CalendarianAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0 );
+        *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
+        *temperatureValueState = state::ValueStateWrapper< double >( &aging.mActualTemperature );
+        *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
         aging.CollectData( tpState, tpState, 5.0 );
         aging.CalculateAging( tpState, 5.0, 1.0 );
         TS_ASSERT_DELTA( aging.GetStressFactorCapacity(), soc, 1e-6 );

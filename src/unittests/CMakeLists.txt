@@ -3,6 +3,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/unittest)
 
 if(BUILD_UNITTESTS)
   find_package(CxxTest)
+  find_package(MATIO REQUIRED)
   add_custom_target(unittests)
 
   # find all header files to pass to the test generator
@@ -12,7 +13,8 @@ if(BUILD_UNITTESTS)
   add_custom_command(
     OUTPUT unittestNumeric.cpp
     COMMAND cxxtestgen --error-printer -o unittestNumeric.cpp
-            ${UNITTEST_HEADERS} COMMAND_EXPAND_LISTS)
+            ${UNITTEST_HEADERS}
+    COMMAND_EXPAND_LISTS)
 
   # find all source files to compile for the unittests
   file(GLOB_RECURSE UNITTEST_SOURCES *.cpp)
@@ -20,11 +22,12 @@ if(BUILD_UNITTESTS)
   if(BUILD_NUMERIC)
     add_executable(unittestNumeric unittestNumeric.cpp ${UNITTEST_HEADERS}
                                    ${UNITTEST_SOURCES})
-    target_link_libraries(unittestNumeric ISEAFrameNumeric ${COMMON_LIBRARIES}
-                          ${NUMERIC_LIBRARIES} ${BOOST_TARGETS})
+    target_link_libraries(unittestNumeric cinterface ISEAFrameNumeric ${COMMON_LIBRARIES}
+                          ${NUMERIC_LIBRARIES} ${BOOST_TARGETS} matio::matio)
     # _CXXTEST_HAVE_EH needs to be defined for some unknown reason
-    target_compile_definitions(unittestNumeric PUBLIC ${COMMON_DEFINITIONS}
-                               ${NUMERIC_DEFINITIONS} _CXXTEST_HAVE_EH)
+    target_compile_definitions(
+      unittestNumeric PUBLIC ${COMMON_DEFINITIONS} ${NUMERIC_DEFINITIONS}
+                             _CXXTEST_HAVE_EH)
     set_target_properties(
       unittestNumeric PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/unittest)
@@ -73,17 +76,19 @@ if(BUILD_UNITTESTS)
     add_custom_command(
       OUTPUT unittestSymbolic.cpp
       COMMAND cxxtestgen --error-printer -o unittestSymbolic.cpp
-              ${UNITTEST_SYMBOLIC_HEADERS} COMMAND_EXPAND_LISTS)
+              ${UNITTEST_SYMBOLIC_HEADERS}
+      COMMAND_EXPAND_LISTS)
 
     add_executable(
       unittestSymbolic unittestSymbolic.cpp ${UNITTEST_SYMBOLIC_HEADERS}
                        ${UNITTEST_SYMBOLIC_SOURCES})
     target_link_libraries(
       unittestSymbolic ISEAFrameSymbolic ${COMMON_LIBRARIES}
-      ${SYMBOLIC_LIBRARIES} ${BOOST_TARGETS})
+      ${SYMBOLIC_LIBRARIES} ${BOOST_TARGETS} matio::matio)
     # _CXXTEST_HAVE_EH needs to be defined for some unknown reason
-    target_compile_definitions(unittestSymbolic PUBLIC ${COMMON_DEFINITIONS}
-                               ${SYMBOLIC_DEFINITIONS} _CXXTEST_HAVE_EH)
+    target_compile_definitions(
+      unittestSymbolic PUBLIC ${COMMON_DEFINITIONS} ${SYMBOLIC_DEFINITIONS}
+                              _CXXTEST_HAVE_EH)
     set_target_properties(
       unittestSymbolic PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                   ${CMAKE_BINARY_DIR}/unittest)

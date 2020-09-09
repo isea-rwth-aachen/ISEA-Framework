@@ -11,10 +11,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/thread/thread.hpp>
 
+#include "../electrical/electrical_simulation.h"
 #include "../electrical/twoport_withchild.h"
 #include "../exceptions/error_proto.h"
 #include "../misc/matrixInclude.h"
-#include "../electrical/electrical_simulation.h"
 #include "baseExport.h"
 
 namespace symbolic
@@ -148,7 +148,7 @@ void ExportSystem< matType, ExportClass, Parser, DEPTH >::PrintVoltageMatrix()
     }
     if ( DEPTH > 2 )
     {
-        typedef Eigen::Matrix< symbolic::Symbolic< double >, Dynamic, Dynamic > full_t;
+        typedef Eigen::Matrix< symbolic::Symbolic< double >, Eigen::Dynamic, Eigen::Dynamic > full_t;
         /*
         full_t a_ode( A_ODE.n_rows, A_ODE.n_cols );
         for ( size_t i = 0; i < A_ODE.n_rows; ++i )
@@ -163,7 +163,7 @@ void ExportSystem< matType, ExportClass, Parser, DEPTH >::PrintVoltageMatrix()
 
         // Eigen::SparseMatrix< symbolic::Symbolic< double >, Eigen::RowMajor >
         full_t a_ode = A_ODE;
-        FullPivHouseholderQR< full_t > lu_decomp( a_ode );
+        Eigen::FullPivHouseholderQR< full_t > lu_decomp( a_ode );
         ( *mStream ) << mExportStruct.PreTextOutput( "A_{Q}_{min}" );
         std::cout << lu_decomp.matrixQ() << std::endl;
         //    Output( output );

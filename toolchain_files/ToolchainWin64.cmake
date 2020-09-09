@@ -21,14 +21,12 @@ set(TOOLCHAIN_LINK_OPTIONS
 # here is the target environment located
 set(CMAKE_FIND_ROOT_PATH /usr/x86_64-w64-mingw32/FrameworkExtensions)
 
-set(MATLAB_INCLUDE_DIR
+set(Matlab_INCLUDE_DIRS
     /usr/x86_64-w64-mingw32/matlab/include
     CACHE STRING "Path to matlab header files")
-set(SIMULINK_INCLUDE_DIR
-    ${MATLAB_INCLUDE_DIR}
-    CACHE STRING "Path to simulink header files")
-set(MATLAB_LINK_DIR
-    /usr/x86_64-w64-mingw32/matlab/lib
+file(GLOB LIBRARIES /usr/x86_64-w64-mingw32/matlab/lib/*.lib)
+set(Matlab_LIBRARIES
+    ${LIBRARIES}
     CACHE STRING "Path to matlab library files")
 
 # adjust the default behaviour of the FIND_XXX() commands: search headers and

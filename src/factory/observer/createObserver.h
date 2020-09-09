@@ -174,4 +174,27 @@ CreateAgingObserver( containerType& observablePorts, const xmlparser::XmlParamet
 
 #endif    // BUILD_AGING_SIMULATION
 
+/// inserts all observable twoports inside root into the vector twoports if they are not already found in the vector
+/// for building the twoport observer, the vector should already contain all cellements before calling this function so that they are always printed first
+template < typename matrixType >
+void FindObservableTwoports( std::vector< boost::shared_ptr< electrical::TwoPort< matrixType > > >& twoports,
+                             const boost::shared_ptr< electrical::TwoPort< matrixType > >& root )
+{
+    if ( root->IsObservable() )
+    {
+        if ( std::find( twoports.begin(), twoports.end(), root ) == twoports.end() )
+            twoports.push_back( root );
+    }
+
+    if ( root->HasChildren() )
+    {
+        const electrical::TwoPortWithChild< matrixType >& tpWithChild =
+         static_cast< const electrical::TwoPortWithChild< matrixType >& >( *root );
+        for ( const auto& child : tpWithChild )
+        {
+            FindObservableTwoports( twoports, child );
+        }
+    }
+}
+
 #endif /* _CREATEOBSERVER_ */

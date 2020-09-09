@@ -141,8 +141,8 @@ The calendric aging is used by adding an element with the class attribute "Calen
 XML Tag                                 | Type          | Unit      | Explanation                                                                                 
 ----------------------------------------|---------------|-----------|----------------------------------------------------------------------------------------
 TimeExponent                            | double        |           | Exponent n in the formulas used to calculate the calendric aging
-FormulaCapacity                         | string        |           | Formula used to calculate the value of alpha. The symbols V and T can be used for the cell's voltage and temperature
-FormulaResistance                       | string        |           | Formula used to calculate the value of alpha. The symbols V and T can be used for the cell's voltage and temperature
+FormulaCapacity                         | string        |           | Formula used to calculate the value of alpha. The symbols V, T and SOC can be used for the cell's voltage, temperature and SOC
+FormulaResistance                       | string        |           | Formula used to calculate the value of alpha. The symbols V, T and SOC can be used for the cell's voltage, temperature and SOC
 MinAlphaCapacity                        | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinAlphaResistance                      | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
@@ -157,8 +157,8 @@ XML Tag                                 | Type          | Unit      | Explanatio
 ----------------------------------------|---------------|-----------|----------------------------------------------------------------------------------------
 ChargeExponentCapacity                  | double        |           | Exponent n in the formula used to calculate the capacity for the cyclic aging
 ChargeExponentResistance                | double        |           | Exponent n in the formula used to calculate the resistance for the cyclic aging
-FormulaCapacity                         | string        |           | Formula used to calculate the value of beta. The symbols meanV and deltaDOD can be used for the cell's average voltage and depth of discharge
-FormulaResistance                       | string        |           | Formula used to calculate the value of beta. The symbols meanV and deltaDOD can be used for the cell's average voltage and depth of discharge
+FormulaCapacity                         | string        |           | Formula used to calculate the value of beta. The symbols meanV, deltaDOD, meanSOC and meanI can be used for the cell's average voltage, depth of discharge, average SOC and average current
+FormulaResistance                       | string        |           | Formula used to calculate the value of beta. The symbols meanV, deltaDOD, meanSOC and meanI can be used for the cell's average voltage, depth of discharge, average SOC and average current
 MinBetaCapacity                         | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinBetaResistance                       | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.

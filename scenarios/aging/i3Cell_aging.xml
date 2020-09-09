@@ -45,10 +45,10 @@
          </Filter1>
          <Filter2 class="MatlabFilter">
             <Filename>Patch_Temperatures.mat</Filename>
-            <VerticesFile>Patch_Vertices.mat</VerticesFile>
-            <VolumesFile>Patch_Volumes.mat</VolumesFile>
-            <VolumesNameFile>Patch_VolumeNames.mat</VolumesNameFile>
-            <AreasFile>Patch_Areas.mat</AreasFile>
+            <VerticesFile>Patch_Vertices.csv</VerticesFile>
+            <VolumesFile>Patch_Volumes.csv</VolumesFile>
+            <VolumeNamesFile>Patch_VolumeNames.csv</VolumeNamesFile>
+            <AreasFile>Patch_Areas.csv</AreasFile>
          </Filter2>
       </Thermal>
       <Aging>

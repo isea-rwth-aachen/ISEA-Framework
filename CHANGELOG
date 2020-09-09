@@ -1,3 +1,10 @@
+Version 2.22.0
+===========
+- Output filenames for the thermal matlab filter can be set in the XML file
+- The simulink converter has a function to discretize the generated model
+- The average current can be used in the formulas for cyclic aging with the symbol "meanI" 
+- Fixed a bug that crashed the program when the matlab filter reached its maximum number of samples
+
 Version 2.21.2
 ===========
 - Fix a bug in the simulink converter that leads to incorrect voltages over rmphn elements

@@ -25,12 +25,7 @@ extern "C"
 {
 #endif
 
-    void CheckVectorSizes( const size_t &smallInt, const size_t &bigInt,
-                           const char *
-#ifdef __EXCEPTIONS__
-                            myChars
-#endif
-    )
+    void CheckVectorSizes( const size_t &smallInt, const size_t &bigInt, const char *myChars )
     {
         if ( smallInt > bigInt )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "VectorSizeError", myChars, smallInt, bigInt );

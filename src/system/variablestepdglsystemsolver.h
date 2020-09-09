@@ -8,8 +8,8 @@
 #ifndef VARIABLESTEPDGLSYSTEMSOLVER_H_
 #define VARIABLESTEPDGLSYSTEMSOLVER_H_
 #ifndef _DS1006
-#include "systemSolver.h"
 #include "dae_sys.h"
+#include "systemSolver.h"
 #include <boost/scoped_ptr.hpp>
 
 
@@ -91,17 +91,18 @@ class VariableStepDglSystemSolver< arma::SpMat< double > > : public SystemSolver
 
 #ifdef _EIGEN_
 template <>
-class VariableStepDglSystemSolver< SparseMatrix< double, RowMajor > > : public SystemSolver< SparseMatrix< double, RowMajor > >
+class VariableStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >
+    : public SystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >
 {
     public:
-    VariableStepDglSystemSolver( StateSystemGroup< SparseMatrix< double, RowMajor > >* stateSystemGroup );
+    VariableStepDglSystemSolver( StateSystemGroup< Eigen::SparseMatrix< double, Eigen::RowMajor > >* stateSystemGroup );
 
     virtual ~VariableStepDglSystemSolver() {}
 
     virtual double Solve();
 
     private:
-    boost::scoped_ptr< systm::DifferentialAlgebraicSystem< SparseMatrix< double, RowMajor > > > daeSystem;
+    boost::scoped_ptr< systm::DifferentialAlgebraicSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > > > daeSystem;
     boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< arma::Mat< double > > >::type mStepper;
 };
 #endif /* _EIGEN_ */

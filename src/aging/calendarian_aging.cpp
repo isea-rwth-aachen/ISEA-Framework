@@ -5,11 +5,12 @@
 
 namespace aging
 {
-CalendarianAging::CalendarianAging( const double agingStepTime, const double minAlphaCapacity,
-                                    const double minAlphaResistance, const std::string& formulaAlphaCapacity,
-                                    const std::string& formulaAlphaResistance, const double initialCapacityFactor,
-                                    const double initialResistanceFactor, const bool isEnabled, const double timeExponent )
-    : EmpiricalAging( agingStepTime, minAlphaCapacity, minAlphaResistance, formulaAlphaCapacity, formulaAlphaResistance,
+CalendarianAging::CalendarianAging( const double agingStepTime, const double minAlphaCapacity, const double minAlphaResistance,
+                                    const boost::shared_ptr< object::Object< double > >& alphaCapacity,
+                                    const boost::shared_ptr< object::Object< double > >& alphaResistance,
+                                    const double initialCapacityFactor, const double initialResistanceFactor,
+                                    const bool isEnabled, const double timeExponent )
+    : EmpiricalAging( agingStepTime, minAlphaCapacity, minAlphaResistance, alphaCapacity, alphaResistance,
                       initialCapacityFactor, initialResistanceFactor, isEnabled )
     , mTimeExponent( timeExponent )
     , mActualVoltage( 0.0 )
@@ -17,14 +18,6 @@ CalendarianAging::CalendarianAging( const double agingStepTime, const double min
     , mActualSoc( 0.0 )
     , mTimeSinceLastAgingStep( 0.0 )
 {
-    // Assigns the parameter name and the associated variable to the expressionparser
-    std::vector< std::pair< const char*, double& > > expressionParserContent;
-    expressionParserContent.push_back( std::pair< const char*, double& >( "V", mActualVoltage ) );
-    expressionParserContent.push_back( std::pair< const char*, double& >( "T", mActualTemperature ) );
-    expressionParserContent.push_back( std::pair< const char*, double& >( "SOC", mActualSoc ) );
-
-    this->mExpressionParserStressFactorCapacity.AddContent( formulaAlphaCapacity, expressionParserContent );
-    this->mExpressionParserStressFactorResistance.AddContent( formulaAlphaResistance, expressionParserContent );
 }
 
 size_t CalendarianAging::GetType() const { return AgingType::CALENDARIAN; }
@@ -44,8 +37,8 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
             mActualTemperature = mTemperatureValues[i];
             mActualSoc = mSocValues[i];
             dt = mTimeValues[i] - previousTime;
-            alphaCap = this->mExpressionParserStressFactorCapacity.GetSolution();
-            alphaRes = this->mExpressionParserStressFactorResistance.GetSolution();
+            alphaCap = this->mCapacityStressFactor->GetValue();
+            alphaRes = this->mResistanceStressFactor->GetValue();
             if ( alphaCap < this->mMinStressFactorCapacity )
                 alphaCap = this->mMinStressFactorCapacity;
             if ( alphaRes < this->mMinStressFactorResistance )

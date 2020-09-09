@@ -4,21 +4,29 @@
 #include "../misc/macros.h"
 
 // BOOST
+#include <boost/algorithm/string.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/algorithm/string.hpp>
 
 // STD
-#include <string>
-#include <cstring>
-#include <cstdio>
 #include <cstdarg>
+#include <cstdio>
+#include <cstring>
+#include <string>
 
 // ETC
 #include "../cstring/strlcpy.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
 
 extern std::string XML_ERRORS;
+
+#ifndef __EXCEPTIONS__
+namespace boost
+{
+// if exceptions are disabled, bosst expects this function to be user-defined
+void throw_exception( std::exception const &e );
+}    // namespace boost
+#endif
 
 template < typename ErrorType >
 void ErrorFunction( const char *fct, const int line, const char *file, const char *XML_FEHLER_ID, ... )

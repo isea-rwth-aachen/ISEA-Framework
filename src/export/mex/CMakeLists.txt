@@ -18,27 +18,19 @@ elseif(WIN_TARGET)
 endif()
 
 if(BUILD_SIMULINK_MATRIX_MODEL)
-  set(NEED_SIMULINK
-      ON
-      PARENT_SCOPE)
-  add_definitions(-DMATLAB_MEX_FILE)
+  if(NOT Matlab_LIBRARIES)
+    find_package(Matlab REQUIRED COMPONENTS MAT_LIBRARY SIMULINK)
+  endif()
 
   function(create_mex mex_name sourcefile)
-    add_library(${mex_name} SHARED ${sourcefile})
-    target_link_libraries(${mex_name} ISEAFrameSymbolic ${COMMON_LIBRARIES}
-                          ${SYMBOLIC_LIBRARIES})
+    add_library(${mex_name} SHARED ${sourcefile} simulink_export_symbols.def)
+    target_link_libraries(${mex_name} ISEAFrameSymbolic ${Matlab_LIBRARIES})
+    target_include_directories(${mex_name} PUBLIC ${Matlab_INCLUDE_DIRS})
     set_target_properties(
       ${mex_name}
-      PROPERTIES PREFIX
-                 ""
-                 SUFFIX
-                 ${MEX_SUFFIX}
-                 WINDOWS_EXPORT_ALL_SYMBOLS
-                 ON
-                 RUNTIME_OUTPUT_DIRECTORY
-                 ${CMAKE_BINARY_DIR}/simulinkConverter
-                 LIBRARY_OUTPUT_DIRECTORY
-                 ${CMAKE_BINARY_DIR}/simulinkConverter)
+      PROPERTIES PREFIX "" SUFFIX ${MEX_SUFFIX}
+                 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/simulinkConverter
+                 LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/simulinkConverter)
 
     add_dependencies(simulinkConverter ${mex_name})
   endfunction(create_mex)

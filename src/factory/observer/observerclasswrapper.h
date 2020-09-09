@@ -164,7 +164,7 @@ class ObserverClassWrapperThermal< MatrixT, observer::CsvFilterThermal >
         std::string fileNameVertices( param->GetElementStringValue( "VerticesFile", "Patch_Vertices.csv" ) );
         std::string fileNameAreas( param->GetElementStringValue( "AreasFile", "Patch_Areas.csv" ) );
         std::string fileNameVolumes( param->GetElementStringValue( "VolumesFile", "Patch_Volumes.csv" ) );
-        std::string fileNameVolumeNames( param->GetElementStringValue( "VolumesNameFile", "Patch_VolumeNames.csv" ) );
+        std::string fileNameVolumeNames( param->GetElementStringValue( "VolumeNamesFile", "Patch_VolumeNames.csv" ) );
         std::string fileNameProbes( param->GetElementStringValue( "ProbesFile", "Patch_Probes.csv" ) );
         std::string fileNameConductivity(
          param->GetElementStringValue( "ConductivityFile", "Patch_Conductivity.csv" ) );
@@ -343,9 +343,24 @@ class ObserverClassWrapperThermal< MatrixT, observer::MatlabFilterThermal >
         else if ( param->HasElementDirectChild( "FilenamePrefix" ) )
             filenamePrefix = param->GetElementStringValue( "FilenamePrefix" );
 
+        std::string fileVertices = "Patch_Vertices.csv";
+        std::string fileAreas = "Patch_Areas.csv";
+        std::string fileVolumes = "Patch_Volumes.csv";
+        std::string fileVolumeNames = "Patch_VolumeNames.csv";
+
+        if ( param->HasElementDirectChild( "VerticesFile" ) )
+            fileVertices = param->GetElementStringValue( "VerticesFile" );
+        if ( param->HasElementDirectChild( "AreasFile" ) )
+            fileAreas = param->GetElementStringValue( "AreasFile" );
+        if ( param->HasElementDirectChild( "VolumesFile" ) )
+            fileVolumes = param->GetElementStringValue( "VolumesFile" );
+        if ( param->HasElementDirectChild( "VolumeNamesFile" ) )
+            fileVolumeNames = param->GetElementStringValue( "VolumeNamesFile" );
+
         auto filter =
          boost::make_shared< observer::MatlabFilterThermal< MatrixT > >( param->GetElementStringValue( "Filename" ),
-                                                                         maxSampleSize, filenamePrefix );
+                                                                         maxSampleSize, filenamePrefix, fileVertices,
+                                                                         fileAreas, fileVolumes, fileVolumeNames );
 
         if ( param->HasElementDirectChild( "DataLocation" ) )
         {

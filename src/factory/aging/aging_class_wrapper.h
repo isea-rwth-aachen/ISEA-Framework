@@ -13,6 +13,7 @@
 #include "../../electrical/cellelement.h"
 #include "../../object/const_obj.h"
 #include "../../state/aging_state.h"
+#include "../../state/valueStateWrapper.h"
 
 #include "../classwrapper.h"
 #include "../factory.h"
@@ -74,9 +75,38 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
 
     boost::shared_ptr< aging::AgingBase > CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeAging* /* arg */ = 0 )
     {
+        auto voltageState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto temperatureState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto socState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        this->GetStateFactory()->CacheInstance( "V", voltageState );
+        this->GetStateFactory()->CacheInstance( "T", temperatureState );
+        this->GetStateFactory()->CacheInstance( "SOC", socState );
+
+        boost::shared_ptr< object::Object< double > > alphaCapacity;
+        boost::shared_ptr< object::Object< double > > alphaResistance;
+
+        std::vector< typename object::ExpressionObject< double >::ParameterT > objectParameters{ { "V", voltageState },
+                                                                                                 { "T", temperatureState },
+                                                                                                 { "SOC", socState } };
         // Collects the calendarian data from the cell-specific aging node
-        const std::string formulaAlphaCap = param->GetElementStringValue( "FormulaCapacity" );
-        const std::string formulaAlphaRes = param->GetElementStringValue( "FormulaResistance" );
+        if ( param->HasElementDirectChild( "AlphaCapacity" ) )
+        {
+            alphaCapacity = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "AlphaCapacity" ) );
+        }
+        else
+        {
+            const std::string formulaAlphaCap = param->GetElementStringValue( "FormulaCapacity" );
+            alphaCapacity = boost::make_shared< object::ExpressionObject< double > >( formulaAlphaCap, objectParameters );
+        }
+        if ( param->HasElementDirectChild( "AlphaResistance" ) )
+        {
+            alphaResistance = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "AlphaResistance" ) );
+        }
+        else
+        {
+            const std::string formulaAlphaRes = param->GetElementStringValue( "FormulaResistance" );
+            alphaResistance = boost::make_shared< object::ExpressionObject< double > >( formulaAlphaRes, objectParameters );
+        }
         const bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
         const double timeExponent = param->GetElementDoubleValue( "TimeExponent" );
         const double minAlphaCap = param->GetElementDoubleValue( "MinAlphaCapacity" );
@@ -96,9 +126,12 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
 
         // Creates an object of the class "aging::CalendarianAging"
         boost::shared_ptr< aging::CalendarianAging > calendarianAging =
-         boost::make_shared< aging::CalendarianAging >( agingStepTime, minAlphaCap, minAlphaRes, formulaAlphaCap,
-                                                        formulaAlphaRes, initialCapacityFactor, initialResistanceFactor,
-                                                        isEnabled, timeExponent );
+         boost::make_shared< aging::CalendarianAging >( agingStepTime, minAlphaCap, minAlphaRes, alphaCapacity, alphaResistance,
+                                                        initialCapacityFactor, initialResistanceFactor, isEnabled, timeExponent );
+
+        *voltageState = state::ValueStateWrapper< double >( &calendarianAging->mActualVoltage );
+        *temperatureState = state::ValueStateWrapper< double >( &calendarianAging->mActualTemperature );
+        *socState = state::ValueStateWrapper< double >( &calendarianAging->mActualSoc );
 
         return calendarianAging;
     }
@@ -115,9 +148,42 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
 
     boost::shared_ptr< aging::AgingBase > CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeAging* /* arg */ = 0 )
     {
+        auto dodState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto voltageState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto socState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto currentState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        this->GetStateFactory()->CacheInstance( "deltaDOD", dodState );
+        this->GetStateFactory()->CacheInstance( "meanV", voltageState );
+        this->GetStateFactory()->CacheInstance( "meanSOC", socState );
+        this->GetStateFactory()->CacheInstance( "meanI", currentState );
+
+        boost::shared_ptr< object::Object< double > > betaCapacity;
+        boost::shared_ptr< object::Object< double > > betaResistance;
+
+        std::vector< typename object::ExpressionObject< double >::ParameterT > objectParameters{ { "deltaDOD", dodState },
+                                                                                                 { "meanV", voltageState },
+                                                                                                 { "meanSOC", socState },
+                                                                                                 { "meanI", currentState } };
         // Collects the cyclical data from the cell-specific aging node
-        const std::string formulaBetaCap = param->GetElementStringValue( "FormulaCapacity" );
-        const std::string formulaBetaRes = param->GetElementStringValue( "FormulaResistance" );
+        if ( param->HasElementDirectChild( "BetaCapacity" ) )
+        {
+            betaCapacity = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "BetaCapacity" ) );
+        }
+        else
+        {
+            const std::string formulaBetaCap = param->GetElementStringValue( "FormulaCapacity" );
+            betaCapacity = boost::make_shared< object::ExpressionObject< double > >( formulaBetaCap, objectParameters );
+        }
+        if ( param->HasElementDirectChild( "BetaResistance" ) )
+        {
+            betaResistance = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "BetaResistance" ) );
+        }
+        else
+        {
+            const std::string formulaBetaRes = param->GetElementStringValue( "FormulaResistance" );
+            betaResistance = boost::make_shared< object::ExpressionObject< double > >( formulaBetaRes, objectParameters );
+        }
+
         const bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
         const double chargeExponentCapacity = param->GetElementDoubleValue( "ChargeExponentCapacity" );
         const double chargeExponentResistance = param->GetElementDoubleValue( "ChargeExponentResistance" );
@@ -138,9 +204,14 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
 
         // Creates an object of the class "aging::CyclicalAging"
         boost::shared_ptr< aging::CyclicalAging > cyclicalAging =
-         boost::make_shared< aging::CyclicalAging >( agingStepTime, minBetaCap, minBetaRes, formulaBetaCap,
-                                                     formulaBetaRes, initialCapacityFactor, initialResistanceFactor,
+         boost::make_shared< aging::CyclicalAging >( agingStepTime, minBetaCap, minBetaRes, betaCapacity,
+                                                     betaResistance, initialCapacityFactor, initialResistanceFactor,
                                                      isEnabled, chargeExponentCapacity, chargeExponentResistance );
+
+        *dodState = state::ValueStateWrapper< double >( &cyclicalAging->mActualDod );
+        *voltageState = state::ValueStateWrapper< double >( &cyclicalAging->mActualVoltage );
+        *socState = state::ValueStateWrapper< double >( &cyclicalAging->mActualSoc );
+        *currentState = state::ValueStateWrapper< double >( &cyclicalAging->mActualCurrent );
 
         return cyclicalAging;
     }

@@ -104,13 +104,13 @@ void FastCopyMatrix( arma::SpMat< double > &matrix, const arma::SpMat< double > 
 // Eigen
 #elif defined( _EIGEN_ )
 template <>
-void FastCopyMatrix( ScalarUnit *array, const Eigen::SparseMatrix< double, RowMajor > &matrix, unsigned int numberOfElements )
+void FastCopyMatrix( ScalarUnit *array, const Eigen::SparseMatrix< double, Eigen::RowMajor > &matrix, unsigned int numberOfElements )
 {
     memset( array, 0, numberOfElements * sizeof( ScalarUnit ) );
 
     for ( size_t i = 0; i < numberOfElements; ++i )
     {
-        Eigen::SparseMatrix< double, RowMajor >::InnerIterator it( matrix, i );
+        Eigen::SparseMatrix< double, Eigen::RowMajor >::InnerIterator it( matrix, i );
         if ( it )
             array[i] = it.value();
     }
@@ -143,7 +143,7 @@ void FastCopyMatrix( myMatrixType &matrix, const myMatrixType &matrixToCopyFrom,
         tripletVector.resize( numberOfElements );
         for ( size_t i = 0; i < numberOfElementsMatrix; ++i )
         {
-            Eigen::SparseMatrix< double, RowMajor >::InnerIterator it( matrixToCopyFrom, i );
+            Eigen::SparseMatrix< double, Eigen::RowMajor >::InnerIterator it( matrixToCopyFrom, i );
             if ( it )
                 tripletVector.push_back( Eigen::Triplet< double >( i, 0, it.value() ) );
         }

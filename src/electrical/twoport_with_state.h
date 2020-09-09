@@ -67,9 +67,12 @@ void TwoPortWithState< T >::CalculateStateDependentValues()
 {
     SerialTwoPort< T >::CalculateStateDependentValues();
 
-    // for observable TwoPorts, the current is already calculated
+    // for observable TwoPorts, the the values are already calculated
     if ( !this->IsObservable() )
+    {
         this->CalculateCurrentValue();
+        this->CalculateVoltageValue();
+    }
 
 #ifndef _SYMBOLIC_
     // Update the Soc state. Therefore calculate the charge which is stored/released in the previous simulation step

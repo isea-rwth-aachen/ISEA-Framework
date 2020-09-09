@@ -22,7 +22,7 @@ typedef double real_T;
 
 namespace observer
 {
-/// DESCRIPTION
+/// Filter that copies electrical data directly into output vectors
 template < typename T = myMatrixType >
 class VCPFilter : public Filter< T, electrical::TwoPort, PreparationType< T > >
 {
@@ -52,11 +52,6 @@ class VCPFilter : public Filter< T, electrical::TwoPort, PreparationType< T > >
                     mSurfaceSocArray[i] = cell->GetSurfaceSocStateValue();
                 else
                     mSurfaceSocArray[i] = 0;
-            }
-            else
-            {
-                mSocArray[i] = 0;
-                mSurfaceSocArray[i] = 0;
             }
         }
 

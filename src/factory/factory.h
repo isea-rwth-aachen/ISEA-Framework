@@ -72,13 +72,17 @@ class Factory
     /// Returns all objects that have been created.
     void GetObjects( std::vector< boost::shared_ptr< TBase > >& objects ) const;
 
+    /// Returns all objects that have been created for wich the predicate returns true.
+    template < class UnaryPredicate >
+    std::vector< boost::shared_ptr< TBase > > GetObjectsIf( UnaryPredicate p ) const;
+
     /// Returns all objects of class classname that have been created.
     std::vector< boost::shared_ptr< TBase > >& GetObjectsOfClass( const char* classname );
 
-    private:
     /// Caches an instance via boost::shared_ptr in a std::map.
     void CacheInstance( const char* name, boost::shared_ptr< TBase > obj );
 
+    private:
     /// Retrieves the cached instance by name. Throws ClassNotFoundException.
     boost::shared_ptr< TBase > GetCachedInstance( const char* name );
 
@@ -181,6 +185,22 @@ void Factory< TBase, Argument >::GetObjects( std::vector< boost::shared_ptr< TBa
 
     for ( vectorMapIterator it = mObjectVectorMap.begin(); it != mObjectVectorMap.end(); ++it )
         objects.insert( objects.end(), it->second.begin(), it->second.end() );
+}
+
+template < typename TBase, typename Argument >
+template < class UnaryPredicate >
+std::vector< boost::shared_ptr< TBase > > Factory< TBase, Argument >::GetObjectsIf( UnaryPredicate p ) const
+{
+    std::vector< boost::shared_ptr< TBase > > objects;
+    for ( const auto& pair : mObjectVectorMap )
+    {
+        for ( const boost::shared_ptr< TBase >& obj : pair.second )
+        {
+            if ( p( *obj ) )
+                objects.push_back( obj );
+        }
+    }
+    return objects;
 }
 
 template < typename TBase, typename Argument >

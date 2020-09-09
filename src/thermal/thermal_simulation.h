@@ -320,7 +320,7 @@ ThermalSimulation< Matrix, T, filterTypeChoice >::ThermalSimulation(
             {
                 for ( size_t j = 0; j < mThermalSystem->GetOdeSystemSize(); ++j )
                 {
-                    conductivity->at( i ).at( j ) = conMat( i, j );
+                    conductivity->at( i ).at( j ) = conMat.coeff( i, j );
                 }
             }
         }

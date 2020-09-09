@@ -14,7 +14,8 @@ class EmpiricalAging : public AgingBase
     public:
     /// Constructor
     EmpiricalAging( const double agingStepTime, const double minStressFactorCapacity, const double minStressFactorResistance,
-                    const std::string& formulaStressFactorCapacity, const std::string& formulaStressFactorResistance,
+                    const boost::shared_ptr< object::Object< double > >& capacityStressFactor,
+                    const boost::shared_ptr< object::Object< double > >& resistanceStressFactor,
                     const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled );
 
     virtual double GetCapacityFactor() { return mCapacityFactor; };
@@ -40,8 +41,8 @@ class EmpiricalAging : public AgingBase
     double mStressFactorCapacity;
     double mStressFactorResistance;
 
-    expressionparser::ExpressionParser mExpressionParserStressFactorCapacity;
-    expressionparser::ExpressionParser mExpressionParserStressFactorResistance;
+    boost::shared_ptr< object::Object< double > > mCapacityStressFactor;
+    boost::shared_ptr< object::Object< double > > mResistanceStressFactor;
 };
 }    // namespace aging
 

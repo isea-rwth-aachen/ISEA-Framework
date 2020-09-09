@@ -377,17 +377,17 @@ void Zarc< T >::SetResistanceFactor( const double factor )
 
 #ifdef _EIGEN_
 template <>
-Eigen::SparseMatrix< double, RowMajor >* Zarc< Eigen::SparseMatrix< double, RowMajor > >::GetVoltage();
+Eigen::SparseMatrix< double, Eigen::RowMajor >* Zarc< Eigen::SparseMatrix< double, Eigen::RowMajor > >::GetVoltage();
 
 template <>
-void Zarc< Eigen::SparseMatrix< double, RowMajor > >::FirstRcVoltage( const RcElements& rc,
-                                                                      Eigen::SparseMatrix< double, RowMajor >& voltageEquation );
+void Zarc< Eigen::SparseMatrix< double, Eigen::RowMajor > >::FirstRcVoltage( const RcElements& rc,
+                                                                             Eigen::SparseMatrix< double, Eigen::RowMajor >& voltageEquation );
 template <>
-void Zarc< Eigen::SparseMatrix< double, RowMajor > >::SecondRcVoltage( const RcElements& rc,
-                                                                       Eigen::SparseMatrix< double, RowMajor >& voltageEquation );
+void Zarc< Eigen::SparseMatrix< double, Eigen::RowMajor > >::SecondRcVoltage( const RcElements& rc,
+                                                                              Eigen::SparseMatrix< double, Eigen::RowMajor >& voltageEquation );
 template <>
-void Zarc< Eigen::SparseMatrix< double, RowMajor > >::ThirdRcVoltage( const RcElements& rc,
-                                                                      Eigen::SparseMatrix< double, RowMajor >& voltageEquation );
+void Zarc< Eigen::SparseMatrix< double, Eigen::RowMajor > >::ThirdRcVoltage( const RcElements& rc,
+                                                                             Eigen::SparseMatrix< double, Eigen::RowMajor >& voltageEquation );
 #endif /* _EIGEN_ */
 
 #ifdef _SYMBOLIC_

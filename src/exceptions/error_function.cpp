@@ -10,12 +10,19 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <exception>
 
 // ETC
-#include "../misc/StrCont.h"
-#include "../observer/observerException.h"
+#include "../factory/exceptions/classnotcachedexception.h"
 #include "../factory/exceptions/classnotfoundexception.h"
 #include "../factory/exceptions/nochildrenexception.h"
-#include "../factory/exceptions/classnotcachedexception.h"
+#include "../misc/StrCont.h"
+#include "../observer/observerException.h"
 
+#ifndef __EXCEPTIONS__
+void boost::throw_exception( std::exception const &e )
+{
+    fprintf( stderr, "Error in boost:\n%s", e.what() );
+    abort();
+}
+#endif
 
 template void ErrorFunction< std::runtime_error >( const char *fct, const int line, const char *file, const char *XML_FEHLER_ID, ... );
 

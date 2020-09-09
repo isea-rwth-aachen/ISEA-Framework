@@ -7,7 +7,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #ifndef _STDOUTFILTER_
 #define _STDOUTFILTER_
 
-#ifdef __EXCEPTIONS__
 // BOOST
 #include <boost/shared_ptr.hpp>
 
@@ -258,5 +257,4 @@ template < typename T >
 using StdoutFilterThermal = StdoutFilterBase< T, thermal::ThermalElement, ThermalPreperation >;
 
 }    // namespace observer
-#endif /* __EXCEPTIONS__ */
 #endif /* _STDOUTFILTER_ */

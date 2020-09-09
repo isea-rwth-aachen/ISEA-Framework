@@ -74,16 +74,16 @@ class StateSystem
 
 #ifdef _EIGEN_
 template <>
-void StateSystem< SparseMatrix< double, RowMajor > >::AddEquations( size_t equationNumber,
-                                                                    const SparseMatrix< double, RowMajor > &matrix );
+void StateSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > >::AddEquations(
+ size_t equationNumber, const Eigen::SparseMatrix< double, Eigen::RowMajor > &matrix );
 
 template <>
-void StateSystem< SparseMatrix< double, RowMajor > >::AddEquations( size_t equationNumber,
-                                                                    const SparseMatrix< double, RowMajor > &matrix,
-                                                                    const SparseMatrix< double, RowMajor > &vectorC );
+void StateSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > >::AddEquations(
+ size_t equationNumber, const Eigen::SparseMatrix< double, Eigen::RowMajor > &matrix,
+ const Eigen::SparseMatrix< double, Eigen::RowMajor > &vectorC );
 
 template <>
-void StateSystem< SparseMatrix< double, RowMajor > >::ResetSystem();
+void StateSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > >::ResetSystem();
 #endif /* _EIGEN_ */
 
 /// Standard constructor for empty StateSystem

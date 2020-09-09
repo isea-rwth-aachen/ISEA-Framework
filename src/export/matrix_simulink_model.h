@@ -258,7 +258,7 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
     mSubSystemStack.pop();
 
     for ( size_t i = 0; i < mElectricalSimulation->mStateSystemGroup.GetStateCount(); ++i )
-        mElectricalSimulation->mStateSystemGroup.mStateVector( i, 0 ) =
+        mElectricalSimulation->mStateSystemGroup.mStateVector.coeffRef( i, 0 ) =
          ScalarUnit( misc::StrCont( "State" ) + misc::StrCont( i + 1 ) );
 
     mElectricalSimulation->mRootTwoPort->SetCurrent( ScalarUnit( "InputCurrent" ) );
@@ -288,10 +288,10 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
         auto matC = sys->GetC();
 
         Matrix tmp = matA * mElectricalSimulation->mStateSystemGroup.mStateVector.block(
-                             0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 1, 1 );
+                             0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.rows() - 1, 1 );
         tmp += matC;
         MakeMatrix( tmp, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/MatrixAxC" ), true );
-        if ( a_alg2.n_rows != 0 && a_alg2.n_cols != 0 )
+        if ( a_alg2.rows() != 0 && a_alg2.cols() != 0 )
         {
             // TODO: FIX!
             /*
@@ -310,9 +310,9 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
     myMatrixType totalValuesMatrix( 3, 1 );
     current = mElectricalSimulation->mRootTwoPort->GetCurrent() * mElectricalSimulation->mStateSystemGroup.mStateVector;
     voltage = *mElectricalSimulation->mRootTwoPort->GetVoltage() * mElectricalSimulation->mStateSystemGroup.mStateVector;
-    totalValuesMatrix( 0, 0 ) = current( 0, 0 );
-    totalValuesMatrix( 1, 0 ) = voltage( 0, 0 );
-    totalValuesMatrix( 2, 0 ) = mElectricalSimulation->mRootTwoPort->GetPowerValue();
+    totalValuesMatrix.coeffRef( 0, 0 ) = current.coeffRef( 0, 0 );
+    totalValuesMatrix.coeffRef( 1, 0 ) = voltage.coeffRef( 0, 0 );
+    totalValuesMatrix.coeffRef( 2, 0 ) = mElectricalSimulation->mRootTwoPort->GetPowerValue();
     MakeMatrix( totalValuesMatrix, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/TotalValues" ) );
     prhs.at( 0 ) = mxCreateString( mSimulinkModel );
     if ( mexCallMATLAB( 0, plhs, 1, prhs.data(), "ConnectTotalValuesMatrix" ) != 0 )
@@ -325,10 +325,10 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
     for ( size_t i = 0; i < mElectricalSimulation->mCellElements.size(); ++i )
     {
         current = mElectricalSimulation->mCellElements.at( i )->GetCurrent() * mElectricalSimulation->mStateSystemGroup.mStateVector;
-        cellCurrents( i, 0 ) = current( 0, 0 );
+        cellCurrents.coeffRef( i, 0 ) = current.coeff( 0, 0 );
         voltage = *mElectricalSimulation->mCellElements.at( i )->GetVoltage() * mElectricalSimulation->mStateSystemGroup.mStateVector;
-        cellVoltages( i, 0 ) = voltage( 0, 0 );
-        cellPowers( i, 0 ) = mElectricalSimulation->mCellElements.at( i )->GetPowerValue();
+        cellVoltages.coeffRef( i, 0 ) = voltage.coeff( 0, 0 );
+        cellPowers.coeffRef( i, 0 ) = mElectricalSimulation->mCellElements.at( i )->GetPowerValue();
     }
     MakeMatrix( cellCurrents, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/CellCurrentMatrices" ) );
     MakeMatrix( cellVoltages, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/CellVoltageMatrices" ) );
@@ -892,34 +892,34 @@ misc::StrCont MatrixSimulinkModel< Matrix, T >::MakeDestination( const electrica
 template < typename Matrix, typename T >
 void MatrixSimulinkModel< Matrix, T >::MakeMatrix( const Matrix &matrix, const char *destination, bool StateMatrix )
 {
-    for ( size_t i = 0; i < matrix.n_rows; ++i )
-        for ( size_t j = 0; j < matrix.n_cols; ++j )
-            if ( !matrix( i, j ).IsEmpty() )
-            {
-                mxArray **plhs = 0;
-                boost::array< mxArray *, 5 > prhs;
-                prhs.at( 0 ) = mxCreateString( destination );
-                prhs.at( 1 ) = mxCreateString( matrix( i, j ).GetString() );
-                prhs.at( 2 ) = mxCreateDoubleScalar( i );
-                prhs.at( 3 ) = mxCreateDoubleScalar( j );
-                prhs.at( 4 ) =
-                 mxCreateDoubleScalar( mElectricalSimulation->mStateSystemGroup.mDglStateSystem.GetEquationCount() );
+    for ( size_t i = 0; i < matrix.rows(); ++i )
+    {
+        for ( size_t j = 0; j < matrix.cols(); ++j )
+        {
+            mxArray **plhs = 0;
+            boost::array< mxArray *, 5 > prhs;
+            prhs.at( 0 ) = mxCreateString( destination );
+            prhs.at( 1 ) = mxCreateString( matrix.coeff( i, j ).GetString() );
+            prhs.at( 2 ) = mxCreateDoubleScalar( i );
+            prhs.at( 3 ) = mxCreateDoubleScalar( j );
+            prhs.at( 4 ) = mxCreateDoubleScalar( mElectricalSimulation->mStateSystemGroup.mDglStateSystem.GetEquationCount() );
 
-                if ( !StateMatrix )
+            if ( !StateMatrix )
+            {
+                if ( mexCallMATLAB( 0, plhs, 4, prhs.data(), "MakeComponent" ) != 0 )
                 {
-                    if ( mexCallMATLAB( 0, plhs, 4, prhs.data(), "MakeComponent" ) != 0 )
-                    {
-                        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorMatrixModel", 1 );
-                    }
-                }
-                else
-                {
-                    if ( mexCallMATLAB( 0, plhs, 5, prhs.data(), "MakeStateComponent" ) != 0 )
-                    {
-                        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorMatrixModel", 1 );
-                    }
+                    ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorMatrixModel", 1 );
                 }
             }
+            else
+            {
+                if ( mexCallMATLAB( 0, plhs, 5, prhs.data(), "MakeStateComponent" ) != 0 )
+                {
+                    ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorMatrixModel", 1 );
+                }
+            }
+        }
+    }
 }
 
 template < typename Matrix, typename T >

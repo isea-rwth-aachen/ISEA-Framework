@@ -16,8 +16,7 @@ Factory< state::State, ArgumentTypeState > *FactoryBuilder< MatrixT, ValueT >::B
 
     stateFactory->AddWrapper( new StateClassWrapper< state::Soc >( stateFactory ), "Soc" );
     stateFactory->AddWrapper( new StateClassWrapper< state::SurfaceSoc >( stateFactory ), "SurfaceSoc" );
-    stateFactory->AddWrapper( new StateClassWrapper< state::ThermalState< double > >( stateFactory ),
-                              "ThermalState" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::ThermalState< double > >( stateFactory ), "ThermalState" );
     stateFactory->AddWrapper( new StateClassWrapper< state::ValueStateWrapper< ScalarUnit > >( stateFactory ),
                               "ElectricalState" );
     stateFactory->AddWrapper( new StateClassWrapper< state::AgingState >( stateFactory ), "AgingState" );
@@ -50,6 +49,8 @@ Factory< object::Object< double >, ArgumentTypeObject< double > > *FactoryBuilde
                                "LookupObj2dWithState" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::MultiObj >( stateFactory, objectFactory ),
                                "MultiObj" );
+    objectFactory->AddWrapper( new ObjectClassWrapper< double, object::ExpressionObject >( stateFactory, objectFactory ),
+                               "ExpressionObj" );
     return objectFactory;
 }
 

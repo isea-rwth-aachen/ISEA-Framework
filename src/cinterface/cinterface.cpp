@@ -10,11 +10,11 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include <boost/scoped_ptr.hpp>
 
+#include "../electrical/electrical_simulation.h"
 #include "../export/esbVisualizer.h"
 #include "../export/spiceExport.h"
 #include "../misc/fast_copy_matrix.h"
 #include "../observer/filter/filter.h"
-#include "../electrical/electrical_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
 
 #ifndef _SYMBOLIC_
@@ -105,11 +105,36 @@ extern "C"
     {
         PointerStructure *pointerStructure = (PointerStructure *)*pointerStructureAddress;
 
-
-        pointerStructure->mElectricalSimulation->mObserver =
-         CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
-          &pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts(), 0, voltageOutputVec,
-          currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        size_t numberOfCellelements = GetNumberOfCellElements( pointerStructureAddress );
+        const auto &observedTwoports = pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts();
+        if ( observedTwoports.size() > numberOfCellelements )
+        {
+            // Reorder the observed twoports so that all elements inside one cell end up in the same row in the output
+            // matrix. The vector is interpreted as a column-major matrix with the number of rows equal to the number of cells
+            std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size() );
+            size_t outputRows = numberOfCellelements;
+            size_t outputColumns = std::ceil( (double)observedTwoports.size() / outputRows );
+            // first column has all the cellements, so they can just be copied
+            for ( size_t i = 0; i < numberOfCellelements; ++i )
+            {
+                twoportVector[i] = observedTwoports[i];
+            }
+            for ( size_t i = numberOfCellelements; i < observedTwoports.size(); ++i )
+            {
+                size_t row = ( i - numberOfCellelements ) / ( outputColumns - 1 );
+                size_t column = ( i - numberOfCellelements ) % ( outputColumns - 1 ) + 1;
+                twoportVector[row * outputRows + column] = observedTwoports[i];
+            }
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &twoportVector, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        }
+        else
+        {
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &observedTwoports, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        }
     }
 
     void SetCurrent( const size_t *pointerStructureAddress, const double current )
@@ -132,7 +157,7 @@ extern "C"
     size_t GetNumberOfCellElements( const size_t *pointerStructureAddress )
     {
         PointerStructure *pointerStructure = (PointerStructure *)*pointerStructureAddress;
-        return pointerStructure->mElectricalSimulation->mThermalStates.size();
+        return pointerStructure->mElectricalSimulation->mCellElements.size();
     }
 
     void RunSystem( const size_t *pointerStructureAddress, real_T *stateVector, real_T *returnDxDt )
@@ -204,15 +229,9 @@ extern "C"
         PointerStructure *pointerStructure = (PointerStructure *)*pointerStructureAddress;
         size_t i = 0;
 
-        std::vector< electrical::TwoPort< myUnit > * > &observedCellelements =
-         pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPortsPtr();
-        for ( observer::Filter< myUnit, electrical::TwoPort, observer::PreparationType< myUnit > >::Data_t::iterator it =
-               observedCellelements.begin();
-              it != observedCellelements.end(); ++it )
+        for ( const auto &cell : pointerStructure->mElectricalSimulation->mCellElements )
         {
-            if ( ( *it )->IsCellelement() )
-                static_cast< electrical::Cellelement< myUnit > * >( *it )->SetCurrentFromActiveBalancer(
-                 *balancingCurrentVector[i++] );
+            cell->SetCurrentFromActiveBalancer( *balancingCurrentVector[i++] );
         }
     }
 

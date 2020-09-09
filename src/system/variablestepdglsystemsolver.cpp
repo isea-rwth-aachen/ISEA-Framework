@@ -85,15 +85,15 @@ double VariableStepDglSystemSolver< arma::SpMat< double > >::Solve()
 
 #ifdef _EIGEN_
 
-VariableStepDglSystemSolver< SparseMatrix< double, RowMajor > >::VariableStepDglSystemSolver(
- StateSystemGroup< SparseMatrix< double, RowMajor > >* stateSystemGroup )
-    : SystemSolver< SparseMatrix< double, RowMajor > >( stateSystemGroup, 0.0001 )
-    , daeSystem( new systm::DifferentialAlgebraicSystem< SparseMatrix< double, RowMajor > >( stateSystemGroup ) )
+VariableStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::VariableStepDglSystemSolver(
+ StateSystemGroup< Eigen::SparseMatrix< double, Eigen::RowMajor > >* stateSystemGroup )
+    : SystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >( stateSystemGroup, 0.0001 )
+    , daeSystem( new systm::DifferentialAlgebraicSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > >( stateSystemGroup ) )
     , mStepper( make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< arma::Mat< double > >() ) )
 {
 }
 
-double VariableStepDglSystemSolver< SparseMatrix< double, RowMajor > >::Solve()
+double VariableStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve()
 {
     bool successfull = false;
 

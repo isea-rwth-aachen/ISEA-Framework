@@ -146,6 +146,8 @@ void MatlabFilter< T, TConcrete, ArgumentType >::MaxSampleReached( size_t nextNu
     WriteToDisk();
     this->mMatFile.reset( new matlab::MatFile( this->MakeFilename( nextNumber ), MAT_ACC_RDWR ) );
 
+    // empty rows are removed before writing the file, so the matrix sizes have to be restored
+    this->InitializeMatrices( mMatrixSizes );
     for ( auto &pair : mMatlabMatrices )
     {
         for ( size_t i = 0; i < mMatrixSizes; ++i )
@@ -191,7 +193,7 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
         mRootPort = prePareData.mRootPort;
         if ( mRootPort )
         {
-            std::vector< double > capacity = {mRootPort->GetTotalCapacity()};
+            std::vector< double > capacity = { mRootPort->GetTotalCapacity() };
             *this->mMatFile << matlab::MatioData( capacity, this->mDataLocation + "totalCapacity" );
         }
     };
@@ -262,19 +264,19 @@ MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >::MatlabFilterBa
                                                                                     const std::string &filenamePrefix )
     : MatlabFilter< T, electrical::TwoPort, PreparationType< T > >( filename, maxSize, filenamePrefix )
 {
-    this->mMatlabMatrices = {{&mCurrentVec, "StromVec"},
-                             {&mVoltageVec, "SpannungVec"},
-                             {&mAnodeVoltageVec, "AnodeVoltageVec"},
-                             {&mAnodePotentialVec, "AnodePotentialVec"},
-                             {&mCathodeVoltageVec, "CathodeVoltageVec"},
-                             {&mCathodePotentialVec, "CathodePotentialVec"},
-                             {&mPowerVec, "ThermischLeistungVec"},
-                             {&mSocVec, "SOCVec"},
-                             {&mAnodeSocVec, "AnodeSOCVec"},
-                             {&mCathodeSocVec, "CathodeSOCVec"},
-                             {&mTemperatureVec, "TemperaturVec"}};
+    this->mMatlabMatrices = { { &mCurrentVec, "StromVec" },
+                              { &mVoltageVec, "SpannungVec" },
+                              { &mAnodeVoltageVec, "AnodeVoltageVec" },
+                              { &mAnodePotentialVec, "AnodePotentialVec" },
+                              { &mCathodeVoltageVec, "CathodeVoltageVec" },
+                              { &mCathodePotentialVec, "CathodePotentialVec" },
+                              { &mPowerVec, "ThermischLeistungVec" },
+                              { &mSocVec, "SOCVec" },
+                              { &mAnodeSocVec, "AnodeSOCVec" },
+                              { &mCathodeSocVec, "CathodeSOCVec" },
+                              { &mTemperatureVec, "TemperaturVec" } };
 
-    this->mMatlabVectors = {{&mCurrent, "Strom"}, {&mVoltage, "Spannung"}, {&mPower, "ThermischLeistung"}};
+    this->mMatlabVectors = { { &mCurrent, "Strom" }, { &mVoltage, "Spannung" }, { &mPower, "ThermischLeistung" } };
 };
 
 template < typename T >
@@ -285,7 +287,11 @@ class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
     typedef Filter< T, thermal::ThermalElement, ThermalPreperation > FilterT;
 
     public:
-    MatlabFilterBase( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" );
+    MatlabFilterBase( const std::string &filename, const size_t maxSize = 100000,
+                      const std::string &filenamePrefix = "", const std::string &fileVertices = "Patch_Vertices.csv",
+                      const std::string &fileAreas = "Patch_Areas.csv",
+                      const std::string &fileVolumes = "Patch_Volumes.csv",
+                      const std::string &fileVolumeNames = "Patch_VolumeNames.csv" );
 
     virtual ~MatlabFilterBase() { this->WriteToDisk(); }
 
@@ -295,9 +301,9 @@ class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
         InitializeVectors( prepData.mAreas->size() );
 
         *this->mMatFile << matlab::MatioData( *prepData.mConductivityMatrix, this->mDataLocation + "Conductivity" );
-        std::vector< double > surf = {prepData.mSurfaceArea};
+        std::vector< double > surf = { prepData.mSurfaceArea };
         *this->mMatFile << matlab::MatioData( surf, this->mDataLocation + "SurfaceArea" );
-        std::vector< double > capacity = {prepData.mTotalHeatCapacity};
+        std::vector< double > capacity = { prepData.mTotalHeatCapacity };
         *this->mMatFile << matlab::MatioData( capacity, this->mDataLocation + "TotalHeatCapacity" );
         mThermalProbes = prepData.mProbes;
         mProbesTemperature.resize( prepData.mProbes->size() );
@@ -390,20 +396,21 @@ class MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
 };
 
 template < typename T >
-MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >::MatlabFilterBase( std::string filename, const size_t maxSize,
-                                                                                      const std::string &filenamePrefix )
+MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >::MatlabFilterBase(
+ const std::string &filename, const size_t maxSize, const std::string &filenamePrefix, const std::string &fileVertices,
+ const std::string &fileAreas, const std::string &fileVolumes, const std::string &fileVolumeNames )
     : MatlabFilter< T, thermal::ThermalElement, ThermalPreperation >( filename, maxSize, filenamePrefix )
-    , mFileNameVertices( "Patch_Vertices.csv" )
-    , mFileNameAreas( "Patch_Areas.csv" )
+    , mFileNameVertices( fileVertices )
+    , mFileNameAreas( fileAreas )
     , mFileNameAreasElectrical( "Patch_AreasElectrical.csv" )
     , mFileNameElectricThermalMapping( "Patch_ElectricThermalMapping.csv" )
-    , mFileNameVolumes( "Patch_Volumes.csv" )
-    , mFileNameVolumeNames( "Patch_VolumeNames.csv" )
+    , mFileNameVolumes( fileVolumes )
+    , mFileNameVolumeNames( fileVolumeNames )
     , mFileNameVolumeMaterials( "Patch_VolumeMaterials.csv" )
 {
-    this->mMatlabMatrices = {{&mTemperature, "Temperature"},
-                             {&mProbesTemperature, "ThermalProbe"},
-                             {&mCoolingVector, "Cooling"}};
+    this->mMatlabMatrices = { { &mTemperature, "Temperature" },
+                              { &mProbesTemperature, "ThermalProbe" },
+                              { &mCoolingVector, "Cooling" } };
 };
 
 template < typename T >
@@ -418,6 +425,11 @@ template < typename T >
 class MatlabFilterThermal : public MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >
 {
     public:
+    MatlabFilterThermal( std::string filename, const size_t maxSize, const std::string &filenamePrefix, const std::string &fileVertices,
+                         const std::string &fileAreas, const std::string &fileVolumes, const std::string &fileVolumeNames )
+        : MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >( filename, maxSize, filenamePrefix, fileVertices,
+                                                                              fileAreas, fileVolumes, fileVolumeNames ){};
+
     MatlabFilterThermal( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" )
         : MatlabFilterBase< T, thermal::ThermalElement, ThermalPreperation >( filename, maxSize, filenamePrefix ){};
 };

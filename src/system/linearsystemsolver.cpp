@@ -14,11 +14,11 @@ namespace systm
 
 #ifdef _EIGEN_
 template <>
-double LinearSystemSolver< Eigen::SparseMatrix< double, RowMajor > >::Solve()
+double LinearSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve()
 {
     if ( linAlgSystem->GetEquationCount() )
     {
-        Eigen::SparseMatrix< double, RowMajor > realStat = this->mStateVector.topRows( this->mStateVector.rows() - 1 );
+        Eigen::SparseMatrix< double, Eigen::RowMajor > realStat = this->mStateVector.topRows( this->mStateVector.rows() - 1 );
         linAlgSystem->SolveForStateVector( realStat );
         this->mStateVector.topRows( this->mStateVector.rows() - 1 ) = realStat;
     }

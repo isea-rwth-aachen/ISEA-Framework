@@ -126,7 +126,7 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
         DoubleMapConstIterator it = arg->mDoubleMap.find( mapEntry );
         if ( it == arg->mDoubleMap.end() )
         {
-            return 1;
+            return 1.0;
         }
         return it->second;
     }
@@ -532,6 +532,48 @@ class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWra
         return boost::make_shared< LookupObj2dWithState< ValueT > >( lookupData, measurementPointsRow,
                                                                      measurementPointsColumn, rowstate, colstate,
                                                                      lookup::LookupType( this->GetLookupType( param ) ) );
+    }
+};
+
+/// Classwrapper for object::ExpressionObject
+template < typename ValueT >
+class ObjectClassWrapper< ValueT, ExpressionObject > : public ObjectClassWrapperBase< ValueT >
+{
+    public:
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
+                        Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
+        : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
+    {
+    }
+
+
+    boost::shared_ptr< Object< ValueT > >
+    CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeObject< ValueT >* arg = 0 )
+    {
+        std::string expressionString = param->GetElementStringValue( "Expression" );
+
+        if ( arg != 0 )
+        {
+            double multiplier = this->GetMultiplier( arg );
+            if ( arg->mObjectFactor != 1.0 )
+                multiplier *= arg->mObjectFactor;
+            if ( multiplier != 1.0 )
+                expressionString = std::to_string( multiplier ) + " * (" + expressionString + ")";
+        }
+
+        std::vector< typename ExpressionObject< ValueT >::ParameterT > parameters;
+        for ( const auto& element : param->GetElementChildren( "Parameters" ) )
+        {
+            const boost::shared_ptr< state::State >& state = this->GetStateFactory()->CreateInstance( element );
+            std::string name;
+            if ( element->HasElementAttribute( "cacheref" ) && !element->HasElementAttribute( "name" ) )
+                name = element->GetElementAttributeCharPtrValue( "cacheref" );
+            else
+                name = element->GetElementAttributeCharPtrValue( "name" );
+            parameters.push_back( {name, state} );
+        }
+
+        return boost::make_shared< ExpressionObject< ValueT > >( expressionString, parameters );
     }
 };
 

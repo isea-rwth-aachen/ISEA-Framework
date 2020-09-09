@@ -57,7 +57,7 @@ double ConstantStepDglSystemSolver< T >::Solve()
 
 #ifdef _EIGEN_
 template <>
-double ConstantStepDglSystemSolver< SparseMatrix< double, RowMajor > >::Solve();
+double ConstantStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve();
 #endif /* _EIGEN_ */
 
 #ifdef _ARMADILLO_
