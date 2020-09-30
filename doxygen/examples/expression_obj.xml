@@ -1,0 +1,7 @@
+<Object class="ExpressionObj">
+    <Expression>Soc / 2 + T / 3</Expression>
+    <Parameters>
+        <Param cacheref="Soc"/>
+        <Param cacheref="ThermalState" name="T"/>
+    </Parameters>
+</Object>

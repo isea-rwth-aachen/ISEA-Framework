@@ -1,85 +1,6 @@
 Thermal materials     {#xmlthermalmaterial}
 ===================
 
-\~German
-Nachfolgend sind alle Materialien, die im thermischen Modell verwendet werden können, aufgelistet.
-Für jedes Material wird der Aufbau des dazugehörigen XML-Elementes beschrieben und ein Codebeispiel gegeben.
-
-<br/>
-
-Allgemein
-=========
-
-Alle Materialien sind im <**ThermalMaterials**>-Knoten, der im Wurzelknoten der XML-Datei (im <**Configurations**>-Knoten) zu finden ist, aufgelistet.
-Alle Materialien müssen das Attribut "cache='true'" gesetzt haben.
-
-<br/>
-
-Thermische Materialien
-==========
-
-<br/>
-
-Material mit isotroper Wärmeleitfähgkeit
-----------
-
-__Objekttyp: "Material"__
-
-<**Density**>: Dichte in kg/m³
-
-<**SpecificCapacity**>: Spezifische Wärmekapazität in J/(kg·K)
-
-<**Conductivity**>: Wärmeleitfähigkeit in W/(m·K)
-
-<**Emissivity**>: Emissionsgrad ohne Einheit
-
-\htmlinclude thermalmaterial_color.xml
-
-<br/>
-
-
-Material mit anisotroper Wärmeleitfähigkeit gegeben in kartesischen Koordinaten
-----------
-
-__Objekttyp: "MaterialCartesian"__
-
-<**Density**>: Dichte in kg/m³
-
-<**SpecificCapacity**>: Spezifische Wärmekapazität in J/(kg·K)
-
-<**ConductivityX**>: Wärmeleitfähigkeit in x-Richtung in W/(m·K)
-
-<**ConductivityY**>: Wärmeleitfähigkeit in y-Richtung in W/(m·K)
-
-<**ConductivityZ**>: Wärmeleitfähigkeit in z-Richtung in W/(m·K)
-
-<**Emissivity**>: Emissionsgrad ohne Einheit
-
-\htmlinclude thermalmaterialcartesian_color.xml
-
-<br/>
-
-
-Material mit anisotroper Wärmeleitfähigkeit gegeben in zylindirschen Koordinaten
-----------
-
-__Objekttyp: "MaterialCylindric"__
-
-<**Density**>: Dichte in kg/m³
-
-<**SpecificCapacity**>: Spezifische Wärmekapazität in J/(kg·K)
-
-<**ConductivityRho**>: Wärmeleitfähigkeit in &rho;-Richtung in W/(m·K)
-
-<**ConductivityPhi**>: Wärmeleitfähigkeit in &phi;-Richtung in W/(m·K)
-
-<**ConductivityZ**>: Wärmeleitfähigkeit in z-Richtung in W/(m·K)
-
-<**Emissivity**>: Emissionsgrad ohne Einheit
-
-\htmlinclude thermalmaterialcylindric_color.xml
-
-\~English
 All materials, which are used in the thermal model, are listed below.
 The structure of the corresponding xml elements and a code snippet are given for each material.
 
@@ -88,7 +9,7 @@ The structure of the corresponding xml elements and a code snippet are given for
 Abstract
 =========
 
-All material are listed in the <**ThermalMaterials**>-node, which could be found in the root node of the xml file (within the <**Configurations**>-node).
+All material are listed in the <**ThermalMaterials**>-node, which can be found in the root node of the xml file (within the <**Configurations**>-node).
 The attribute "cache='true'" has to be set for all materials.
 
 <br/>
@@ -103,36 +24,28 @@ Material with isotropic thermal conductivity
 
 __Object type: "Material"__
 
-<**Density**>: density in kg/m³
-
-<**SpecificCapacity**>: specific heat capacity in J/(kg·K)
-
-<**Conductivity**>: thermal conductivity in W/(m·K)
-
-<**Emissivity**>:  Emissivity without unit
+XML Tag                  | Type                                | Explanation
+-------------------------|-------------------------------------|----------------------------
+Density                  | double                              | density in kg/m³
+SpecificCapacity         | double                              | specific heat capacity in J/(kg*K)
+Conductivity             | double                              | thermal conductivity in W/(m*K)
+Emissivity               | double                              | emissivity (0 to 1)
 
 \htmlinclude thermalmaterial_color.xml
 
-<br/>
-
-
-Material with anisotropic thermal conductivity in Cartesian coordinates
+Material with anisotropic thermal conductivity in cartesian coordinates
 ----------
 
 __Object type: "MaterialCartesian"__
 
-<**Density**>: density in kg/m³
-
-<**SpecificCapacity**>: specific heat capacity in J/(kg·K)
-
-<**ConductivityX**>: thermal conductivity in x-direction in W/(m·K)
-
-<**ConductivityY**>: thermal conductivity in y-direction in W/(m·K)
-
-<**ConductivityZ**>: thermal conductivity in z-direction in W/(m·K)
-
-<**Emissivity**>:  Emissivity without unit
-
+XML Tag                  | Type                                | Explanation
+-------------------------|-------------------------------------|----------------------------
+Density                  | double                              | density in kg/m³
+SpecificCapacity         | double                              | specific heat capacity in J/(kg*K)
+ConductivityX            | double                              | thermal conductivity in x direction in W/(m*K)
+ConductivityY            | double                              | thermal conductivity in y direction in W/(m*K)
+ConductivityZ            | double                              | thermal conductivity in z direction in W/(m*K)
+Emissivity               | double                              | emissivity (0 to 1)
 
 \htmlinclude thermalmaterialcartesian_color.xml
 
@@ -144,16 +57,14 @@ Material with anisotropic thermal conductivity in cylindrical coordinates
 
 __Objekttyp: "MaterialCylindric"__
 
-<**Density**>: density in kg/m³
+XML Tag                  | Type                                | Explanation
+-------------------------|-------------------------------------|----------------------------
+Density                  | double                              | density in kg/m³
+SpecificCapacity         | double                              | specific heat capacity in J/(kg*K)
+ConductivityRho          | double                              | thermal conductivity in &rho; direction in W/(m*K)
+ConductivityPhi          | double                              | thermal conductivity in &phi; direction in W/(m*K)
+ConductivityZ            | double                              | thermal conductivity in z direction in W/(m*K)
+Emissivity               | double                              | emissivity (0 to 1)
 
-<**SpecificCapacity**>: specific heat capacity in J/(kg·K)
-
-<**ConductivityRho**>: thermal conductivity in &rho;-direction in W/(m·K)
-
-<**ConductivityPhi**>: thermal conductivity in &phi;-direction in W/(m·K)
-
-<**ConductivityZ**>: thermal conductivity in z-direction in W/(m·K)
-
-<**Emissivity**>:  Emissivity without unit
 \htmlinclude thermalmaterialcylindric_color.xml
 

@@ -1,3 +1,9 @@
+Version 2.23.0
+===========
+- The aging model is available as an S-Function for Simulink
+- Individual twoports can be added to the observer output by marking them as observable
+- Updates to the documentation
+
 Version 2.22.0
 ===========
 - Output filenames for the thermal matlab filter can be set in the XML file

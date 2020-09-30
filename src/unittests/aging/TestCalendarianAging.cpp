@@ -73,7 +73,7 @@ void TestCalendarianAging::testAgingCalculation()
     double alphaRes = ( ( 0.00015 * ( 3.8 + 300 - 300 ) ) * 3.0 + ( 0.00015 * ( 4.1 + 296 - 300 ) ) * 4.2 ) / ( 3.0 + 4.2 );
     double cap = 1 - pow( pow( 1 - initialCap, 1 / exponent ) + ( steptime * pow( alphaCap, 1 / exponent ) ), exponent );
     double res = 1 + pow( pow( initialRes - 1, 1 / exponent ) + ( steptime * pow( alphaRes, 1 / exponent ) ), exponent );
-    double socOffset = 3600 * ( cap - 1.0 ) * totalCap * soc / 100;
+    double socOffset = 3600 * ( cap - initialCap ) * totalCap * soc / 100;
 
     TS_ASSERT_DELTA( aging.GetCapacityFactor(), cap, 1e-6 );
     TS_ASSERT_DELTA( aging.GetSocOffset(), socOffset, 1e-6 );
@@ -134,7 +134,7 @@ void TestCalendarianAging::testReset()
     double alphaRes = ( ( 0.00015 * ( 3.8 + 300 - 300 ) ) * 3 + ( 0.00015 * ( 4.1 + 296 - 300 ) ) * 4.2 ) / ( 3 + 4.2 );
     double cap = 1 - pow( pow( 1 - initialCap, 1 / exponent ) + ( steptime * pow( alphaCap, 1 / exponent ) ), exponent );
     double res = 1 + pow( pow( initialRes - 1, 1 / exponent ) + ( steptime * pow( alphaRes, 1 / exponent ) ), exponent );
-    double socOffset = 3600 * ( cap - 1.0 ) * totalCap * soc / 100;
+    double socOffset = 3600 * ( cap - initialCap ) * totalCap * soc / 100;
 
     TS_ASSERT_DELTA( aging.GetCapacityFactor(), cap, 1e-6 );
     TS_ASSERT_DELTA( aging.GetSocOffset(), socOffset, 1e-6 );

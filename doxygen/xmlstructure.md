@@ -1,126 +1,5 @@
 XML description language    {#xmlsprache}
 ========================
-
-\~German
-Die Konfiguration der Simulationsszenarien erfolgt mit Hilfe einer speziellen XML-Sprache.
-Für jedes Simulationsszenario legt der Benutzer eine XML-Datei an.
-Diese XML-Datei kann dann vom Programm eingelesen und verarbeitet werden.
-
-Beschreibungen der verschiedenen Objektgruppen:
--   [Elektrische Objekte](xmlelectrical.html)
--   [Parameterobjekte](xmlobject.html)
--   [Zustandsobjekte](xmlstate.html)
--   [Thermische Blöcke](xmlthermalblock.html)
--   [Kühlungen](xmlcooling.html)
--   [Thermische Materialien](xmlthermalmaterial.html)
--   [Optionen](xmloption.html)
-
-
-Dazu:
--   Die Beschreibung der XML-Parametrierung und des Einlesevorgangs des [thermischen Modells](xmlthermalmodel.html), die die hier gezeigten XML-Strukturen ergänzen.
--   Die Besonderheiten beim [Benutzen des Simulink-Modells](xmlcinterface.html).
-
-<br/>
-
-Grundaufbau
-===========
-
-__Der Grundaufbau einer solchen Konfigurationsdatei:__
-\htmlinclude xmlstructure_color.xml
-
-
-__Die Konfigurationsdatei kann in drei Abschnitte unterteilt werden:__
-
--   **Options**<br/>
-    In den [Options](xmloption.html) können globale Einstellungen vorgenommen werden.
-
--   **CustomDefinitions**<br/>
-    In diesem Element können sogenannte Muster definiert werden.
-    Später können diese Muster im [elektrischen Netzwerk](xmlelectrical.html) und im [thermischen Aufbau](xmlthermalblock.html) verwendet werden.
-
--   **RootElement**<br/>
-    Das RootElement ist das Wurzelelement des elektrischen Netzwerkes.
-      Über das Attribut "class" wird das assoziierte Objekt definiert.
-      Meist ist dieses Objekt ein ParallelTwoport oder ein SerialTwoport.
-
-Nur nötig, wenn das [thermische Modell](thermalmodel.xml) verwendet wird:
--   **ThermalMaterials**<br/>
-    Enthält alle [Materialien](xmlthermalmaterial.html), die für das thermische Modell verwendet werden.
-
--   **CachedCoolings**<br/>
-    Hier können die <**Cooling**>-Tags, die in den Kühlblöcken die Art und Stärke der Külung bestimmen, gecahcet werden.
-  
-
--   **CoolingBlocks**<br/>
-    Enthält [Kühlungen](xmlcooling.html), die für das thermische Modell verwendet werden.
-    Diese werden hier erstellt, um an anderer Stelle per Objektreferenzierung übergeben zu werden.
-    Also muss bei allen das Attribut cache="true" gesetzt werden.
-    Kühlungen können auch innerhalb des RootElement definiert werden.
-
-
-
-Das elektrische Netzwerk wird aus verschiedenen Objekten (Basisklasse TwoPort) aufgebaut.
-Jedes Objekt wird in der Konfigurationsdatei durch ein XML-Element repräsentiert.
-Die XML-Elemente besitzen, in Abhängigkeit des zu beschreibenen Objektes, unterschiedliche Attribute und Kindelemente.
-Beispielsweise besitzt ein XML-Element für ein Objekt des Typs "ParallelTwoport" ein Kindelement "Children".
-Dieses Element enthält seinerseits mehrere Kindelemente als Zweige der Parallelschaltung.
-Eine Auflistung aller unterstützten elektrischen Objekttypen und die Beschreibung der jeweiligen XML-Elemente kann [hier nachgelesen werden](xmlelectrical.html).
-
-
-__Neben den elektrischen Objekten werden auch weitere Objekttypen angeboten:__
-
--   **Zustandsobjekte (States)**<br/>
-    Es existieren zwei unterschiedliche Zustandsobjekte:
-    +   Soc <br/>
-        Das Objekt Soc speichert den Ladezustand einer Batterie.
-    +   ThermalState <br/>
-        Das Objekt ThermalState (thermischer Zustand) speichert die Wärmeerzeugung durch Verlustleistung und die Temperatur eines elektrischen Bauteils.
-<br/><br/>
--   **Parameterobjekte (Object)**<br/>
-    Ein Parameterobjekt beschreibt Parameter wie beispielsweise den Widerstandswert eines Widerstands oder den Spannungswert einer Spannungsquelle.<br/>
-    Diese Objektgruppe enthält verschiedene Arten von Parameterobjekten:
-    +   Konstanter Parameterwert
-    +   Parameterwert nach gegebener Funktion berechnet
-    +   Nachschlagetabellen (abhängig von Soc oder Temperatur oder Soc und Temperatur)
-
-
-Musterreferenzierung
-====================
-
-Für die Erstellung eines Musters wird das XML-Element im Abschnitt "CustomDefinitions" eingefügt.
-Der Name des Elementes muss eindeutig sein.
-Dannach kann das Muster an anderer Stelle (innerhalb "CustomDefinitions" und "RootElement") über das Attribut "ref" referenziert werden.
-
-Hier ein Beispiel:
-\htmlinclude basic_example_color.xml
-
-Objektreferenzierung
-============
-
-Die XML-Beschreibungssprache erlaubt eine Objektreferenzierung.
-Bei der Objektreferenzierung wird dasselbe Objekt an mehrere andere Objekte übergeben.
-Das ist vor allem bei der Verwendung von Zustandsobjekten sinnvoll.
-
-Damit ein Objekt referenziert werden kann, muss bei seiner Definition im XML-Element das Attribut "cache='True'" angegeben werden.
-Dadurch wird das Objekt unter seinem Elementnamen im Cache zwischengespeichert.
-An anderer Stelle kann dieses Objekt wieder über das Attribut "cacheref" referenziert werden.
-Bei der erneuten Zwischenspeicherung eines Objektes gleichen Namens wird das vorherige Objekt im Cache überschrieben (nur der Zeiger auf dieses Objekt).
-
-Hier ein Beispiel:
-\htmlinclude xmlobject_ref_color.xml
-
-In diesem Beispiel werden die beiden Zustandsobjekte "ThermalState" und "Soc" im Cache zwischengespeichert.
-Die Parameterobjekte "LookupTau", "LookupOhmicResistance", "LookupPhi" verwenden diese Zustandsobjekte.
-Im Gegensatz zu einer Musterreferenzierung werden bei der Objektreferenzierung keine neuen Objekte erzeugt.
-
-
-Beispiel Konfigurationsdatei
-============================
-
-Ein einfaches Simulationsszenario für rein elektrische Simulation mit insgesamt 16 Batterien:
-\htmlinclude testconfig_color.xml
-
-\~English
 The configuration of the simulation scenarios is done via a particular xml language.
 For each scenario, a xml file has to be created by the user.
 This xml file can be read and evaluated by the program.
@@ -133,6 +12,7 @@ Description of the different object groups:
 -   [Coolings](xmlcooling.html)
 -   [Thermal materials](xmlthermalmaterial.html)
 -   [Options](xmloption.html)
+-   [Observer Filters](xmlobserver.html)
 
 
 Furthermore:
@@ -213,7 +93,7 @@ Afterwards, the template can be referenced at other points (within "CustomDefini
 An example:
 \htmlinclude basic_example_color.xml
 
-Object referencing
+Object referencing {#xml_object_refs}
 ============
 
 The xml language permits object referencing.

@@ -96,19 +96,8 @@ The time constant \f$ \tau \f$ depens on the temperature \f$ T \f$ and is calcul
 XML Format
 ==========
 
-A detailed example for an aging simulation can be found at scenarions/aging/sanyo_18651_single_cell_aging.xml .
-
-Global Options
---------------
-
-These options for the aging simulation must be added in <Configuration><Options><Aging>.
-
-XML Tag                                 | Type          | Unit      | Explanation                                                                                 
-----------------------------------------|---------------|-----------|----------------------------------------------------------------------------------------
-CalculationCycles                       | int > 0       |           | Number of times the current or power profile is simulated before each aging step. Optional, default = 1.
-SteadyStateCycles                       | int >= 0      |           | Number of cycles that are simulated without collecting data for aging before the cycles specified in CalculationCycles are simulated. Optional, default = 0.
-AgingSteps                              | int > 0       |           | Number of aging steps. Optional, default = 1.
-AgingStepTime                           | double > 0    | day       | Duration of each aging step
+Global options for the aging simulation are described on the page [XML options](xmloption.html#aging).
+A detailed example for an aging simulation can be found at scenarions/aging/sanyo_18651_single_cell_aging.xml.
 
 Observer
 --------
@@ -118,10 +107,10 @@ Filters for the aging simulation can be added in <Configuration><Observer><Aging
 Cell Aging
 ----------
 
-The aging for each cell can be specified using the element <Aging> inside the cell's XML element.
+The aging for each cell can be specified using the element <**Aging**> inside the cell's XML element.
 The aging element contains a list of aging effects affecting the cell.
 
-If the cell is not new at the beginnig of the simulation, the initial cell age and charge throughput can be set by adding an <AgingState> element with the following children:
+If the cell is not new at the beginnig of the simulation, the initial cell age and charge throughput can be set by adding an <**AgingState**> element with the following children:
 
 XML Tag                                 | Type          | Unit      | Explanation                                                                                 
 ----------------------------------------|---------------|-----------|----------------------------------------------------------------------------------------
@@ -131,7 +120,7 @@ ChargeThroughput                        | double        | Ah        | Charge thr
 Halfcell Simulation
 -------------------
 
-The general XML format of a halfcell simulation is described [here](xmlhalfcell.html). Each element of the classes AnodeElement and CathodeElement con contain an <Aging> element and an <AgingState> element that work in the same way as those of a cell. An example for a halfcell simulation is given in scenarions/aging/sanyo_18651_single_cell_aging.
+The general XML format of a halfcell simulation is described [here](xmlhalfcell.html). Each element of the classes AnodeElement and CathodeElement con contain an <**Aging**> element and an <**AgingState**> element that work in the same way as those of a cell. An example for a halfcell simulation is given in scenarions/aging/sanyo_18651_single_cell_aging.
 
 Calendric Aging
 ---------------

@@ -53,6 +53,7 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
 
         double timestepDays = timestep * scaleFactor / 86400;
 
+        double previousCapFactor = this->mCapacityFactor;
         this->mCapacityFactor = 1 - pow( pow( 1 - this->mCapacityFactor, 1 / this->mTimeExponent ) +
                                           ( timestepDays * pow( this->mStressFactorCapacity, 1 / this->mTimeExponent ) ),
                                          this->mTimeExponent );
@@ -61,7 +62,7 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
                                             ( timestepDays * pow( this->mStressFactorResistance, 1 / this->mTimeExponent ) ),
                                            this->mTimeExponent );
 
-        this->CalculateChargeLoss( twoportState );
+        this->CalculateChargeLoss( twoportState, previousCapFactor );
 
         mTimeValues.clear();
         mVoltageValues.clear();

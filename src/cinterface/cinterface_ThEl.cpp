@@ -17,10 +17,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../observer/filter/filter.h"
 #include "../operators/vectorOperator.h"
 
+#include "../electrical/electrical_simulation.h"
 #include "../export/esbVisualizer.h"
 #include "../export/spiceExport.h"
 #include "../observer/filter/vcpfilter.h"
-#include "../electrical/electrical_simulation.h"
 #include "../thermal/simulation_data_outline.h"
 #include "../thermal/thermal_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
@@ -157,10 +157,36 @@ extern "C"
     {
         PointerStructure_ThEl *pointerStructure = (PointerStructure_ThEl *)*pointerStructureAddress;
 
-        pointerStructure->mElectricalSimulation->mObserver =
-         CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
-          &pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts(), 0, voltageOutputVec,
-          currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        size_t numberOfCellelements = pointerStructure->mElectricalSimulation->mCellElements.size();
+        const auto &observedTwoports = pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts();
+        if ( observedTwoports.size() > numberOfCellelements )
+        {
+            // Reorder the observed twoports so that all elements inside one cell end up in the same row in the output
+            // matrix. The vector is interpreted as a column-major matrix with the number of rows equal to the number of cells
+            std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size(), nullptr );
+            size_t outputRows = numberOfCellelements;
+            size_t outputColumns = std::ceil( (double)observedTwoports.size() / outputRows );
+            // first column has all the cellements, so they can just be copied
+            for ( size_t i = 0; i < numberOfCellelements; ++i )
+            {
+                twoportVector[i] = observedTwoports[i];
+            }
+            for ( size_t i = numberOfCellelements; i < observedTwoports.size(); ++i )
+            {
+                size_t row = ( i - numberOfCellelements ) / ( outputColumns - 1 );
+                size_t column = ( i - numberOfCellelements ) % ( outputColumns - 1 ) + 1;
+                twoportVector[column * outputRows + row] = observedTwoports[i];
+            }
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &twoportVector, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        }
+        else
+        {
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &observedTwoports, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        }
     }
 
     void GetRealSizes_ThEl( const char *configStr, const size_t *pointerStructureAddress, size_t *stateSize,

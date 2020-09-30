@@ -310,8 +310,8 @@ void MatrixSimulinkModel< Matrix, T >::CreateElectricalModel()
     myMatrixType totalValuesMatrix( 3, 1 );
     current = mElectricalSimulation->mRootTwoPort->GetCurrent() * mElectricalSimulation->mStateSystemGroup.mStateVector;
     voltage = *mElectricalSimulation->mRootTwoPort->GetVoltage() * mElectricalSimulation->mStateSystemGroup.mStateVector;
-    totalValuesMatrix.coeffRef( 0, 0 ) = current.coeffRef( 0, 0 );
-    totalValuesMatrix.coeffRef( 1, 0 ) = voltage.coeffRef( 0, 0 );
+    totalValuesMatrix.coeffRef( 0, 0 ) = current.coeff( 0, 0 );
+    totalValuesMatrix.coeffRef( 1, 0 ) = voltage.coeff( 0, 0 );
     totalValuesMatrix.coeffRef( 2, 0 ) = mElectricalSimulation->mRootTwoPort->GetPowerValue();
     MakeMatrix( totalValuesMatrix, misc::StrCont( mSimulinkModel ) + misc::StrCont( "/TotalValues" ) );
     prhs.at( 0 ) = mxCreateString( mSimulinkModel );
@@ -928,7 +928,7 @@ void MatrixSimulinkModel< Matrix, T >::MakeStateResetMatrix( const Matrix &matri
     UNUSED( StateMatrix );
     for ( size_t i = 0; i < matrix.n_rows; ++i )
         for ( size_t j = 0; j < matrix.n_cols; ++j )
-            if ( !matrix( i, j ).IsEmpty() )
+            if ( !matrix.coeff( i, j ).IsEmpty() )
             {
                 mxArray **plhs = 0;
                 boost::array< mxArray *, 6 > prhs;
@@ -1000,7 +1000,7 @@ void MatrixSimulinkModel< Matrix, T >::LoadInitialState()
         temperatureDoubles[i] = cell->GetThermalState()->GetValue();
     }
     mxArray **plhs = 0;
-    boost::array< mxArray *, 3 > prhs{mxCreateString( mInitialStateStruct ), socArray, temperatureArray};
+    boost::array< mxArray *, 3 > prhs{ mxCreateString( mInitialStateStruct ), socArray, temperatureArray };
     if ( mexCallMATLAB( 0, plhs, 3, prhs.data(), "LoadInitialStateToWorkspace" ) != 0 )
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorMatrixModel",
                                              "loading initial state" );
@@ -1111,8 +1111,8 @@ void MatrixSimulinkModel< Matrix, T >::LoadObjectValues()
 {
     auto rootPort = mElectricalSimulation->mRootTwoPort.get();
     size_t index = 0;
-    mwSize arraySize[1] = {this->mElectricalSimulation->mNumberOfObjects};
-    const char *fieldnames[4] = {"destination", "rowPoints", "colPoints", "values"};
+    mwSize arraySize[1] = { this->mElectricalSimulation->mNumberOfObjects };
+    const char *fieldnames[4] = { "destination", "rowPoints", "colPoints", "values" };
     // const char** fieldnamePtr = &fieldnames[0];
     mxArray *data = mxCreateStructArray( 1, arraySize, 4, (const char **)fieldnames );
     GetObjectValues( rootPort, data, mSimulinkModel + "/ElectricalCircuit/" + rootPort->GetName() + "_Elem1", index );

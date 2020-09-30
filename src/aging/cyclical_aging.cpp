@@ -1,4 +1,5 @@
 #include "cyclical_aging.h"
+#include "../misc/rainflow.h"
 #include <fstream>
 #include <iostream>
 
@@ -66,6 +67,7 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
         // rest of the aging step.
         additionalChargeThroughput = chargeThroughput * scaleFactor;
 
+        double previousCapFactor = this->mCapacityFactor;
         this->mCapacityFactor =
          1 - pow( pow( 1 - this->mCapacityFactor, 1 / this->mChargeThroughputExponentCapacity ) +
                    ( additionalChargeThroughput * pow( this->mStressFactorCapacity, 1 / this->mChargeThroughputExponentCapacity ) ),
@@ -76,7 +78,7 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
                    ( additionalChargeThroughput * pow( this->mStressFactorResistance, 1 / this->mChargeThroughputExponentResistance ) ),
                   this->mChargeThroughputExponentResistance );
 
-        this->CalculateChargeLoss( twoportState );
+        this->CalculateChargeLoss( twoportState, previousCapFactor );
     }
 
     this->mTimeValues.clear();

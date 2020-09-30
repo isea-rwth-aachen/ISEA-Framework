@@ -84,7 +84,7 @@ void TestCyclicalAging::testAgingCalculation()
     aging.CalculateAging( tpState, 16.2, steptime * 86400 / 16.2 );
     double cap = 0.6599;
     double res = 1.3458;
-    double socOffset = 3600 * ( aging.GetCapacityFactor() - 1.0 ) * totalCap * soc / 100;
+    double socOffset = 3600 * ( aging.GetCapacityFactor() - initialCap ) * totalCap * soc / 100;
 
     TS_ASSERT_DELTA( aging.GetCapacityFactor(), cap, 1e-3 );
     TS_ASSERT_DELTA( aging.GetSocOffset(), socOffset, 1e-3 );
@@ -145,7 +145,7 @@ void TestCyclicalAging::testReset()
     aging.CalculateAging( tpState, 16.2, steptime * 86400 / 16.2 );
     double cap = 0.6599;
     double res = 1.3458;
-    double socOffset = 3600 * ( aging.GetCapacityFactor() - 1.0 ) * totalCap * soc / 100;
+    double socOffset = 3600 * ( aging.GetCapacityFactor() - initialCap ) * totalCap * soc / 100;
 
     TS_ASSERT_DELTA( aging.GetCapacityFactor(), cap, 1e-3 );
     TS_ASSERT_DELTA( aging.GetSocOffset(), socOffset, 1e-3 );

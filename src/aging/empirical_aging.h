@@ -26,7 +26,7 @@ class EmpiricalAging : public AgingBase
     virtual double GetStressFactorResistance() { return mStressFactorResistance; };
 
     protected:
-    virtual void CalculateChargeLoss( const TwoportState& twoportState );
+    virtual void CalculateChargeLoss( const TwoportState& twoportState, double previousCapFactor );
 
     double mCapacityFactor;
     double mResistanceFactor;

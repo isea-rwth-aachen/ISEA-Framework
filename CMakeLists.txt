@@ -5,9 +5,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 cmake_policy(SET CMP0009 NEW)
 set(ISEAFrameVERSION_MAJOR 2)
-set(ISEAFrameVERSION_MINOR 22)
+set(ISEAFrameVERSION_MINOR 23)
 set(ISEAFramePATCH_LEVEL 0)
-set(ISEAFrameNAME "Refactor")
+set(ISEAFrameNAME "docs")
 set(ARCH_TYPE
     "64"
     CACHE STRING "")
@@ -187,7 +187,7 @@ function(copy_windows_files_to_dir binary_dir)
   endif()
 endfunction(copy_windows_files_to_dir)
 
-# copy files to the binary folder if CREATE_RELEASE_DIRS is set target is the
+# copy files to the binary folder if CREATE_RELEASE_DIRS is set. target is the
 # CMake target and must have RUNTIME_OUTPUT_DIRECTORY set
 function(add_release_files target files_to_copy)
   if(CREATE_RELEASE_DIRS)

@@ -5,7 +5,6 @@
 #define _CYCLICAL_AGING_
 
 #include "../electrical/cellelement.h"
-#include "../misc/rainflow.h"
 #include "../state/soc.h"
 #include "empirical_aging.h"
 

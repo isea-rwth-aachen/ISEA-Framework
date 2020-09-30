@@ -18,10 +18,10 @@ EmpiricalAging::EmpiricalAging( const double agingStepTime, const double minStre
 {
 }
 
-void EmpiricalAging::CalculateChargeLoss( const TwoportState& twoportState )
+void EmpiricalAging::CalculateChargeLoss( const TwoportState& twoportState, double previousCapFactor )
 {
-    this->mChargeLoss = ( 1 - this->mCapacityFactor ) *
-                        twoportState.mSocState->template GetInitialCapacity< state::SocGetFormat::AS >() *
-                        twoportState.mSocState->template GetValue< state::SocGetFormat::PERCENT >() / 100;
+    this->mChargeLoss += ( previousCapFactor - this->mCapacityFactor ) *
+                         twoportState.mSocState->template GetInitialCapacity< state::SocGetFormat::AS >() *
+                         twoportState.mSocState->template GetValue< state::SocGetFormat::PERCENT >() / 100;
 }
 }    // namespace aging

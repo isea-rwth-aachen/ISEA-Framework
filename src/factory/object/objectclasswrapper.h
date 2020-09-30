@@ -142,10 +142,9 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
 
     /** Get the LookupType from xml file, e.g. LinearInterpolation
      * @param    param Pointer of type xmlparser::XmlParameter. This is the desired LookupType in the xml-file.
-     * @return   Integer representing a LookupType: 0 => "LinearInterpolation", 1 => NearestNeighbour", 2 =>
-     * ConstantUntilThreshold, 3 => SplineInterpolation
+     * @return   Type of the lookup, defaults to LinearInterpolation
      */
-    int GetLookupType( const xmlparser::XmlParameter* param )
+    lookup::LookupType GetLookupType( const xmlparser::XmlParameter* param )
     {
         if ( !param )
         {
@@ -159,20 +158,20 @@ class ObjectClassWrapperBase : public ClassWrapperBase< Object< ValueT >, Argume
                 const char* myLookupTypeString = param->GetElementAttributeCharPtrValue( "LookupType" );
                 misc::equal_str myCompareObject;
                 if ( myCompareObject( myLookupTypeString, "LinearInterpolation" ) )
-                    return 0;
+                    return lookup::LookupType::LINEAR_INTERPOLATION;
                 else if ( myCompareObject( myLookupTypeString, "NearestNeighbour" ) )
-                    return 1;
+                    return lookup::LookupType::NEAREST_NEIGHBOUR;
                 else if ( myCompareObject( myLookupTypeString, "ConstantUntilThreshold" ) )
-                    return 2;
+                    return lookup::LookupType::CONSTANT_UNTIL_THRESHOLD;
                 else if ( myCompareObject( myLookupTypeString, "SplineInterpolation" ) )
-                    return 3;
+                    return lookup::LookupType::SPLINE_INTERPOLATION;
                 else
                 {
                     ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "UnknownLookupType" );
                 }
             }
         }
-        return 0;    // Set LookupType to default 0 = LinearInterpolation
+        return lookup::LookupType::LINEAR_INTERPOLATION;    // Set LookupType to default LinearInterpolation
     }
 
     private:

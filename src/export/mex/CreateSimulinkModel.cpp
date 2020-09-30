@@ -12,9 +12,9 @@ void mexFunction( int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[] )
     {
         mexPrintf( "%s\n",
                    "Usage: CreateSimulinkModel(configstring, modelType, modelLocation='BuildMatrixModel', "
-                   "initialStateStruct='MDL.battery.initialState'\nCreates a simulink model from the specified config "
+                   "initialStateStruct='MDL.battery.initialState')\nCreates a simulink model from the specified config "
                    "string.\nconfigstring: The contents of an XML file describing the system\nmodelType: type of the "
-                   "simulink model, 0 = CircuitModel (currently broken), 1 = MatrixModel\nmodelLocation: System that "
+                   "simulink model, 0 = CircuitModel (currently broken), 1 = MatrixModel\nmodelLocation: system that "
                    "the model will be built in\ninitialStateStruct: workspace variable that contains the initial state "
                    "of the model\n" );
         return;

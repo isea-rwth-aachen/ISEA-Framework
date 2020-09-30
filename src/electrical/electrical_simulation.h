@@ -82,7 +82,8 @@ class ElectricalSimulation
 
     void LoadCapacityForLaterReset();
     void SaveCapacityForLaterReset();
-    std::vector< T > mCapcityValues;
+    std::vector< T > mSavedSocValues;
+    std::vector< T > mSavedSocOffsets;
 
     // Internal data
     boost::shared_ptr< electrical::TwoPort< Matrix > > mRootTwoPort;
@@ -146,40 +147,14 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
     factory::Factory< electrical::TwoPort< Matrix >, factory::ArgumentTypeElectrical > *electricalFactory =
      factoryBuilder->BuildElectricalFactory();
 
-    // Evaluate Options node
-    boost::shared_ptr< xmlparser::XmlParameter > optionsNode = rootXmlNode->GetElementChild( "Options" );
-    bool observeAllElectricalElements = false;
-    if ( optionsNode->HasElementDirectChild( "ObserveAllElectricalElements" ) )
-        observeAllElectricalElements = optionsNode->GetElementBoolValue( "ObserveAllElectricalElements" );
-
     // Create electrical system
-    factory::ArgumentTypeElectrical factoryArg;
-    factoryArg.mMakeAllECMElementsObservable = observeAllElectricalElements;
-    mRootTwoPort = electricalFactory->CreateInstance( rootXmlNode->GetElementChild( "RootElement" ), &factoryArg );
-
-    std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > > electricalElements;
-    electricalFactory->GetObjects( electricalElements );
-
-    // create observer and give out cells if wanted
-    if ( cells )
-    {
-        *cells = electricalFactory->GetObjectsOfClass( "Cellelement" );
-        std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > > observableTwoports = *cells;
-        FindObservableTwoports( observableTwoports, mRootTwoPort );
-
-        mObserver = CreateTwoPortObserver< std::vector< boost::shared_ptr< ::electrical::TwoPort< Matrix > > >, Matrix, filterTypeChoice >(
-         &observableTwoports, rootXmlNode.get(), 0, 0, 0, 0, 0, mRootTwoPort );
-    }
-    else
-    {
-        mObserver = CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > >, Matrix, filterTypeChoice >(
-         0, rootXmlNode.get(), 0, 0, 0, 0, 0, mRootTwoPort );
-    }
-
+    mRootTwoPort = electricalFactory->CreateInstance( rootXmlNode->GetElementChild( "RootElement" ) );
 #ifdef _SYMBOLIC_
     mRootTwoPort->SetID( 0 );
     size_t iDCounter = 1;
 
+    std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > > electricalElements;
+    electricalFactory->GetObjects( electricalElements );
     for ( size_t i = 0; i < electricalElements.size(); ++i )
         if ( electricalElements.at( i ).get() != mRootTwoPort.get() )
             electricalElements.at( i )->SetID( iDCounter++ );
@@ -242,7 +217,8 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
 
     const size_t numberOfSocObject = stateFactory->GetObjectsOfClass( "Soc" ).size();
     mSocStates.reserve( numberOfSocObject );
-    mCapcityValues.resize( numberOfSocObject );
+    mSavedSocValues.resize( numberOfSocObject );
+    mSavedSocOffsets.resize( numberOfSocObject );
 
     BOOST_FOREACH ( const boost::shared_ptr< state::State > &socStateFromFactory,
                     stateFactory->GetObjectsOfClass( "Soc" ) )
@@ -265,12 +241,30 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
         }
     }
 
+    // Evaluate Options node
+    boost::shared_ptr< xmlparser::XmlParameter > optionsNode = rootXmlNode->GetElementChild( "Options" );
+
     // SocStopCriterion
     if ( optionsNode->HasElementDirectChild( "SocStopCriterionInPercent" ) )
     {
         mSocStopCriterion = optionsNode->GetElementDoubleValue( "SocStopCriterionInPercent" );
         if ( mSocStopCriterion <= 0.0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "SocStopCriterionInPercentNegative" );
+    }
+
+    // Give out cells if wanted
+    if ( cells )
+        *cells = electricalFactory->GetObjectsOfClass( "Cellelement" );
+
+    if ( cells )
+    {
+        mObserver = CreateTwoPortObserver< std::vector< boost::shared_ptr< ::electrical::TwoPort< Matrix > > >, Matrix, filterTypeChoice >(
+         cells, rootXmlNode.get(), 0, 0, 0, 0, 0, mRootTwoPort );
+    }
+    else
+    {
+        mObserver = CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< Matrix > > >, Matrix, filterTypeChoice >(
+         0, rootXmlNode.get(), 0, 0, 0, 0, 0, mRootTwoPort );
     }
 }
 
@@ -447,14 +441,20 @@ template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::SaveCapacityForLaterReset()
 {
     for ( size_t i = 0; i < mSocStates.size(); ++i )
-        mCapcityValues[i] = mSocStates[i]->template GetValue< state::SocGetFormat::AS >();
+    {
+        mSavedSocValues[i] = mSocStates[i]->template GetValue< state::SocGetFormat::AS >();
+        mSavedSocOffsets[i] = mSocStates[i]->template GetOffset< state::SocGetFormat::AS >();
+    }
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::LoadCapacityForLaterReset()
 {
     for ( size_t i = 0; i < mSocStates.size(); ++i )
-        mSocStates[i]->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( mCapcityValues[i] );
+    {
+        mSocStates[i]->template SetOffset< state::SocSetFormat::ABSOLUT >( mSavedSocOffsets[i] );
+        mSocStates[i]->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( mSavedSocValues[i] );
+    }
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >

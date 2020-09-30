@@ -8,7 +8,7 @@ namespace rainflow
 typedef std::vector< double >::const_iterator valuesIt;
 typedef std::vector< std::vector< double >::const_iterator >::iterator reversalsIt;
 
-// rainflow implementation according to ASTM E1049-85
+/// rainflow implementation according to ASTM E1049-85
 std::vector< Cycle > countCycles( const std::vector< double > &values )
 {
     if ( values.size() < 2 )
@@ -136,4 +136,4 @@ std::vector< Cycle > countCycles( const std::vector< double > &values )
 
     return cycles;
 }
-}
+}    // namespace rainflow

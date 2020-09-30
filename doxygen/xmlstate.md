@@ -1,79 +1,9 @@
 State objects     {#xmlstate}
 ===============
-\~German
-Es existieren zwei Arten von Zustandsobjekten: Ein thermischer Zustand (Temperatur und Wärmeerzeugung) und ein Ladezustand (SoC).
-Die Zustandsobjekte werden im Zusammenhang mit einer Batterie verwendet.
-Neben der Beschreibung des gegenwärtigen Zustandes einer Batterie, werden diese Zustände auch für [Parameterobjekte](xmlobject.html) mit Nachschlagetabellen verwendet.
-Dadurch können die Parameter der elektrischen Objekte in Abhängigkeit der Batterietemperatur und des Ladezustandes berechnet werden.
-
-<br/>
-
-Allgemein
-=========
-
-Jedes XML-Element, das in der Konfiguration ein Zustandsobjekt repräsentiert, besitzt das Attribut "class".
-Über dieses Attribut wird der Objekttyp zugeordnet.
-Zustandsobjekte werden normalerweise im Cache zwischengespeichert und über die Objektreferenzierung mehrmals für Parameterobjekte mit Nachschlagetabellen verwendet.
-
-<br/>
-
-Grundtypen
-==========
-
-<br/>
-
-Thermischer Zustand
-----------
-
-Dieser Zustand speichert die Wärmeerzeugung durch elektrische Verlustleistung und die Temperatur.
-
-__Objekttyp: "ThermalState"__
-
-<**InitialTemperature**>: Wert der anfänglichen Temperatur in °C
-
-Definition eines thermischen Zustandes:
-\htmlinclude thermalstate_color.xml
-
-
-Ladezustand
-----------
-
-__Objekttyp: "Soc"__
-
-<**InitialCapacity**>: Wert der maximalen Kapazität in Ah
-
-<**InitialSoc**>: Wert des anfänglichen Ladezustandes in Prozent (0 bis 100)
-
-Aktuell können auch SOC-Werte höher als 100 % oder kleiner als 0 % in der Simulation vorkommen. Die Limits für den SOC wurden aufgehoben
-
-Definition eines Ladezustandes:
-\htmlinclude socstate_color.xml
-
-Strom, Spannung
-----------
-
-__Object type: "ElectricalState"__
-
-Zusätzliche Attribut:
-
-**StateType='Current'**
-
-oder
-
-**StateType='Voltage'**
-
-Strom und Spannung der elektrischen Komponenten können als weiterer State genutzt werden. Damit kann z.B. das Verhalten der Butler–Volmer Gleichung nachgestellt werden.
-
-\htmlinclude xmlCurrentState_color.xml
-
-
-\~English
 There are two different types of state objects: A thermal state (temperature and heat generation) and a state of charge (SoC).
 The state objects are used in connection with a battery.
 Apart from the description of the current battery condition, these states are also used for [parameter objects](xmlobject.html) with lookup tables.
 As a result, the parameters of the electrical object could be calculated as a function of battery temperature and SoC.
-
-<br/>
 
 Abstract
 =========
@@ -82,54 +12,45 @@ Each xml element, which represents a state object in the configuration, possesse
 The object type is defined by this attribute.
 State objects are normally stored in the cache and are used multiple times via object references for parameter objects with lookup tables.
 
-<br/>
-
-Basic types
-==========
-
-<br/>
-
 Thermal state
-----------
+=========
 
 This state stores the heat generation by electrical power loss and the temperature.
 
-__Object type: "ThermalState"__
+Object type: __"ThermalState"__
 
-<**InitialTemperature**>: Value of the initial temperature °C
+XML Tag                                 | Unit | Type                     | Explanation                                                                                 
+----------------------------------------|------|--------------------------|--------------------------------------------------------------------------------
+InitialTemperature                      | °C   | double                   | Value of the initial temperature
 
 Definition of a thermal state:
 \htmlinclude thermalstate_color.xml
 
 
 State of charge
-----------
+=========
 
-__Object type: "Soc"__
+Object type: __"Soc"__
 
-<**InitialCapacity**>: Value of the initial capacity in Ah
+XML Tag                                 | Unit | Type                     | Explanation                                                                                 
+----------------------------------------|------|--------------------------|--------------------------------------------------------------------------------
+InitialCapacity                         | Ah   | double                   | Initial capacity. The value will only change during the simulation if the aging model is used.
+InitialSoc                              | %    | double                   | Initial state of charge from 0 to 100
 
-<**InitialSoc**>: Value of the initial charge in percent (0 to 100)
-
-Current SOC values can be greater than 100% or smaller than 0%. The limits have been lifted.
+SOC values are not limited and can be greater than 100% or smaller than 0%.
 
 Definition of a state of charge:
 \htmlinclude socstate_color.xml
 
 
 Current, Voltage
-----------
-
-__Object type: "ElectricalState"__
-
-Additional attributes:
-
-**StateType='Current'**
-
-or
-
-**StateType='Voltage'**
+=========
 
 The current and voltage of an electric component can be used as an input for lookups. Therefore non-linear behavior e.g. for the Butler–Volmer equation can be approximated. 
+Object type: **"ElectricalState"**
+
+XML Tag                                 | Type   | Explanation                                                                                 
+----------------------------------------|--------|--------------------------------------------------------------------------------
+Attribute StateType                     | string | "current", "voltage" or "power". 
 
 \htmlinclude xmlCurrentState_color.xml

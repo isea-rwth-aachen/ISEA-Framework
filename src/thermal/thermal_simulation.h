@@ -310,11 +310,11 @@ ThermalSimulation< Matrix, T, filterTypeChoice >::ThermalSimulation(
         if ( mThermalSystem->GetOdeSystemSize() > maxOdeSize )    // Arbitrary limit for conductivty matrix
         {
             // Not feasable!! Memory is not cheap enough
-            *conductivity = {1, std::vector< double >( 1, 0 )};
+            *conductivity = { 1, std::vector< double >( 1, 0 ) };
         }
         else
         {
-            *conductivity = {mThermalSystem->GetOdeSystemSize(), std::vector< double >( mThermalSystem->GetOdeSystemSize(), 0 )};
+            *conductivity = { mThermalSystem->GetOdeSystemSize(), std::vector< double >( mThermalSystem->GetOdeSystemSize(), 0 ) };
             const auto &conMat = mThermalSystem->GetA_th_Conductivity();
             for ( size_t i = 0; i < mThermalSystem->GetOdeSystemSize(); ++i )
             {

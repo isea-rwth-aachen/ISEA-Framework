@@ -1,0 +1,40 @@
+<div class="fragment">
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#0000FF">&lt;Cell</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"CellElement"</font><b><font color="#0000FF">&gt;</font></b>
+    <i><font color="#9A1900">&lt;!-- Because the cache attribute is set to "true", the state object will be added to the cache under the name "Soc" --&gt;</font></i>
+    <b><font color="#0000FF">&lt;Soc</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"Soc"</font> <font color="#009900">cache</font><font color="#990000">=</font><font color="#FF0000">"true"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;InitialCapacity&gt;</font></b>10.0<b><font color="#0000FF">&lt;/InitialCapacity&gt;</font></b>
+        <b><font color="#0000FF">&lt;InitialSoc&gt;</font></b>50.0<b><font color="#0000FF">&lt;/InitialSoc&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Soc&gt;</font></b>
+
+    <i><font color="#9A1900">&lt;!-- Similarly, this will be cached as "ThermalState" --&gt;</font></i>
+    <b><font color="#0000FF">&lt;ThermalState</font></b> <font color="#009900">cache</font><font color="#990000">=</font><font color="#FF0000">"true"</font><b><font color="#0000FF">&gt;</font></b>
+        <b><font color="#0000FF">&lt;InitialTemperature&gt;</font></b>25.0<b><font color="#0000FF">&lt;/InitialTemperature&gt;</font></b>
+    <b><font color="#0000FF">&lt;/ThermalState&gt;</font></b>
+
+    <b><font color="#0000FF">&lt;Children&gt;</font></b>
+        <i><font color="#9A1900">&lt;!-- copy the Resistance element from below --&gt;</font></i>
+        <b><font color="#0000FF">&lt;Resistance</font></b> <font color="#009900">ref</font><font color="#990000">=</font><font color="#FF0000">"Resistance"</font><b><font color="#0000FF">/&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Children&gt;</font></b>
+<b><font color="#0000FF">&lt;/Cell&gt;</font></b>
+
+<b><font color="#0000FF">&lt;Resistance</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"OhmicResistance"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;Object</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"LookupObj2dWithState"</font><b><font color="#0000FF">&gt;</font></b>
+        <i><font color="#9A1900">&lt;!-- Reference to the caced soc state of the cell --&gt;</font></i>
+        <b><font color="#0000FF">&lt;RowState</font></b> <font color="#009900">cacheref</font><font color="#990000">=</font><font color="#FF0000">"Soc"</font><b><font color="#0000FF">/&gt;</font></b>
+        <i><font color="#9A1900">&lt;!-- Reference to the caced thermal state of the cell --&gt;</font></i>
+        <b><font color="#0000FF">&lt;ColState</font></b> <font color="#009900">cacheref</font><font color="#990000">=</font><font color="#FF0000">"ThermalState"</font><b><font color="#0000FF">/&gt;</font></b>
+        <b><font color="#0000FF">&lt;LookupData&gt;</font></b>
+            1.0, 1.1, 1.0;
+            1.2, 1.1, 1.3;
+        <b><font color="#0000FF">&lt;/LookupData&gt;</font></b>
+        <i><font color="#9A1900">&lt;!-- SOC values that the three columns were measured at --&gt;</font></i>
+        <b><font color="#0000FF">&lt;/MeasurementPointsRow&gt;</font></b>10, 50, 90<b><font color="#0000FF">&lt;/MeasurementPointsRow&gt;</font></b>
+        <i><font color="#9A1900">&lt;!-- temperature values that the two rows were measured at --&gt;</font></i>
+        <b><font color="#0000FF">&lt;/MeasurementPointsColumn&gt;</font></b>20, 25<b><font color="#0000FF">&lt;/MeasurementPointsColumn&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Object&gt;</font></b>
+<b><font color="#0000FF">&lt;/Resistance&gt;</font></b></tt></pre>
+</div>

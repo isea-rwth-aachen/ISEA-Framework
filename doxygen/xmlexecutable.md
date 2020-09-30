@@ -47,13 +47,11 @@ Executable TestShowBattery.xml Stromprofil.txt
 
 
 \~English
-Abstract
-=========
 
 The electrical/thermal simulation is run with a variable step solver.
 The electrical and thermal simulations are run alternately.
-Firstly, the electrical model is simulating a certain period. Afterwards, the thermal model is simulating exactly the same period.
-If the changes of the SoC or of the temperature are crossing the limits, a premature switch between the two models is forced.
+Firstly, the electrical model is simulated for a certain period. Afterwards, the thermal model is simulated for exactly the same period.
+If the change of any SoC or temperature exceeds a limit set in the [XML options](xmloption.html), a premature switch between the two models is forced.
 
 Execution
 =========

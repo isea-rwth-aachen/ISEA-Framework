@@ -2,12 +2,12 @@
 
 <pre>
  
- <img src="misc/images/Logo_V3.jpg" /> 
+ <img src="misc/images/logo.jpg" /> 
 
 </pre>
 
 <div align=right>
-<a href="http://www.isea.rwth-aachen.de/">  <img src="misc/images/logo.png" width="500" /> </a>
+<a href="http://www.isea.rwth-aachen.de/">  <img src="misc/images/logo_isea.png" width="500" /> </a>
 </div>
 
 About ISEAFrame
@@ -36,7 +36,7 @@ Linux Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/a
 Windows Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=windows_standalones)<br/>
 Wndows Simulink Converter: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=windows_simulink_converter)<br/>
 <br/><br/>
-Documentation: [View online](https://isea.pages.rwth-aachen.de/framework) | [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=documentation) | [Download Development Version](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=documentation)
+Documentation: [View online](https://isea.pages.rwth-aachen.de/framework) | [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=documentation) | [Download Development Version](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/master/download?job=development_documentation)
 
 
 Required Software:

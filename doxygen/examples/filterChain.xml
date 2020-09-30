@@ -1,8 +1,8 @@
 <Observer>
     <Filter1 class="MatlabFilter">
-        <filename>
+        <Filename>
             sanyo.mat
-        </filename>
+        </Filename>
     </Filter1>
 
     <Filter2 class="DecimateFilter">
@@ -11,13 +11,13 @@
         </TimeDelay>
     </Filter2>
 
-    <Filter3 class="StdOutFilter"/>
+    <Filter3 class="StdoutFilter"/>
 
     <Filter4 class="CSVFilter">
-        <filename>
+        <Filename>
             sanyo.csv
-        </filename>
-        <printHeader> 1 </printHeader>
+        </Filename>
+        <printHeader>true</printHeader>
     </Filter4>
 </Observer>
 

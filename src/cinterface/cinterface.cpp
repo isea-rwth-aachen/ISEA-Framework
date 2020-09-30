@@ -111,7 +111,7 @@ extern "C"
         {
             // Reorder the observed twoports so that all elements inside one cell end up in the same row in the output
             // matrix. The vector is interpreted as a column-major matrix with the number of rows equal to the number of cells
-            std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size() );
+            std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size(), nullptr );
             size_t outputRows = numberOfCellelements;
             size_t outputColumns = std::ceil( (double)observedTwoports.size() / outputRows );
             // first column has all the cellements, so they can just be copied
@@ -123,7 +123,7 @@ extern "C"
             {
                 size_t row = ( i - numberOfCellelements ) / ( outputColumns - 1 );
                 size_t column = ( i - numberOfCellelements ) % ( outputColumns - 1 ) + 1;
-                twoportVector[row * outputRows + column] = observedTwoports[i];
+                twoportVector[column * outputRows + row] = observedTwoports[i];
             }
             pointerStructure->mElectricalSimulation->mObserver =
              CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(

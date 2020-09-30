@@ -1,0 +1,34 @@
+<Cell class="CellElement">
+    <!-- Because the cache attribute is set to "true", the state object will be added to the cache under the name "Soc" -->
+    <Soc class="Soc" cache="true">
+        <InitialCapacity>10.0</InitialCapacity>
+        <InitialSoc>50.0</InitialSoc>
+    </Soc>
+
+    <!-- Similarly, this will be cached as "ThermalState" -->
+    <ThermalState cache="true">
+        <InitialTemperature>25.0</InitialTemperature>
+    </ThermalState>
+
+    <Children>
+        <!-- copy the Resistance element from below -->
+        <Resistance ref="Resistance"/>
+    </Children>
+</Cell>
+
+<Resistance class="OhmicResistance">
+    <Object class="LookupObj2dWithState">
+        <!-- Reference to the caced soc state of the cell -->
+        <RowState cacheref="Soc"/>
+        <!-- Reference to the caced thermal state of the cell -->
+        <ColState cacheref="ThermalState"/>
+        <LookupData>
+            1.0, 1.1, 1.0;
+            1.2, 1.1, 1.3;
+        </LookupData>
+        <!-- SOC values that the three columns were measured at -->
+        </MeasurementPointsRow>10, 50, 90</MeasurementPointsRow>
+        <!-- temperature values that the two rows were measured at -->
+        </MeasurementPointsColumn>20, 25</MeasurementPointsColumn>
+    </Object>
+</Resistance>

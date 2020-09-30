@@ -30,8 +30,10 @@ enum FcnParameters
 };
 
 #include "cinterface.h"
+#include "cinterface_Aging.h"
 #include "cinterface_Th.h"
 #include "cinterface_ThEl.h"
+#include "cinterface_ThEl_Aging.h"
 #include "cinterface_common_functions.h"
 
 #ifdef _MOCK_    // This has to be included out of the __cplusplus scope

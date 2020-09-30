@@ -89,7 +89,7 @@ class Soc : public State
 
     double mActualCapacity;    // [As]
     double mActualSoc;         // [%]
-    // portion of the soc that is caused by an offset from aging. This offset is already included in mActualSoc.
+    /// portion of the soc that is caused by an offset from aging. This offset is already included in mActualSoc.
     double mOffset;    // [%]
 
     const double mMinimumValue;

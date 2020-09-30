@@ -12,6 +12,9 @@ class ElectricalSimulation;
 
 template < typename Matrix, typename Scalar, bool filterTypeChoice >
 class ThermalSimulation;
+
+template < typename Matrix, typename Scalar, bool filterTypeChoice >
+class AgingSimulation;
 }    // namespace simulation
 
 namespace observer
@@ -47,5 +50,18 @@ struct PointerStructure_ThEl
     size_t mVisualizerMaxNumberOfFrames;
 };
 
+#ifdef BUILD_AGING_SIMULATION
+
+struct PointerStructure_ThEl_Aging : PointerStructure_ThEl
+{
+    boost::scoped_ptr< simulation::AgingSimulation< myMatrixType, double, false > > mAgingSimulation;
+};
+
+struct PointerStructure_Aging
+{
+    boost::scoped_ptr< simulation::AgingSimulation< myMatrixType, double, false > > mAgingSimulation;
+};
+
+#endif
 #endif
 #endif
