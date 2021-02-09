@@ -120,22 +120,28 @@ foreach(f ${TMP_SOURCE})
   endif(${tmp_found} EQUAL -1)
 endforeach(f ${TMP_SOURCE})
 
+find_package(Boost REQUIRED)
+find_package(MATIO REQUIRED)
+
 if(BUILD_NUMERIC)
   set(libname_NUMERIC ISEAFrameNumeric)
   add_library(${libname_NUMERIC} ${NUMERIC_SOURCE} ${NUMERIC_HEADERS})
-  target_link_libraries(${libname_NUMERIC} PUBLIC ${COMMON_LIBRARIES}
-                        ${NUMERIC_LIBRARIES} ${MATIO_LIBRARIES})
+  target_link_libraries(
+    ${libname_NUMERIC} PUBLIC ${COMMON_LIBRARIES} ${NUMERIC_LIBRARIES}
+                              matio::matio)
+  target_include_directories(${libname_NUMERIC} PUBLIC ${Boost_INCLUDE_DIRS})
   target_compile_definitions(${libname_NUMERIC} PUBLIC ${COMMON_DEFINITIONS}
-                             ${NUMERIC_DEFINITIONS})
+                                                       ${NUMERIC_DEFINITIONS})
   add_dependencies(framework ${libname_NUMERIC})
 endif()
 
 if(BUILD_SYMBOLIC)
   set(libname_SYMBOLIC ISEAFrameSymbolic)
   add_library(${libname_SYMBOLIC} ${SYMBOLIC_SOURCE} ${SYMBOLIC_HEADERS})
-  target_link_libraries(${libname_SYMBOLIC} PUBLIC ${COMMON_LIBRARIES}
-                        ${SYMBOLIC_LIBRARIES})
+  target_link_libraries(
+    ${libname_SYMBOLIC} PUBLIC Boost::headers ${COMMON_LIBRARIES}
+                               ${SYMBOLIC_LIBRARIES})
   target_compile_definitions(${libname_SYMBOLIC} PUBLIC ${COMMON_DEFINITIONS}
-                             ${SYMBOLIC_DEFINITIONS})
+                                                        ${SYMBOLIC_DEFINITIONS})
   add_dependencies(framework ${libname_SYMBOLIC})
 endif()

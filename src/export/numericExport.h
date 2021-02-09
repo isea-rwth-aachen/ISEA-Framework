@@ -6,9 +6,9 @@
 _._._._._._._._._._._._._._._._._._._._._.*/
 #ifndef _NUMERICEXPORT_
 #define _NUMERICEXPORT_
+#include "../electrical/electrical_simulation.h"
 #include "../electrical/twoport_withchild.h"
 #include "../misc/matrixInclude.h"
-#include "../electrical/electrical_simulation.h"
 #include "baseExport.h"
 
 /// DESCRIPTION
@@ -16,10 +16,10 @@ template < typename matType = myMatrixType >
 class NumericExport : public BaseExport< matType >
 {
     public:
-    NumericExport( simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false > *sim, std::ostream *stream );
+    NumericExport( simulation::ElectricalSimulation< myMatrixType, double, false > *sim, std::ostream *stream );
 
     private:
-    simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false > *mSimulation = 0;
+    simulation::ElectricalSimulation< myMatrixType, double, false > *mSimulation = 0;
     std::ostream *mStream = 0;
 
     virtual void WritePreamble(){};
@@ -36,7 +36,7 @@ class NumericExport : public BaseExport< matType >
 };
 
 template < typename matType >
-NumericExport< matType >::NumericExport( simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false > *sim, std::ostream *stream )
+NumericExport< matType >::NumericExport( simulation::ElectricalSimulation< myMatrixType, double, false > *sim, std::ostream *stream )
     : BaseExport< matType >( sim ? ( sim->mRootTwoPort ? sim->mRootTwoPort.get() : 0 ) : 0 )
     , mSimulation( sim )
     , mStream( stream )

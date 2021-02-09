@@ -42,17 +42,5 @@ class WarburgCotanh : public SerialTwoPort< T >
     protected:
 };
 
-template < typename T >
-WarburgCotanh< T >::WarburgCotanh( const bool observable, typename TwoPort< T >::DataType dataValues )
-    : SerialTwoPort< T >( observable, dataValues )
-{
-}
-
-
-template < typename T >
-const char* WarburgCotanh< T >::GetName() const
-{
-    return "WarburgCotanh";
-}
 }    // namespace electrical
 #endif /* _WARBURGCOTA_ */

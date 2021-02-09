@@ -1,3 +1,13 @@
+Version 2.24.0
+===========
+- Expression object can rescale parameters and output value
+- Two new aging effects for Loss of Active Material and Loss of Lithium Inventory
+- Speed improvements for electrical and thermal simulation
+- Simulation standalones write metadata to the file simulation.xml, including a randomly generated UUID for the simulation
+- XML files can contain a hash value that can be checked with the verification standalone to see if they have been modified
+- All matlab files create by the matlab filters contain the simulation UUID
+- Output from the aging matlab filter contains the capacity in Ah and optionally OCV values
+
 Version 2.23.0
 ===========
 - The aging model is available as an S-Function for Simulink

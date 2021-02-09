@@ -49,12 +49,33 @@ This object can be used to get a value from a mathematical expression.
 XML Tag                 | Type                                   | Explanation
 ------------------------|----------------------------------------|----------------------------------------------------
 Expression              | mathematical expression                | expression that is evaluated each time the object value is needed
+Rescale                 | rescale (see below)                    | rescaling of the calculated value
 Parameters              | list of [state objects](xmlstate.html) | list of states that are used as parameters in the expression
 - Attribute name        | string                                 | variable name used in the expression. If this attribute is not set, but the attribute cacheref is used, that name is used instead 
+- Rescale               | rescale (see below)                    | rescaling of the parameter before the expression is evaluated
 
 To evaluate the expressions, the library [exprtk](https://github.com/ArashPartow/exprtk) is used. The documentation provides a list of operations that can be used in the expressions.
 
 \htmlinclude expression_obj_color.xml
+
+Rescaling
+--------------
+
+The input parameters as well as the calculated output value of the expression object can be rescaled by specifying an input range that is mapped to an output range. This is done by adding an element with the tag Rescale that contains the following children:
+
+XML Tag            | Type   | Explanation
+-------------------|--------|-------------------------------
+InputRangeMinimum  | double | lower end of the input range
+InputRangeMaximum  | double | upper end of the input range
+OutputRangeMinimum | double | lower end of the output range
+OutputRangeMaximum | double | upper end of the output range
+
+The value is rescaled according to the formula
+\f{eqnarray*}{
+f(x) = (x - InputRangeMinimum) \frac{OutputRangeMaximum - OutputRangeMinimum}{InputRangeMaximum - InputRangeMinimum} + OutputRangeMinimum
+\f}
+
+\htmlinclude expression_obj_rescale_color.xml
 
 Combination of objects
 ==========================

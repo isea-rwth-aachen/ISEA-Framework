@@ -35,7 +35,7 @@ MexRelease/
 compile_commands.json
 .vscode/
 __pycache__/
-/scenariotest/standalone_test/*/*.txt
+/scenariotest/standalone_test/*/*
 !/scenariotest/standalone_test/*/reference/**
 !/scenariotest/standalone_test/*.csv
 !/scenariotest/simulink_test/reference/*/*.mat

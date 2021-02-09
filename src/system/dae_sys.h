@@ -19,7 +19,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../misc/fast_copy_matrix.h"
 #include "../misc/macros.h"
 #include "../misc/matrixInclude.h"
-#include "generalizedsystem.h"
 #include "stateSystemGroup.h"
 
 /// Namespace for system objects
@@ -27,7 +26,7 @@ namespace systm
 {
 /// Class for creating a Differential Algebraic System from a electric circuit
 template < typename T = myMatrixType >
-class DifferentialAlgebraicSystem : public GeneralizedSystem< T >
+class DifferentialAlgebraicSystem
 {
     public:
     DifferentialAlgebraicSystem( StateSystemGroup< T >* stateSystemGroup );
@@ -67,8 +66,7 @@ class DifferentialAlgebraicSystem : public GeneralizedSystem< T >
 
 template < typename T >
 DifferentialAlgebraicSystem< T >::DifferentialAlgebraicSystem( StateSystemGroup< T >* stateSystemGroup )
-    : GeneralizedSystem< T >()
-    , mMatrixA( T() )
+    : mMatrixA( T() )
     , mStateSystemGroup( stateSystemGroup )
     , mDglStateSystem( &stateSystemGroup->mDglStateSystem )
     , mAlgStateSystem( &stateSystemGroup->mAlgStateSystem )
@@ -125,19 +123,9 @@ template < typename T >
 void DifferentialAlgebraicSystem< T >::operator()( const std::vector< double >& x, std::vector< double >& dxdt, const double /* t */ )
 {
 #ifndef _SYMBOLIC_
-    const size_t stateCount = mStateSystemGroup->GetStateCount();
-
-    // Store x into temporary states
-    T tmpX( stateCount, 1 );
-    misc::FastCopyMatrix( tmpX, &x[0], stateCount );
-
-    // Calculate dxdt
-    T tmpDxdt( stateCount, 1 );
-    operator()( tmpX, tmpDxdt, 0.0 );
-
-    // Store result back into dxdt
-    dxdt.resize( stateCount );
-    misc::FastCopyMatrix( &dxdt[0], tmpDxdt, stateCount );
+    Eigen::Map< const T > xMap( &x[0], x.size(), 1 );
+    Eigen::Map< T > dxdtMap( &dxdt[0], x.size(), 1 );
+    operator()( xMap, dxdtMap, 0.0 );
 #else
     UNUSED( x );
     UNUSED( dxdt );
@@ -254,7 +242,7 @@ void DifferentialAlgebraicSystem< Mat< double > >::CopyDGLResultsToMatrixAndVect
 
 /// Class for creating a Differential Algebraic System from a electric circuit
 template <>
-class DifferentialAlgebraicSystem< arma::SpMat< double > > : public GeneralizedSystem< arma::SpMat< double > >
+class DifferentialAlgebraicSystem< arma::SpMat< double > >
 {
     public:
     DifferentialAlgebraicSystem( StateSystemGroup< arma::SpMat< double > >* stateSystemGroup );
@@ -296,12 +284,11 @@ typedef Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > MatrixType;
 
 /// Class for creating a Differential Algebraic System from a electric circuit
 template <>
-class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< MatrixType >
+class DifferentialAlgebraicSystem< MatrixType >
 {
     public:
     DifferentialAlgebraicSystem( StateSystemGroup< MatrixType >* stateSystemGroup )
-        : GeneralizedSystem< Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > >()
-        , mStateSystemGroup( stateSystemGroup )
+        : mStateSystemGroup( stateSystemGroup )
         , mDglStateSystem( &stateSystemGroup->mDglStateSystem )
         , mAlgStateSystem( &stateSystemGroup->mAlgStateSystem )
     {
@@ -315,8 +302,8 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         const size_t algUIDCount = mAlgStateSystem->GetEquationCount();
         const size_t dglUIDCount = mDglStateSystem->GetEquationCount();
 
-        if ( dglUIDCount == 0 )
-            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "DGLNotEnough" );
+        // if ( dglUIDCount == 0 )
+        //    ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "DGLNotEnough" );
 
         mAlg1MatrixA = mAlgStateSystem->GetEquationSystemAMatrix().leftCols( dglUIDCount );
         mAlg2MatrixA = mAlgStateSystem->GetEquationSystemAMatrix().rightCols( algUIDCount );
@@ -333,28 +320,52 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         b.makeCompressed();
         mAlg2MatrixA.makeCompressed();
 
-        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
-
         // Compute the ordering permutation vector from the structural pattern of A
-        solver.analyzePattern( mAlg2MatrixA );
+        mSolver.analyzePattern( mAlg2MatrixA );
         // Compute the numerical factorization
-        solver.factorize( mAlg2MatrixA );
+        mSolver.factorize( mAlg2MatrixA );
         // Use the factors to solve the linear system
 
         Eigen::ComputationInfo o;
-        if ( Eigen::Success != ( o = solver.info() ) )
+        if ( Eigen::Success != ( o = mSolver.info() ) )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
-                                                 solver.lastErrorMessage().c_str() );
+                                                 mSolver.lastErrorMessage().c_str() );
 
-        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = mSolver.solve( b );
 
         mStateSystemGroup->mStateVector.middleRows( dglUIDCount, algUIDCount ) = ret;
     }
 
-    void operator()( const MatrixType& x, MatrixType& dxdt, const double /* t */ )
+    template < typename DerivedX, typename DerivedDxdt >
+    void operator()( const Eigen::MatrixBase< DerivedX >& x, Eigen::MatrixBase< DerivedDxdt >& dxdt, const double /* t */ )
     {
         dxdt.setZero();
 
+        const size_t algUIDCount = mAlgStateSystem->GetEquationCount();
+        const size_t dglUIDCount = mDglStateSystem->GetEquationCount();
+        const MatrixType& dglMatrixA = mDglStateSystem->GetEquationSystemAMatrix();
+        const MatrixType& dglVectorC = mDglStateSystem->GetEquationSystemCVector();
+
+        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > dxdt_dgl;
+        dxdt_dgl.noalias() = dglMatrixA * x;
+        dxdt_dgl += dglVectorC;
+
+        dxdt.topRows( dglUIDCount ) = dxdt_dgl;
+
+        if ( algUIDCount == 0 )
+            return;
+
+        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > b;
+        b.noalias() = -mAlg1MatrixA * dxdt_dgl;
+
+        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > ret = mSolver.solve( b );
+
+        dxdt.bottomRows( algUIDCount ) = ret;
+    }
+
+    template < typename DerivedX, typename DerivedDxdt >
+    void operator()( const Eigen::SparseMatrixBase< DerivedX >& x, Eigen::SparseMatrixBase< DerivedDxdt >& dxdt, const double /* t */ )
+    {
         const size_t algUIDCount = mAlgStateSystem->GetEquationCount();
         const size_t dglUIDCount = mDglStateSystem->GetEquationCount();
         const MatrixType& dglMatrixA = mDglStateSystem->GetEquationSystemAMatrix();
@@ -371,69 +382,17 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
         Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
         b.makeCompressed();
 
-        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
-
-        // Compute the ordering permutation vector from the structural pattern of A
-        solver.analyzePattern( mAlg2MatrixA );
-        // Compute the numerical factorization
-        solver.factorize( mAlg2MatrixA );
-        // Use the factors to solve the linear system
-
-        Eigen::ComputationInfo o;
-        if ( Eigen::Success != ( o = solver.info() ) )
-            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
-                                                 solver.lastErrorMessage().c_str() );
-
-        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
+        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = mSolver.solve( b );
 
         dxdt.bottomRows( algUIDCount ) = ret;
     }
-
-    void operator()( const MatrixType& x, Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 >& dxdt, const double /* t */ )
-    {
-        dxdt.setZero();
-
-        const size_t algUIDCount = mAlgStateSystem->GetEquationCount();
-        const size_t dglUIDCount = mDglStateSystem->GetEquationCount();
-        const MatrixType& dglMatrixA = mDglStateSystem->GetEquationSystemAMatrix();
-        const MatrixType& dglVectorC = mDglStateSystem->GetEquationSystemCVector();
-
-        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > dxdt_dgl = dglMatrixA * x;
-        dxdt_dgl += dglVectorC;
-
-        dxdt.topRows( dglUIDCount ) = dxdt_dgl;
-
-        if ( algUIDCount == 0 )
-            return;
-
-        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > b = -mAlg1MatrixA * dxdt_dgl;
-        b.makeCompressed();
-
-        Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > solver;
-
-        // Compute the ordering permutation vector from the structural pattern of A
-        solver.analyzePattern( mAlg2MatrixA );
-        // Compute the numerical factorization
-        solver.factorize( mAlg2MatrixA );
-        // Use the factors to solve the linear system
-
-        Eigen::ComputationInfo o;
-        if ( Eigen::Success != ( o = solver.info() ) )
-            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorPassThrough",
-                                                 solver.lastErrorMessage().c_str() );
-
-        Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > ret = solver.solve( b );
-
-        dxdt.bottomRows( algUIDCount ) = ret;
-    }
-
 
 #if defined( _DS1006 ) || !defined( _SYMBOLIC_ )
     void operator()( const arma::Mat< double >& x, arma::Mat< double >& dxdt, const double /* t */ )
     {
         // Read from arma matrix
         // TODO:Use memcpy in future
-        MatrixType x2( x.n_rows, x.n_cols );
+        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > x2( x.n_rows, x.n_cols );
         for ( size_t i = 0; i < x.n_rows; ++i )
             x2.coeffRef( i, 0 ) = x( i, 0 );
 
@@ -451,18 +410,10 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
     void operator()( const std::vector< _Scalar >& x, std::vector< _Scalar >& dxdt, const double /* t */ )
     {
         const size_t stateCount = mStateSystemGroup->GetStateCount();
-
-        // Store x into temporary states
-        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > tmpX( stateCount, 1 );
-        misc::FastCopyMatrix( tmpX, &x[0], stateCount );
-
-        // Calculate dxdt
-        Eigen::SparseMatrix< _Scalar, Eigen::RowMajor > tmpDxdt( stateCount, 1 );
-        operator()( tmpX, tmpDxdt, 0.0 );
-
-        // Store result back into dxdt
         dxdt.resize( x.size() );
-        misc::FastCopyMatrix( &dxdt[0], tmpDxdt, stateCount );
+        Eigen::Map< const Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > > xMap( &x[0], stateCount );
+        Eigen::Map< Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > > dxdtMap( &dxdt[0], stateCount );
+        operator()( xMap, dxdtMap, 0.0 );
     }
 
     virtual const MatrixType GetA() const    ///< Get MatrixA
@@ -624,11 +575,13 @@ class DifferentialAlgebraicSystem< MatrixType > : public GeneralizedSystem< Matr
 
 
     MatrixType mAlg1MatrixA;
-    MatrixType mAlg2MatrixA;
+    Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > mAlg2MatrixA;
 
     StateSystemGroup< MatrixType >* mStateSystemGroup;
     StateSystem< MatrixType >* mDglStateSystem;
     StateSystem< MatrixType >* mAlgStateSystem;
+
+    Eigen::SparseLU< Eigen::SparseMatrix< _Scalar, Eigen::ColMajor > > mSolver;
 };
 
 

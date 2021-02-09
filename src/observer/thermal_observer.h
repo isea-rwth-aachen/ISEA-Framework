@@ -36,7 +36,7 @@ class ThermalObserver : public Observer< T, ThermalElement, ThermalPreperation >
                      const boost::shared_ptr< vector< Cartesian< T > > > &vertices,
                      const boost::shared_ptr< std::vector< ::probe::ThermalProbe > > &probes,
                      const boost::shared_ptr< std::vector< std::vector< double > > > &conductivtymatrix,
-                     double surfaceArea = 0, double heatCapacity = 0 );
+                     double surfaceArea = 0, double heatCapacity = 0, const std::string &uuid = "" );
 
     virtual void PrepareFilter( Filter< T, ThermalElement, ThermalPreperation > *filt );
 
@@ -56,8 +56,9 @@ ThermalObserver< T >::ThermalObserver( vector< ThermalElement< T > * > thermalEl
                                        const boost::shared_ptr< vector< Cartesian< T > > > &vertices,
                                        const boost::shared_ptr< std::vector< ::probe::ThermalProbe > > &probes,
                                        const boost::shared_ptr< std::vector< std::vector< double > > > &conductivtymatrix,
-                                       double surfaceArea, double heatCapacity )
-    : mPrepareParameter( areas, volumes, volumeNames, vertices, probes, conductivtymatrix, surfaceArea, heatCapacity )
+                                       double surfaceArea, double heatCapacity, const std::string &uuid )
+    : Observer< T, ThermalElement, ThermalPreperation >( uuid )
+    , mPrepareParameter( uuid, areas, volumes, volumeNames, vertices, probes, conductivtymatrix, surfaceArea, heatCapacity )
     , mThermalElementsOfAreas( thermalElementsOfAreas )
 {
     BOOST_FOREACH ( const vector< size_t > &area, *areas )

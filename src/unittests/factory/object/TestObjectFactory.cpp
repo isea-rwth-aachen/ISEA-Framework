@@ -12,7 +12,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <string>
 #include <vector>
 
-#include "../../../factory/electricalEquationSystem/chooseElectricSystemType.h"
 #include "../../../factory/factorybuilder.h"
 #include "../../../factory/object/objectclasswrapper.h"
 #include "../../../misc/matrixInclude.h"

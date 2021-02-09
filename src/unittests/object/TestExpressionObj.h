@@ -7,6 +7,7 @@ class TestExpressionObj : public CxxTest::TestSuite
 {
     public:
     void testExpressionObj();
+    void testRescale();
 };
 
 #endif

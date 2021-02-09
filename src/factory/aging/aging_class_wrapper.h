@@ -6,6 +6,8 @@
 
 #include "../../misc/macros.h"
 
+#include "../../aging/aging_lam.h"
+#include "../../aging/aging_lli.h"
 #include "../../aging/anode_overhang.h"
 #include "../../aging/calendarian_aging.h"
 #include "../../aging/cyclical_aging.h"
@@ -85,9 +87,9 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
         boost::shared_ptr< object::Object< double > > alphaCapacity;
         boost::shared_ptr< object::Object< double > > alphaResistance;
 
-        std::vector< typename object::ExpressionObject< double >::ParameterT > objectParameters{ { "V", voltageState },
-                                                                                                 { "T", temperatureState },
-                                                                                                 { "SOC", socState } };
+        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{{"V", voltageState},
+                                                                                               {"T", temperatureState},
+                                                                                               {"SOC", socState}};
         // Collects the calendarian data from the cell-specific aging node
         if ( param->HasElementDirectChild( "AlphaCapacity" ) )
         {
@@ -160,10 +162,10 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         boost::shared_ptr< object::Object< double > > betaCapacity;
         boost::shared_ptr< object::Object< double > > betaResistance;
 
-        std::vector< typename object::ExpressionObject< double >::ParameterT > objectParameters{ { "deltaDOD", dodState },
-                                                                                                 { "meanV", voltageState },
-                                                                                                 { "meanSOC", socState },
-                                                                                                 { "meanI", currentState } };
+        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{{"deltaDOD", dodState},
+                                                                                               {"meanV", voltageState},
+                                                                                               {"meanSOC", socState},
+                                                                                               {"meanI", currentState}};
         // Collects the cyclical data from the cell-specific aging node
         if ( param->HasElementDirectChild( "BetaCapacity" ) )
         {
@@ -268,6 +270,56 @@ class AgingClassWrapper< aging::GenericAging > : public AgingClassWrapperBase
         const double socOffset = param->GetElementDoubleValue( "SocOffset" );
 
         return boost::make_shared< aging::GenericAging >( agingStepTime, capFactor, socOffset, resFactor );
+    }
+};
+
+template <>
+class AgingClassWrapper< aging::AgingLAM > : public AgingClassWrapperBase
+{
+    public:
+    AgingClassWrapper( Factory< object::Object< double >, ArgumentTypeObject< double > >* objectFactory,
+                       Factory< state::State, ArgumentTypeState >* stateFactory )
+        : AgingClassWrapperBase( objectFactory, stateFactory ){};
+
+    boost::shared_ptr< aging::AgingBase > CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeAging* /* arg */ = 0 )
+    {
+        const double agingStepTime = param->GetConfigurationRoot()
+                                      ->GetElementChild( "Options" )
+                                      ->GetElementChild( "Aging" )
+                                      ->GetElementDoubleValue( "AgingStepTime" );
+        const bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
+        auto cyclesState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        this->GetStateFactory()->CacheInstance( "cycles", cyclesState );
+        auto valueObject = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "Value" ) );
+        auto aging = boost::make_shared< aging::AgingLAM >( agingStepTime, isEnabled, valueObject );
+        *cyclesState = state::ValueStateWrapper< double >( &aging->mCycles );
+
+        return aging;
+    }
+};
+
+template <>
+class AgingClassWrapper< aging::AgingLLI > : public AgingClassWrapperBase
+{
+    public:
+    AgingClassWrapper( Factory< object::Object< double >, ArgumentTypeObject< double > >* objectFactory,
+                       Factory< state::State, ArgumentTypeState >* stateFactory )
+        : AgingClassWrapperBase( objectFactory, stateFactory ){};
+
+    boost::shared_ptr< aging::AgingBase > CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeAging* /* arg */ = 0 )
+    {
+        const double agingStepTime = param->GetConfigurationRoot()
+                                      ->GetElementChild( "Options" )
+                                      ->GetElementChild( "Aging" )
+                                      ->GetElementDoubleValue( "AgingStepTime" );
+        const bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
+        auto cyclesState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        this->GetStateFactory()->CacheInstance( "cycles", cyclesState );
+        auto valueObject = this->GetObjectFactory()->CreateInstance( param->GetElementChild( "Value" ) );
+        auto aging = boost::make_shared< aging::AgingLLI >( agingStepTime, isEnabled, valueObject );
+        *cyclesState = state::ValueStateWrapper< double >( &aging->mCycles );
+
+        return aging;
     }
 };
 

@@ -2,6 +2,7 @@
 
 #include "aging_standalone.h"
 #include "../../src/factory/factorybuilder_for_aging.h"
+#include "../../src/observer/filter/metadataFilter.h"
 
 extern template class simulation::AgingSimulation< myMatrixType, double, true >;
 extern template class observer::AgingObserver< myMatrixType >;
@@ -43,15 +44,21 @@ void AgingStandalone::ReadXmlOptions()
 
 bool AgingStandalone::CreateAgingSimulation()
 {
+    factory::FactoryBuilderForAging< myMatrixType, double > factoryBuilder;
+    if ( !CreateElectricalSimulation( &factoryBuilder ) )
+    {
+        return false;
+    }
+    if ( !CreateThermalSimulation() )
+    {
+        return false;
+    }
     try
     {
-        factory::FactoryBuilderForAging< myMatrixType, double > factoryBuilder;
-        CreateElectricalSimulation( &factoryBuilder );
-        CreateThermalSimulation();
         mAgingSimulation.reset(
          new simulation::AgingSimulation< myMatrixType, double, true >( mParser->GetRoot(), this->mElectricalSimulation,
                                                                         this->mThermalSimulation, this->mCells,
-                                                                        mAgingStepTime, &factoryBuilder ) );
+                                                                        mAgingStepTime, &factoryBuilder, mUUID ) );
         mAgingSimulation->CalculateAging( 0.0, false );
         mAgingSimulation->ResetThElStates();
     }
@@ -83,7 +90,7 @@ void AgingStandalone::ResetThElSimulation()
     StartNewCycle();
     CreateNewFilters( *mElectricalSimulation->mObserver, *mParser->GetRoot() );
     CreateNewFilters( *mThermalVisualizer, *mParser->GetRoot() );
-    ThermalElectricalStandalone::InitializeSimulation();
+    InitializeSimulation();
 }
 
 void AgingStandalone::CollectAgingData()
@@ -99,14 +106,37 @@ void AgingStandalone::SetCollectAgingData( bool collectAgingData )
 
 void AgingStandalone::InitializeSimulation()
 {
-    ThermalElectricalStandalone::InitializeSimulation();
+    // Initialize the simulation
+    SetCurrent();
+    mElectricalSimulation->UpdateSystem();
+    mElectricalSimulation->UpdateSystemValues();
 
-    // initial observer calls
+    // add default filters
     if ( !this->mQuiet )
     {
-        mAgingSimulation->mAgingObserver->AddFilter( new observer::StdoutFilterAging< myMatrixType >() );
+        if ( this->mOutputDecimation > 0.0 )
+        {
+            mElectricalSimulation->mObserver->AddFilter( new observer::DecimateFilterTwoPort< myMatrixType >( mOutputDecimation ) );
+            mThermalVisualizer->AddFilter( new observer::DecimateFilterThermal< double >( mOutputDecimation ) );
+        }
+        mElectricalSimulation->mObserver->AddFilter( new observer::StdoutFilterTwoPort< myMatrixType >() );
+        mThermalVisualizer->AddFilter( new observer::StdoutFilterThermal< double >() );
+        if ( mTimeOfLastAgingStep == 0.0 )
+        {
+            mAgingSimulation->mAgingObserver->AddFilter( new observer::StdoutFilterAging< myMatrixType >() );
+        }
     }
-    ( *mAgingSimulation->mAgingObserver )( 0.0 );
+    if ( !this->mNoMetadata && mTimeOfLastAgingStep == 0.0 )
+    {
+        mAgingSimulation->mAgingObserver->AddFilter(
+         new observer::MetadataFilterAging< myMatrixType >( "simulation.xml", *mParser, *mProfile ) );
+    }
+
+    // initial observer calls
+    ( *mElectricalSimulation->mObserver )( mElectricalSimulation->mTime );
+    ( *mThermalVisualizer )( mThermalSimulation->mTime );
+    if ( mTimeOfLastAgingStep == 0.0 )
+        ( *mAgingSimulation->mAgingObserver )( 0.0 );
 }
 
 double AgingStandalone::GetTimeOfLastAgingStep() { return mTimeOfLastAgingStep; }

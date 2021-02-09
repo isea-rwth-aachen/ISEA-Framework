@@ -21,95 +21,77 @@ class MatlabFilterAging : public MatlabFilter< T, aging::AgingTwoPort, Preparati
                           public visitor::Visitor< aging::AgingBase >
 {
     typedef Filter< T, aging::AgingTwoPort, PreparationType< T > > FilterT;
+    typedef MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > > MatlabFilterT;
 
     public:
-    MatlabFilterAging( std::string filename, const size_t maxSize = 100000, const std::string &filenamePrefix = "" );
+    MatlabFilterAging( std::string filename, const size_t maxSize, const std::string &filenamePrefix, bool ocvOutput );
 
     virtual ~MatlabFilterAging() { this->WriteToDisk(); }
 
     virtual void PrepareFilter( PreparationType< T > &prePareData );
-
     virtual void ProcessData( const typename FilterT::Data_t &data, const double t );
+    virtual void WriteToDisk();
 
-    virtual void VisitCalendarianAging( aging::CalendarianAging &calendarianAging );
-    virtual void VisitCyclicalAging( aging::CyclicalAging &cyclicalAging );
-    virtual void VisitAnodeOverhang( aging::AnodeOverhang &anodeOverhang );
-    virtual void VisitGenericAging( aging::GenericAging &genericAging );
+    virtual void Visit( aging::CalendarianAging &calendarianAging );
+    virtual void Visit( aging::CyclicalAging &cyclicalAging );
+    virtual void Visit( aging::AnodeOverhang &anodeOverhang );
+    virtual void Visit( aging::GenericAging &genericAging );
+    virtual void Visit( aging::AgingLAM &agingLam );
+    virtual void Visit( aging::AgingLLI &agingLli );
 
     private:
     size_t mCellNumber;
-
-    // general
-    std::vector< std::vector< double > > mCellAgeValues;
-    std::vector< std::vector< double > > mChargeThroughputValues;
-    std::vector< std::vector< double > > mFullCycles;
-    std::vector< std::vector< double > > mCapacityFactors;
-    std::vector< std::vector< double > > mResistanceFactors;
-    std::vector< std::vector< double > > mSocOffsets;
-
-    // calendric
-    std::vector< std::vector< double > > mCapacityFactorCalendarian;
-    std::vector< std::vector< double > > mResistanceFactorCalendarian;
-    std::vector< std::vector< double > > mAlphaCapacity;
-    std::vector< std::vector< double > > mAlphaResistance;
-    std::vector< std::vector< double > > mSocOffsetCalendarian;
-
-    // cyclic
-    std::vector< std::vector< double > > mCapacityFactorCyclical;
-    std::vector< std::vector< double > > mResistanceFactorCyclical;
-    std::vector< std::vector< double > > mBetaCapacity;
-    std::vector< std::vector< double > > mBetaResistance;
-    std::vector< std::vector< double > > mSocOffsetCyclical;
-
-    // anode overhang
-    std::vector< std::vector< double > > mAnodeOverhangSocs;
-    std::vector< std::vector< double > > mAnodeOverhangVoltages;
-    std::vector< std::vector< double > > mAnodeOverhangAnodeOffsets;
-
-    // generic aging
-    std::vector< std::vector< double > > mGenericCapacityFactors;
-    std::vector< std::vector< double > > mGenericSocOffsets;
-    std::vector< std::vector< double > > mGenericResistanceFactors;
+    double mStep;
+    size_t mNumberOfElements;
+    std::vector< std::vector< std::vector< double > > > mOCVMatrix;
+    bool mOCVOutput;
 };
 
 template < typename T >
-MatlabFilterAging< T >::MatlabFilterAging( std::string filename, const size_t maxSize, const std::string &filenamePrefix )
+MatlabFilterAging< T >::MatlabFilterAging( std::string filename, const size_t maxSize, const std::string &filenamePrefix, bool ocvOutput )
     : MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >( filename, maxSize, filenamePrefix )
+    , mOCVOutput( ocvOutput )
 {
-    this->mMatlabMatrices = {{&mCellAgeValues, "CellAge"},
-                             {&mChargeThroughputValues, "ChargeThroughput"},
-                             {&mFullCycles, "FullCycles"},
-                             {&mCapacityFactors, "RelativeCapacity"},
-                             {&mResistanceFactors, "RelativeResistance"},
-                             {&mSocOffsets, "SocOffset"},
-                             {&mCapacityFactorCalendarian, "calendric.CapacityFactor"},
-                             {&mResistanceFactorCalendarian, "calendric.ResistanceFactor"},
-                             {&mAlphaCapacity, "calendric.AlphaCapacity"},
-                             {&mAlphaResistance, "calendric.AlphaResistance"},
-                             {&mSocOffsetCalendarian, "calendric.SocOffset"},
-                             {&mCapacityFactorCyclical, "cyclic.CapacityFactor"},
-                             {&mResistanceFactorCyclical, "cyclic.ResistanceFactor"},
-                             {&mBetaCapacity, "cyclic.BetaCapacity"},
-                             {&mBetaResistance, "cyclic.BetaResistance"},
-                             {&mSocOffsetCyclical, "cyclic.SocOffset"},
-                             {&mAnodeOverhangSocs, "anodeOverhang.AnodeOverhangSoc"},
-                             {&mAnodeOverhangVoltages, "anodeOverhang.AnodeOverhangVoltage"},
-                             {&mAnodeOverhangAnodeOffsets, "anodeOverhang.AnodeSocOffset"},
-                             {&mGenericCapacityFactors, "genericAging.CapacityFactor"},
-                             {&mGenericSocOffsets, "genericAging.SocOffset"},
-                             {&mGenericResistanceFactors, "genericAging.ResistanceFactor"}};
+    this->mMatlabMatrices["CellAge"];
+    this->mMatlabMatrices["ChargeThroughput"];
+    this->mMatlabMatrices["FullCycles"];
+    this->mMatlabMatrices["Capacity"];
+    this->mMatlabMatrices["RelativeCapacity"];
+    this->mMatlabMatrices["RelativeResistance"];
+    this->mMatlabMatrices["SocOffset"];
+    this->mMatlabMatrices["calendric.CapacityFactor"];
+    this->mMatlabMatrices["calendric.ResistanceFactor"];
+    this->mMatlabMatrices["calendric.AlphaCapacity"];
+    this->mMatlabMatrices["calendric.AlphaResistance"];
+    this->mMatlabMatrices["calendric.SocOffset"];
+    this->mMatlabMatrices["cyclic.CapacityFactor"];
+    this->mMatlabMatrices["cyclic.ResistanceFactor"];
+    this->mMatlabMatrices["cyclic.BetaCapacity"];
+    this->mMatlabMatrices["cyclic.BetaResistance"];
+    this->mMatlabMatrices["cyclic.SocOffset"];
+    this->mMatlabMatrices["anodeOverhang.AnodeOverhangSoc"];
+    this->mMatlabMatrices["anodeOverhang.AnodeOverhangVoltage"];
+    this->mMatlabMatrices["anodeOverhang.AnodeSocOffset"];
+    this->mMatlabMatrices["genericAging.CapacityFactor"];
+    this->mMatlabMatrices["genericAging.ResistanceFactor"];
+    this->mMatlabMatrices["genericAging.SocOffset"];
 }
 
 template < typename T >
 void MatlabFilterAging< T >::PrepareFilter( PreparationType< T > &prePareData )
 {
     MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >::PrepareFilter( prePareData );
-    this->InitializeMatrices( prePareData.mNumberOfElements );
+    mNumberOfElements = prePareData.mNumberOfElements;
+    this->InitializeMatrices( mNumberOfElements );
+    if ( mOCVOutput )
+        this->mOCVMatrix.resize( mNumberOfElements );
 }
 
 template < typename T >
 void MatlabFilterAging< T >::ProcessData( const typename FilterT::Data_t &data, const double t )
 {
+    mStep = t;
+
     for ( size_t i = 0; i < data.size(); ++i )
     {
         aging::AgingTwoPort< T > *agingTwoPort = data[i];
@@ -118,12 +100,14 @@ void MatlabFilterAging< T >::ProcessData( const typename FilterT::Data_t &data, 
         const double fullCycles =
          chargeThroughput / agingTwoPort->GetTwoPort()->GetSoc()->template GetInitialCapacity< state::SocGetFormat::AH >();
 
-        mCellAgeValues[i].push_back( agingState.GetCellAge() / 3600 / 24 );
-        mChargeThroughputValues[i].push_back( chargeThroughput );
-        mFullCycles[i].push_back( fullCycles );
-        mCapacityFactors[i].push_back( agingState.GetCapacityFactor() );
-        mResistanceFactors[i].push_back( agingState.GetResistanceFactor() );
-        mSocOffsets[i].push_back( agingState.GetSocOffset() );
+        this->mMatlabMatrices["CellAge"][i].push_back( agingState.GetCellAge() / 3600 / 24 );
+        this->mMatlabMatrices["ChargeThroughput"][i].push_back( chargeThroughput );
+        this->mMatlabMatrices["FullCycles"][i].push_back( fullCycles );
+        this->mMatlabMatrices["Capacity"][i].push_back(
+         agingTwoPort->GetTwoPort()->GetSoc()->template GetActualCapacity< state::SocGetFormat::AH >() );
+        this->mMatlabMatrices["RelativeCapacity"][i].push_back( agingState.GetCapacityFactor() );
+        this->mMatlabMatrices["RelativeResistance"][i].push_back( agingState.GetResistanceFactor() );
+        this->mMatlabMatrices["SocOffset"][i].push_back( agingState.GetSocOffset() );
 
         mCellNumber = i;
 
@@ -131,45 +115,100 @@ void MatlabFilterAging< T >::ProcessData( const typename FilterT::Data_t &data, 
         {
             agingObject->AcceptVisitor( *this );
         }
+
+        if ( mOCVOutput && agingTwoPort->GetTwoPort()->IsCellelement() )
+        {
+            electrical::Cellelement< T > *cell =
+             static_cast< electrical::Cellelement< T > * >( agingTwoPort->GetTwoPort().get() );
+            if ( cell->HasHalfcells() )
+            {
+                const size_t nSteps = 100;
+                this->mOCVMatrix[i].push_back( std::vector< double >( nSteps + 1 ) );
+                std::vector< double > &ocvVector = this->mOCVMatrix[i].back();
+                state::Soc &cellSoc = *cell->GetSoc();
+                state::Soc &anodeSoc = *cell->GetAnodeElements().front()->GetSoc();
+                state::Soc &cathodeSoc = *cell->GetCathodeElements().front()->GetSoc();
+                double storedChargeAnode = anodeSoc.GetValue< state::SocGetFormat::AS >();
+                double storedChargeCathode = cathodeSoc.GetValue< state::SocGetFormat::AS >();
+                double initialCharge = cellSoc.GetValue< state::SocGetFormat::AS >();
+                double stepsize = cellSoc.GetActualCapacity< state::SocGetFormat::AS >() / nSteps;
+                anodeSoc.SetStoredEnergy< state::SocSetFormat::DELTA >( -initialCharge - stepsize );
+                cathodeSoc.SetStoredEnergy< state::SocSetFormat::DELTA >( -initialCharge - stepsize );
+                for ( size_t k = 0; k <= nSteps; ++k )
+                {
+                    anodeSoc.SetStoredEnergy< state::SocSetFormat::DELTA >( stepsize );
+                    cathodeSoc.SetStoredEnergy< state::SocSetFormat::DELTA >( stepsize );
+                    ocvVector[k] = cell->GetOcvVoltageValue();
+                }
+                anodeSoc.SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode );
+                cathodeSoc.SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeCathode );
+            }
+        }
     }
     MatlabFilter< T, aging::AgingTwoPort, PreparationType< T > >::ProcessData( data, t );
 }
 
 template < typename T >
-void MatlabFilterAging< T >::VisitCalendarianAging( aging::CalendarianAging &calendarianAging )
+void MatlabFilterAging< T >::WriteToDisk()
 {
-    mCapacityFactorCalendarian[mCellNumber].push_back( calendarianAging.GetCapacityFactor() );
-    mSocOffsetCalendarian[mCellNumber].push_back( calendarianAging.GetSocOffset() );
-    mResistanceFactorCalendarian[mCellNumber].push_back( calendarianAging.GetResistanceFactor() );
-    mAlphaCapacity[mCellNumber].push_back( calendarianAging.GetStressFactorCapacity() );
-    mAlphaResistance[mCellNumber].push_back( calendarianAging.GetStressFactorResistance() );
+    MatlabFilterT::WriteToDisk();
+    if ( mOCVOutput )
+    {
+        this->mOCVMatrix.erase( std::remove_if( this->mOCVMatrix.begin(), this->mOCVMatrix.end(),
+                                                []( std::vector< std::vector< double > > &v ) { return v.empty(); } ),
+                                this->mOCVMatrix.end() );
+        matlab::MatioData data;
+        data.LoadFromVector< 3 >( this->mOCVMatrix, this->mDataLocation + "OCV" );
+        *this->mMatFile << data;
+    }
 }
 
 template < typename T >
-void MatlabFilterAging< T >::VisitCyclicalAging( aging::CyclicalAging &cyclicalAging )
+void MatlabFilterAging< T >::Visit( aging::CalendarianAging &calendarianAging )
 {
-    mCapacityFactorCyclical[mCellNumber].push_back( cyclicalAging.GetCapacityFactor() );
-    mSocOffsetCyclical[mCellNumber].push_back( cyclicalAging.GetSocOffset() );
-    mResistanceFactorCyclical[mCellNumber].push_back( cyclicalAging.GetResistanceFactor() );
-    mBetaCapacity[mCellNumber].push_back( cyclicalAging.GetStressFactorCapacity() );
-    mBetaResistance[mCellNumber].push_back( cyclicalAging.GetStressFactorResistance() );
+    this->mMatlabMatrices["calendric.CapacityFactor"][mCellNumber].push_back( calendarianAging.GetCapacityFactor() );
+    this->mMatlabMatrices["calendric.ResistanceFactor"][mCellNumber].push_back( calendarianAging.GetResistanceFactor() );
+    this->mMatlabMatrices["calendric.AlphaCapacity"][mCellNumber].push_back( calendarianAging.GetStressFactorCapacity() );
+    this->mMatlabMatrices["calendric.AlphaResistance"][mCellNumber].push_back( calendarianAging.GetStressFactorResistance() );
+    this->mMatlabMatrices["calendric.SocOffset"][mCellNumber].push_back( calendarianAging.GetSocOffset() );
 }
 
 template < typename T >
-void MatlabFilterAging< T >::VisitAnodeOverhang( aging::AnodeOverhang &anodeOverhang )
+void MatlabFilterAging< T >::Visit( aging::CyclicalAging &cyclicalAging )
 {
-    mAnodeOverhangSocs[mCellNumber].push_back( anodeOverhang.GetSoc()->GetValue() );
-    mAnodeOverhangVoltages[mCellNumber].push_back( anodeOverhang.GetVoltage() );
-    mAnodeOverhangAnodeOffsets[mCellNumber].push_back( anodeOverhang.GetSocOffset() );
+    this->mMatlabMatrices["cyclic.CapacityFactor"][mCellNumber].push_back( cyclicalAging.GetCapacityFactor() );
+    this->mMatlabMatrices["cyclic.ResistanceFactor"][mCellNumber].push_back( cyclicalAging.GetResistanceFactor() );
+    this->mMatlabMatrices["cyclic.BetaCapacity"][mCellNumber].push_back( cyclicalAging.GetStressFactorCapacity() );
+    this->mMatlabMatrices["cyclic.BetaResistance"][mCellNumber].push_back( cyclicalAging.GetStressFactorResistance() );
+    this->mMatlabMatrices["cyclic.SocOffset"][mCellNumber].push_back( cyclicalAging.GetSocOffset() );
 }
 
 template < typename T >
-void MatlabFilterAging< T >::VisitGenericAging( aging::GenericAging &genericAging )
+void MatlabFilterAging< T >::Visit( aging::AnodeOverhang &anodeOverhang )
 {
-    mGenericCapacityFactors[mCellNumber].push_back( genericAging.GetCapacityFactor() );
-    mGenericSocOffsets[mCellNumber].push_back( genericAging.GetSocOffset() );
-    mGenericResistanceFactors[mCellNumber].push_back( genericAging.GetResistanceFactor() );
+    this->mMatlabMatrices["anodeOverhang.AnodeOverhangSoc"][mCellNumber].push_back( anodeOverhang.GetSoc()->GetValue() );
+    this->mMatlabMatrices["anodeOverhang.AnodeOverhangVoltage"][mCellNumber].push_back( anodeOverhang.GetVoltage() );
+    this->mMatlabMatrices["anodeOverhang.AnodeSocOffset"][mCellNumber].push_back( anodeOverhang.GetSocOffset() );
 }
+
+template < typename T >
+void MatlabFilterAging< T >::Visit( aging::GenericAging &genericAging )
+{
+    this->mMatlabMatrices["genericAging.CapacityFactor"][mCellNumber].push_back( genericAging.GetCapacityFactor() );
+    this->mMatlabMatrices["genericAging.ResistanceFactor"][mCellNumber].push_back( genericAging.GetResistanceFactor() );
+    this->mMatlabMatrices["genericAging.SocOffset"][mCellNumber].push_back( genericAging.GetSocOffset() );
+}
+
+template < typename T >
+void MatlabFilterAging< T >::Visit( aging::AgingLAM &agingLam )
+{
+}
+
+template < typename T >
+void MatlabFilterAging< T >::Visit( aging::AgingLLI &agingLli )
+{
+}
+
 }    // namespace observer
 
 #endif /* _DS1006 */

@@ -25,6 +25,18 @@ struct matvar_t;
 namespace matlab
 {
 
+template < int N >
+struct DataVector
+{
+    using DataT = std::vector< typename DataVector< N - 1 >::DataT >;
+};
+
+template <>
+struct DataVector< 1 >
+{
+    using DataT = std::vector< double >;
+};
+
 /// Wrapper for matio data
 /// Basic access to structs is granted through the []operator
 /// Access to 2-D arrays is granted thought the ()operator
@@ -38,13 +50,16 @@ struct MatioData
         Y_DIM = 1
     };
 
-
+    /// Create uninitialized MatioData
+    explicit MatioData();
     /// Create Matio Data from a matvar_t
     MatioData( matvar_t *matvar );
-    /// Create Matio Data from a vector
-    MatioData( std::vector< double > &data, std::string name );
-    /// Create Matio Data from a vector<vector>
-    MatioData( std::vector< std::vector< double > > &data, std::string name );
+    /// Create Matio Data from a 1-dimensional vector
+    MatioData( typename DataVector< 1 >::DataT &data, std::string name );
+    /// Create Matio Data from a 2-dimensional vectorG
+    MatioData( typename DataVector< 2 >::DataT &data, std::string name );
+    /// Create Matio Data from a stringG
+    MatioData( std::string &data, std::string name );
 
 
     /// This function returns a slice of the matlab array as a dense vector
@@ -75,6 +90,9 @@ struct MatioData
     /// \param variableName struct to be accessed
     MatioData &operator[]( std::string variableName );
 
+    template < int N >
+    void LoadFromVector( typename DataVector< N >::DataT &data, std::string name );
+
     matvar_t *mMatlabVar;
 
     std::string mName;
@@ -91,6 +109,68 @@ struct MatioData
 
     boost::shared_ptr< MatioData > mReturnMember;
 };
+
+template < int N >
+void CopyData( typename DataVector< N >::DataT &vecIn, std::vector< double > &vecOut, size_t *dims, size_t position = 0,
+               size_t stepsize = 1 );
+
+template < int N >
+void GetDimensions( typename DataVector< N >::DataT &data, size_t *dims );
+
+
+template < int N >
+MatioData CreateMatioData( typename DataVector< N >::DataT &data, std::string name )
+{
+    MatioData matData;
+    matData.LoadFromVector< N >( data, name );
+    return matData;
+}
+
+template < int N >
+void MatioData::LoadFromVector( typename DataVector< N >::DataT &data, std::string name )
+{
+    size_t dims[N];
+    GetDimensions< N >( data, dims );
+    size_t totalSize = 1;
+    for ( size_t i = 0; i < N; ++i )
+    {
+        totalSize *= dims[i];
+    }
+    std::vector< double > finalVec( totalSize );
+    CopyData< N >( data, finalVec, dims );
+    mMatlabVar = Mat_VarCreate( SetNames( name ).c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, N, dims, &finalVec[0], 0 );
+}
+
+template <>
+void MatioData::LoadFromVector< 1 >( typename DataVector< 1 >::DataT &data, std::string name );
+
+template < int N >
+void CopyData( typename DataVector< N >::DataT &vecIn, std::vector< double > &vecOut, size_t *dims, size_t position, size_t stepsize )
+{
+    size_t length = vecIn.size();
+    if ( length != dims[0] )
+    {
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "matioEmptyVariable", length, dims[0] );
+    }
+    for ( size_t i = 0; i < length; ++i )
+    {
+        CopyData< N - 1 >( vecIn[i], vecOut, dims + 1, position + i * stepsize, stepsize * length );
+    }
+}
+
+template <>
+void CopyData< 1 >( typename DataVector< 1 >::DataT &vecIn, std::vector< double > &vecOut, size_t *dims,
+                    size_t position, size_t stepsize );
+
+template < int N >
+void GetDimensions( typename DataVector< N >::DataT &data, size_t *dims )
+{
+    dims[0] = data.size();
+    GetDimensions< N - 1 >( data[0], dims + 1 );
+}
+
+template <>
+void GetDimensions< 1 >( typename DataVector< 1 >::DataT &data, size_t *dims );
 
 }    // namespace matlab
 

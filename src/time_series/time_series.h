@@ -5,19 +5,21 @@
 #include <istream>
 #include <string>
 #endif
-#include <vector>
+#include <algorithm>
 #include <functional>
 #include <limits>
-#include <algorithm>
+#include <vector>
+
 
 #include <boost/algorithm/cxx11/is_sorted.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
-#include <cstdlib>    //#include <boost/lexical_cast.hpp>
+#include <cstdlib>
 
-#include "eval_no_interpolation.h"
-#include "eval_linear_interpolation.h"
 #include "../exceptions/error_proto.h"
+#include "eval_linear_interpolation.h"
+#include "eval_no_interpolation.h"
+
 
 class TestTimeSeries;
 
@@ -52,8 +54,8 @@ class TimeSeries
     explicit TimeSeries( std::istream &stream, T timeScalingFactor = 1.0, T valueScalingFactor = 1.0 );
 #endif
     /**
-      * A second constructor that uses a vector vector representation, see ResetData
-      */
+     * A second constructor that uses a vector vector representation, see ResetData
+     */
     TimeSeries( const vector< T > &timesData, const vector< T > &valuesData, T timeScalingFactor = 1.0, T valueScalingFactor = 1.0 );
 
 
@@ -325,5 +327,5 @@ TimeSeriesType TimeSeries< T, EVALUATOR >::GetType() const
 }
 
 
-}    // namespace
+}    // namespace electrical
 #endif    // Include guard

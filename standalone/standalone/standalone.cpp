@@ -14,13 +14,13 @@ Standalone::Standalone( const std::string &name )
 
 void Standalone::PrintVersion( int /* count */ )
 {
-    printf( "Version: %s\n", VERSION_NUMBER );
+    printf( "Version: %s\n", VERSION_STRING );
     throw CLI::Success();
 }
 
 void Standalone::AddOptions()
 {
-    mApp.add_flag_function( "-v,--version", PrintVersion, "Display version information and exit" )->short_circuit();
+    mApp.add_flag_function( "-v,--version", PrintVersion, "Display version information and exit" );
 }
 
 bool Standalone::ParseCommandLine( int argc, char *argv[] )

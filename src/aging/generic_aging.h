@@ -32,7 +32,7 @@ class GenericAging : public AgingBase
     virtual void SetSocOffset( double value ) { mSocOffset = value; };    // in As
     virtual void SetResistanceFactor( double value ) { mResistanceFactor = value; };
 
-    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.VisitGenericAging( *this ); }
+    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
     double mCapacityFactor;

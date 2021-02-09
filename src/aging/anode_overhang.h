@@ -37,7 +37,7 @@ class AnodeOverhang : public AgingBase
     virtual double GetSocOffset() { return mAnodeOffset; };    // in As
     virtual double GetResistanceFactor() { return 1; };
 
-    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.VisitAnodeOverhang( *this ); }
+    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
     boost::shared_ptr< object::Object< double > > mVoltage;

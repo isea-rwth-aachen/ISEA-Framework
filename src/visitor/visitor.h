@@ -9,6 +9,8 @@ class CalendarianAging;
 class CyclicalAging;
 class AnodeOverhang;
 class GenericAging;
+class AgingLAM;
+class AgingLLI;
 }    // namespace aging
 
 namespace visitor
@@ -29,10 +31,12 @@ template <>
 class Visitor< aging::AgingBase > : VisitorBase< aging::AgingBase >
 {
     public:
-    virtual void VisitCalendarianAging( aging::CalendarianAging &calendarianAging ) = 0;
-    virtual void VisitCyclicalAging( aging::CyclicalAging &cyclicalAging ) = 0;
-    virtual void VisitAnodeOverhang( aging::AnodeOverhang &anodeOverhang ) = 0;
-    virtual void VisitGenericAging( aging::GenericAging &genericAging ) = 0;
+    virtual void Visit( aging::CalendarianAging &aging ) = 0;
+    virtual void Visit( aging::CyclicalAging &aging ) = 0;
+    virtual void Visit( aging::AnodeOverhang &aging ) = 0;
+    virtual void Visit( aging::GenericAging &aging ) = 0;
+    virtual void Visit( aging::AgingLAM &aging ) = 0;
+    virtual void Visit( aging::AgingLLI &aging ) = 0;
 };
 }    // namespace visitor
 

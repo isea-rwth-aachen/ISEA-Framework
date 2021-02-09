@@ -403,9 +403,11 @@ class ObserverClassWrapperAging< MatrixT, observer::MatlabFilterAging >
         else if ( param->HasElementDirectChild( "FilenamePrefix" ) )
             filenamePrefix = param->GetElementStringValue( "FilenamePrefix" );
 
+        bool ocvOutput = param->GetElementAttributeBoolValue( "OCV", false );
+
         auto filter =
          boost::make_shared< observer::MatlabFilterAging< MatrixT > >( param->GetElementStringValue( "Filename" ),
-                                                                       maxSampleSize, filenamePrefix );
+                                                                       maxSampleSize, filenamePrefix, ocvOutput );
 
         if ( param->HasElementDirectChild( "DataLocation" ) )
         {

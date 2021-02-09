@@ -32,17 +32,19 @@ template < typename T = myMatrixType >
 struct PreparationType
 {
     public:
-    PreparationType( const size_t numberOfElements, electrical::TwoPort< T > *rootPort = 0 )
+    PreparationType( const size_t numberOfElements, electrical::TwoPort< T > *rootPort, const std::string &uuid )
         : mNumberOfElements( numberOfElements )
-        , mRootPort( rootPort ){};
+        , mRootPort( rootPort )
+        , mUUID( uuid ){};
 
     const size_t mNumberOfElements;
     electrical::TwoPort< T > *mRootPort;
+    const std::string mUUID;
 };
 
 struct ThermalPreperation
 {
-    ThermalPreperation( const boost::shared_ptr< std::vector< std::vector< size_t > > > &areas,
+    ThermalPreperation( const std::string &uuid, const boost::shared_ptr< std::vector< std::vector< size_t > > > &areas,
                         const boost::shared_ptr< std::vector< std::vector< size_t > > > &volumes,
                         const boost::shared_ptr< std::vector< misc::StrCont > > &volumeNames,
                         const boost::shared_ptr< std::vector< geometry::Cartesian< double > > > &vertices,
@@ -56,7 +58,8 @@ struct ThermalPreperation
         , mProbes( probes )
         , mConductivityMatrix( conductivtymatrix )
         , mSurfaceArea( surfaceArea )
-        , mTotalHeatCapacity( heatCapacity ){};
+        , mTotalHeatCapacity( heatCapacity )
+        , mUUID( uuid ){};
 
     public:
     boost::shared_ptr< std::vector< std::vector< size_t > > > mAreas;
@@ -67,6 +70,7 @@ struct ThermalPreperation
     boost::shared_ptr< std::vector< std::vector< double > > > mConductivityMatrix;
     double mSurfaceArea = 0;
     double mTotalHeatCapacity = 0;
+    const std::string mUUID;
 };
 
 

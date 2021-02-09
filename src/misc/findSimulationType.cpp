@@ -6,6 +6,7 @@
 _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "findSimulationType.h"
+#include "../factory/factorybuilder_for_aging.h"
 
 simulation::SimulationType simulation::FindSimulationType( boost::shared_ptr< xmlparser::XmlParameter > rootXmlNode,
                                                            CreatedSimulations *simulations )

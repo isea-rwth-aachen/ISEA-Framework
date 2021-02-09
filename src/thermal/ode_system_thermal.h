@@ -194,10 +194,11 @@ void OdeSystemThermal< T >::operator()( const vector< T > &x, vector< T > &dxdt,
 {
     Eigen::Map< const Eigen::Matrix< T, Eigen::Dynamic, Eigen::Dynamic > > xMap( &x[0], x.size(), 1 );
     Eigen::Map< Eigen::Matrix< T, Eigen::Dynamic, Eigen::Dynamic > > dxdtMap( &dxdt[0], x.size(), 1 );
-    dxdtMap = mA_th_Conductivity * xMap;
+    dxdtMap.noalias() = mA_th_Conductivity * xMap;
     for ( size_t i = 0; i < mOdeSystemSize; ++i )
     {
-        const T cooling = mMatrixBoundarySource[i].mA_th * x[i] + mMatrixBoundarySource[i].mC_th;
+        T cooling = mMatrixBoundarySource[i].mA_th * x[i];
+        cooling += mMatrixBoundarySource[i].mC_th;
         dxdt[i] += cooling;
         dxdt[i] *= mThermalElementFactors[i];
         mThermalElements[i]->SetCoolingValue( cooling );

@@ -21,17 +21,18 @@ boost::shared_ptr< observer::TwoPortObserver< matrixType > >
 CreateTwoPortObserver( const containerType* observablePorts, const xmlparser::XmlParameter* rootparam,
                        ScalarUnit* voltageOutputVec = 0, ScalarUnit* currentOutputVec = 0,
                        ScalarUnit* powerOutputVec = 0, ScalarUnit* socOutputVec = 0, ScalarUnit* socSurfaceOutputVec = 0,
-                       const boost::shared_ptr< electrical::TwoPort< matrixType > >& twoPortRoot = 0 )
+                       const boost::shared_ptr< electrical::TwoPort< matrixType > >& twoPortRoot = 0,
+                       const std::string& uuid = "" )
 {
 
     boost::shared_ptr< observer::TwoPortObserver< matrixType > > obs;
     if ( observablePorts )
     {
-        obs = boost::make_shared< observer::TwoPortObserver< matrixType > >( *observablePorts, twoPortRoot );
+        obs = boost::make_shared< observer::TwoPortObserver< matrixType > >( *observablePorts, twoPortRoot, uuid );
     }
     else
     {
-        obs = boost::make_shared< observer::TwoPortObserver< matrixType > >( twoPortRoot );
+        obs = boost::make_shared< observer::TwoPortObserver< matrixType > >( twoPortRoot, uuid );
     }
 
     if ( FilterTypeChoice )
@@ -73,12 +74,12 @@ CreateThermalObserver( const xmlparser::XmlParameter* rootparam,
                        const boost::shared_ptr< std::vector< geometry::Cartesian< matrixType > > >& vertices,
                        const boost::shared_ptr< std::vector< ::probe::ThermalProbe > >& probes,
                        const boost::shared_ptr< std::vector< std::vector< double > > >& conductivtymatrix,
-                       double surfaceArea, double heatCapacity )
+                       double surfaceArea, double heatCapacity, const std::string& uuid = "" )
 {
 
     boost::shared_ptr< observer::ThermalObserver< matrixType > > obs(
      new observer::ThermalObserver< matrixType >( thermalElementsOfAreas, areas, volumes, volumeNames, vertices, probes,
-                                                  conductivtymatrix, surfaceArea, heatCapacity ) );
+                                                  conductivtymatrix, surfaceArea, heatCapacity, uuid ) );
 
     boost::scoped_ptr< factory::Factory< observer::Filter< matrixType, thermal::ThermalElement, observer::ThermalPreperation >, factory::ArgumentTypeObserver > > fct(
      factory::BuildObserverFactoryThermal< matrixType, FilterTypeChoice >() );
@@ -145,9 +146,10 @@ void CreateNewFilters( observer::ThermalObserver< matrixType >& observer, const 
 
 template < class containerType, typename matrixType, bool FilterTypeChoice >
 boost::shared_ptr< observer::AgingObserver< matrixType > >
-CreateAgingObserver( containerType& observablePorts, const xmlparser::XmlParameter* rootparam )
+CreateAgingObserver( containerType& observablePorts, const xmlparser::XmlParameter* rootparam,
+                     const std::string& uuid = "" )
 {
-    boost::shared_ptr< observer::AgingObserver< matrixType > > obs( new observer::AgingObserver< matrixType >( observablePorts ) );
+    boost::shared_ptr< observer::AgingObserver< matrixType > > obs( new observer::AgingObserver< matrixType >( observablePorts, uuid ) );
 
     if ( FilterTypeChoice )
     {

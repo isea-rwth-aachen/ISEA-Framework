@@ -1,7 +1,8 @@
 #!/usr/bin/python3 -u
 
 from executableTest import ExecutableTest as ExecTest
-import sys, os
+import sys
+import os
 
 
 def testStandalone(standalone, xmlFiles):
@@ -10,7 +11,7 @@ def testStandalone(standalone, xmlFiles):
     for xml in xmlFiles:
         # Use filename without .xml as scenario name
         scenario = os.path.splitext(os.path.basename(xml))[0]
-        if (scenario == "*"): # happens if * is used on an empty/nonexistant directory
+        if (scenario == "*"):  # happens if * is used on an empty/nonexistant directory
             continue
         profile = os.path.splitext(xml)[0] + ".txt"
         if not os.path.isfile(profile):
@@ -34,6 +35,7 @@ def testStandalone(standalone, xmlFiles):
                     test.addMatfile(filepath, "reference/" + filepath)
                 else:
                     test.addTextfile(filepath, "reference/" + filepath)
+        test.addIgnoredFile("simulation.xml", "reference/simulation.xml")
 
         if test.run():
             print("\nTest successful.")

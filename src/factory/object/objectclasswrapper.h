@@ -545,6 +545,14 @@ class ObjectClassWrapper< ValueT, ExpressionObject > : public ObjectClassWrapper
     {
     }
 
+    typename ExpressionObject< ValueT >::RescaleRange GetRange( const boost::shared_ptr< xmlparser::XmlParameter > param )
+    {
+        double inputMin = param->GetElementDoubleValue( "InputRangeMinimum" );
+        double inputMax = param->GetElementDoubleValue( "InputRangeMaximum" );
+        double outputMin = param->GetElementDoubleValue( "OutputRangeMinimum" );
+        double outputMax = param->GetElementDoubleValue( "OutputRangeMaximum" );
+        return typename ExpressionObject< ValueT >::RescaleRange( {inputMin, inputMax}, {outputMin, outputMax} );
+    }
 
     boost::shared_ptr< Object< ValueT > >
     CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeObject< ValueT >* arg = 0 )
@@ -560,7 +568,7 @@ class ObjectClassWrapper< ValueT, ExpressionObject > : public ObjectClassWrapper
                 expressionString = std::to_string( multiplier ) + " * (" + expressionString + ")";
         }
 
-        std::vector< typename ExpressionObject< ValueT >::ParameterT > parameters;
+        std::vector< typename ExpressionObject< ValueT >::Parameter > parameters;
         for ( const auto& element : param->GetElementChildren( "Parameters" ) )
         {
             const boost::shared_ptr< state::State >& state = this->GetStateFactory()->CreateInstance( element );
@@ -569,10 +577,17 @@ class ObjectClassWrapper< ValueT, ExpressionObject > : public ObjectClassWrapper
                 name = element->GetElementAttributeCharPtrValue( "cacheref" );
             else
                 name = element->GetElementAttributeCharPtrValue( "name" );
-            parameters.push_back( {name, state} );
+            if ( element->HasElementDirectChild( "Rescale" ) )
+                parameters.push_back( {name, state, GetRange( element->GetElementChild( "Rescale" ) )} );
+            else
+                parameters.push_back( {name, state} );
         }
 
-        return boost::make_shared< ExpressionObject< ValueT > >( expressionString, parameters );
+        if ( param->HasElementDirectChild( "Rescale" ) )
+            return boost::make_shared< ExpressionObject< ValueT > >( expressionString, parameters,
+                                                                     GetRange( param->GetElementChild( "Rescale" ) ) );
+        else
+            return boost::make_shared< ExpressionObject< ValueT > >( expressionString, parameters );
     }
 };
 

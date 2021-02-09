@@ -165,3 +165,21 @@ ActivationCoefficient                   | double        | K         | Constant E
 TauCoefficient                          | double        | day       | Constant A used to calculate the time constant
 SocWhereOffsetIsZero                    | double        | %         | The overhang SOC that results in no change to the balancing. If this is not the same as the initial overhang SOC, the anode SOC is immediately changed before the simulation starts.
 Soc                                     | SOC state     |           | Soc object that specifies the overhang capacity and the initial overhang SOC
+
+Loss of Active Material
+------------------------
+
+Loss of active material in a halfcell simulation is used by adding an element with the class attribute "LAM" to the electrode's aging element.
+
+XML Tag | Type   | Unit                         | Explanation                                                                                 
+--------|--------|------------------------------|----------------------------------------------------------------------------------------
+Value   | Object | fraction of initial capacity | Fraction of the initial capacity that is lost through LAM. The cached variable cycles can be used to get the cell's equivalent full cycles
+
+Loss of Lithium Inventory
+-------------------------
+
+Loss of lithium inventory in a halfcell simulation is used by adding an element with the class attribute "LLI" to the electrode's aging element.
+
+XML Tag | Type   | Unit | Explanation                                                                                 
+--------|--------|------|----------------------------------------------------------------------------------------
+Value   | Object | As   | Amount of lithium that is lost through LLI. The cached variable cycles can be used to get the cell's equivalent full cycles.

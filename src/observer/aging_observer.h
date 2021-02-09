@@ -31,7 +31,7 @@ class AgingObserver : public Observer< T, aging::AgingTwoPort, PreparationType< 
     typedef Filter< T, aging::AgingTwoPort, PreparationType< T > > FilterT;
 
     /// Construtctor
-    AgingObserver( std::vector< boost::shared_ptr< aging::AgingTwoPort< T > > >& observableTwoPorts );
+    AgingObserver( std::vector< boost::shared_ptr< aging::AgingTwoPort< T > > >& observableTwoPorts, const std::string& uuid );
 
     /// Desctructor
     ~AgingObserver(){};
@@ -53,8 +53,9 @@ class AgingObserver : public Observer< T, aging::AgingTwoPort, PreparationType< 
 };
 
 template < typename T >
-AgingObserver< T >::AgingObserver( std::vector< boost::shared_ptr< aging::AgingTwoPort< T > > >& observableTwoPorts )
-    : Observer< T, aging::AgingTwoPort, PreparationType< T > >()
+AgingObserver< T >::AgingObserver( std::vector< boost::shared_ptr< aging::AgingTwoPort< T > > >& observableTwoPorts,
+                                   const std::string& uuid )
+    : Observer< T, aging::AgingTwoPort, PreparationType< T > >( uuid )
     , mObservableTwoPorts( observableTwoPorts )
 {
     ResetObserver();
@@ -63,7 +64,7 @@ AgingObserver< T >::AgingObserver( std::vector< boost::shared_ptr< aging::AgingT
 template < typename T >
 void AgingObserver< T >::PrepareFilter( Filter< T, aging::AgingTwoPort, PreparationType< T > >* filt )
 {
-    PreparationType< T > prepType( mObservableTwoPorts.size() );
+    PreparationType< T > prepType( mObservableTwoPorts.size(), nullptr, this->mUUID );
     filt->PrepareFilter( prepType );
 }
 

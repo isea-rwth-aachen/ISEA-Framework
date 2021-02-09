@@ -29,9 +29,10 @@ class TwoPortObserver : public Observer< T, electrical::TwoPort, PreparationType
     public:
     typedef Filter< T, electrical::TwoPort, PreparationType< T > > FilterT;
 
-    TwoPortObserver( const boost::shared_ptr< electrical::TwoPort< T > >& rootPort );
+    TwoPortObserver( const boost::shared_ptr< electrical::TwoPort< T > >& rootPort, const std::string& uuid );
     TwoPortObserver( const std::vector< boost::shared_ptr< electrical::TwoPort< T > > >& observableTwoPorts,
-                     const boost::shared_ptr< electrical::TwoPort< T > >& twoPortRoot = 0 );
+                     const boost::shared_ptr< electrical::TwoPort< T > >& twoPortRoot = nullptr,
+                     const std::string& uuid = "" );
 
     ~TwoPortObserver(){};
     virtual void operator()( double t );
@@ -62,8 +63,8 @@ class TwoPortObserver : public Observer< T, electrical::TwoPort, PreparationType
 };
 
 template < typename T >
-TwoPortObserver< T >::TwoPortObserver( const boost::shared_ptr< electrical::TwoPort< T > >& rootPort )
-    : Observer< T, electrical::TwoPort, PreparationType< T > >()
+TwoPortObserver< T >::TwoPortObserver( const boost::shared_ptr< electrical::TwoPort< T > >& rootPort, const std::string& uuid )
+    : Observer< T, electrical::TwoPort, PreparationType< T > >( uuid )
     , mRootPort( rootPort )
 {
     ResetObserver( rootPort );
@@ -71,8 +72,8 @@ TwoPortObserver< T >::TwoPortObserver( const boost::shared_ptr< electrical::TwoP
 
 template < typename T >
 TwoPortObserver< T >::TwoPortObserver( const std::vector< boost::shared_ptr< electrical::TwoPort< T > > >& observableTwoPorts,
-                                       const boost::shared_ptr< electrical::TwoPort< T > >& twoPortRoot )
-    : Observer< T, electrical::TwoPort, PreparationType< T > >()
+                                       const boost::shared_ptr< electrical::TwoPort< T > >& twoPortRoot, const std::string& uuid )
+    : Observer< T, electrical::TwoPort, PreparationType< T > >( uuid )
     , mRootPort( twoPortRoot )
     , mObservableTwoPorts( observableTwoPorts )
 {
@@ -82,7 +83,7 @@ TwoPortObserver< T >::TwoPortObserver( const std::vector< boost::shared_ptr< ele
 template < typename T >
 void TwoPortObserver< T >::PrepareFilter( Filter< T, electrical::TwoPort, PreparationType< T > >* filt )
 {
-    PreparationType< T > prepType( mObservableTwoPorts.size(), mRootPort.get() );
+    PreparationType< T > prepType( mObservableTwoPorts.size(), mRootPort.get(), this->mUUID );
     filt->PrepareFilter( prepType );
 }
 

@@ -5,16 +5,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 cmake_policy(SET CMP0009 NEW)
 set(ISEAFrameVERSION_MAJOR 2)
-set(ISEAFrameVERSION_MINOR 23)
+set(ISEAFrameVERSION_MINOR 24)
 set(ISEAFramePATCH_LEVEL 0)
-set(ISEAFrameNAME "docs")
+set(ISEAFrameNAME "misc")
+set(ISEAFrameVERSION
+    "${ISEAFrameVERSION_MAJOR}.${ISEAFrameVERSION_MINOR}.${ISEAFramePATCH_LEVEL}"
+)
 set(ARCH_TYPE
     "64"
     CACHE STRING "")
 
 option(BUILD_SYMBOLIC "Build the symbolic version of the framework" OFF)
-option(BUILD_NUMERIC "Build the numeric version of the framework" OFF)
-option(BUILD_AGING "Build the classes required for the aging simulation" OFF)
+option(BUILD_NUMERIC "Build the numeric version of the framework" ON)
+option(BUILD_AGING "Build the classes required for the aging simulation" ON)
 option(USE_DEBUG_GDB "Create everything with debug symbols" OFF)
 option(CREATE_RELEASE_DIRS
        "Create directories containing all files needed to run the simulation"
@@ -22,6 +25,7 @@ option(CREATE_RELEASE_DIRS
 option(BUILD_FOR_RT "Build a version for the realtime system" OFF)
 option(USE_BOOST_THREADS "Use multithreading for the thermal model" OFF)
 option(USE_EXCEPTIONS "Use exceptions" ON)
+option(BUILD_FOR_NATIVE_ARCH "Optimize for current CPU ( -march=native )" OFF)
 set(MATIRX_IMPLEMENTATION
     Eigen
     CACHE STRING "Choose matrix implementation")
@@ -81,8 +85,10 @@ else()
   if(${USE_DEBUG_GDB})
     add_compile_options(-ggdb)
   endif()
-  add_link_options("-Wl,-rpath=./")
   add_compile_options(-fPIC)
+  if(${BUILD_FOR_NATIVE_ARCH})
+    add_compile_options(-march=native)
+  endif()
 endif()
 
 if(BUILD_FOR_RT)
@@ -192,8 +198,7 @@ endfunction(copy_windows_files_to_dir)
 function(add_release_files target files_to_copy)
   if(CREATE_RELEASE_DIRS)
     add_custom_command(
-      TARGET ${target}
-      POST_BUILD
+      TARGET ${target} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${files_to_copy}
               $<TARGET_PROPERTY:${target},RUNTIME_OUTPUT_DIRECTORY>)
   endif()

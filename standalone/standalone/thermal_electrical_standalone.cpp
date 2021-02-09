@@ -1,4 +1,5 @@
 #include "thermal_electrical_standalone.h"
+#include "../../src/observer/filter/metadataFilter.h"
 
 extern template class electrical::TwoPort< myMatrixType >;
 extern template class simulation::ElectricalSimulation< myMatrixType, double, true >;
@@ -7,6 +8,7 @@ extern template class simulation::ThermalSimulation< myMatrixType, double, true 
 extern template class observer::ThermalObserver< double >;
 extern template class electrical::Cellelement< myMatrixType >;
 extern template class factory::FactoryBuilder< myMatrixType, ScalarUnit >;
+extern template class observer::MetadataFilter< myMatrixType, electrical::TwoPort, observer::PreparationType< myMatrixType > >;
 
 namespace standalone
 {
@@ -35,6 +37,11 @@ void ThermalElectricalStandalone::InitializeSimulation()
         }
         mElectricalSimulation->mObserver->AddFilter( new observer::StdoutFilterTwoPort< myMatrixType >() );
         mThermalVisualizer->AddFilter( new observer::StdoutFilterThermal< double >() );
+    }
+    if ( !this->mNoMetadata )
+    {
+        mElectricalSimulation->mObserver->AddFilter(
+         new observer::MetadataFilterTwoPort< myMatrixType >( "simulation.xml", *mParser, *mProfile ) );
     }
 
     // initial observer calls
@@ -98,7 +105,7 @@ bool ThermalElectricalStandalone::CreateThermalSimulation()
         mThermalSimulation.reset(
          new simulation::ThermalSimulation< myMatrixType, double, true >( mParser->GetRoot(), mStepTime, mProfileLength,
                                                                           mThermalStopCriterion, &mThermalVisualizer,
-                                                                          &mElectricalSimulation->mThermalStates, NULL ) );
+                                                                          &mElectricalSimulation->mThermalStates, NULL, mUUID ) );
 
         mStepperThermal =
          make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > >() );

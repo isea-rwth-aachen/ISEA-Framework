@@ -49,7 +49,7 @@ class CyclicalAging : public EmpiricalAging
 
     virtual void ResetToPointInTime( double time );
 
-    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.VisitCyclicalAging( *this ); }
+    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
     double GetAverageVoltage( double startTime, double endTime );

@@ -99,6 +99,10 @@ class XmlParameterImpl : public xmlparser::XmlParameter
 
     boost::shared_ptr< XmlParameter > AddChild( const char* childName );
 
+    boost::shared_ptr< XmlParameter > GetOrCreateElementChild( const char* childName );
+
+    void DeleteChildren();
+
     void SaveDocument( const char* filename ) const;
 
     private:
@@ -115,8 +119,6 @@ class XmlParameterImpl : public xmlparser::XmlParameter
     const char* GetAttribute( ::tinyxml2::XMLElement* param, const char* attrName, bool throwOnMiss = true ) const;
 
     bool TestStringHasChar( const char* str, const char c ) const;
-
-    std::string GetSourceFilename( ::tinyxml2::XMLElement* param ) const;
 
     ::tinyxml2::XMLElement* mNodePtr;
 };

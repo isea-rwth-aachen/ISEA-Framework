@@ -1,11 +1,13 @@
 #include "thermal_standalone.h"
 
 #include "../../src/factory/factorybuilder.h"
+#include "../../src/observer/filter/metadataFilter.h"
 
 extern template class simulation::ThermalSimulation< myMatrixType, double, true >;
 extern template class observer::ThermalObserver< double >;
 extern template class electrical::Cellelement< myMatrixType >;
 extern template class factory::FactoryBuilder< myMatrixType, ScalarUnit >;
+extern template class observer::MetadataFilter< double, thermal::ThermalElement, observer::ThermalPreperation >;
 
 const double thermal::globalMaxValue = 1000000000.0;
 const double thermal::globalMinValue = -thermal::globalMaxValue;
@@ -24,7 +26,7 @@ bool ThermalStandalone::CreateThermalSimulation()
     {
         mThermalSimulation.reset(
          new simulation::ThermalSimulation< myMatrixType, double, true >( mParser->GetRoot(), mStepTime, mProfileLength, mThermalStopCriterion,
-                                                                          &mThermalVisualizer, NULL, NULL ) );
+                                                                          &mThermalVisualizer, NULL, NULL, mUUID ) );
 
         mStepperThermal =
          make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > >() );
@@ -103,6 +105,10 @@ void ThermalStandalone::InitializeSimulation()
             mThermalVisualizer->AddFilter( new observer::DecimateFilterThermal< double >( mStepTime ) );
         }
         mThermalVisualizer->AddFilter( new observer::StdoutFilterThermal< double >() );
+    }
+    if ( !this->mNoMetadata )
+    {
+        mThermalVisualizer->AddFilter( new observer::MetadataFilterThermal< double >( "simulation.xml", *mParser, *mProfile ) );
     }
 
     // initial observer calls

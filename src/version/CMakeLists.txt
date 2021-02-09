@@ -1,16 +1,31 @@
-cmake_minimum_required(VERSION 3.2)
-project(VersionString)
+# set(REPO_VERSION "unknown")
+find_package(Git)
+if(GIT_FOUND)
+  if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+    message("${GIT_EXECUTABLE}")
+    execute_process(
+      COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+      WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+      OUTPUT_VARIABLE REPO_VERSION
+      RESULT_VARIABLE RES)
+    if(RES)
+      message(FATAL_ERROR "Git command failed with\n${REPO_VERSION}")
+    endif(RES)
+    string(STRIP ${REPO_VERSION} REPO_VERSION)
+  endif(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+endif(GIT_FOUND)
 
-function(WriteToVersion)
-  file(WRITE ${PROJECT_SOURCE_DIR}/version.h
+function(write_to_version)
+  file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/version.h
        "#ifndef _VERSION_\n#define _VERSION_\n")
   file(
-    WRITE ${PROJECT_SOURCE_DIR}/version.cpp
-    "\nconst char * VERSION_NUMBER = \"VERSION ${ISEAFrameVERSION_MAJOR}.${ISEAFrameVERSION_MINOR}.${ISEAFramePATCH_LEVEL} ${ISEAFrameNAME} ${ISEAFrameDATE} ${REPO_VERSION}\\n\"; "
+    WRITE ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
+    "const char * VERSION_STRING = \"VERSION ${ISEAFrameVERSION_MAJOR}.${ISEAFrameVERSION_MINOR}.${ISEAFramePATCH_LEVEL} ${ISEAFrameNAME} GIT ${REPO_VERSION}\";"
   )
-  file(APPEND ${PROJECT_SOURCE_DIR}/version.h
-       "\nextern const char * VERSION_NUMBER;")
+  file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/version.h
+       "\nextern const char * VERSION_STRING;")
   set(UNINCLUDE
+      "OUTPUT"
       "CIFS"
       "DOXYGEN"
       "UNINCLUDE"
@@ -25,14 +40,6 @@ function(WriteToVersion)
       "SOURCE"
       "_boost_"
       "ISEAFrame_BINARY_DIR"
-      "CMAKE_BINARY_DIR"
-      "CMAKE_CACHEFILE_DIR"
-      "CMAKE_CURRENT_BINARY_DIR"
-      "CMAKE_CURRENT_LIST_DIR"
-      "CMAKE_CURRENT_LIST_FILE"
-      "CMAKE_HOME_DIRECTORY"
-      "CMAKE_PARENT_LIST_FILE"
-      "CMAKE_PLATFORM_INFO_DIR"
       "FIND_PACKAGE_MESSAGE_DETAILS_CxxTest"
       "FIND_PACKAGE_MESSAGE_DETAILS_Doxygen"
       "ISEAFrame_BINARY_DIR"
@@ -50,6 +57,9 @@ function(WriteToVersion)
   get_cmake_property(_variableNames VARIABLES)
   list(REMOVE_DUPLICATES _variableNames)
   foreach(_variableName ${_variableNames})
+    if(_variableName MATCHES "^(CMAKE_|_)")
+      continue()
+    endif(_variableName MATCHES "^(CMAKE_|_)")
     foreach(g ${UNINCLUDE})
       string(FIND ${_variableName} ${g} tmp_found REVERSE)
       if(NOT ${tmp_found} EQUAL -1)
@@ -58,20 +68,18 @@ function(WriteToVersion)
     endforeach(g ${UNINCLUDE})
 
     if(${tmp_found} EQUAL -1)
-      string(MAKE_C_IDENTIFIER "${${_variableName}}" c_string)
-      file(
-        APPEND ${PROJECT_SOURCE_DIR}/version.cpp
-        "\nconst char * CMAKE_${_variableName} = \"${_variableName}: ${c_string}\\n\";"
-      )
-      file(APPEND ${PROJECT_SOURCE_DIR}/version.h
+      string(REPLACE "\"" "\\\"" c_value "${${_variableName}}")
+      file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
+           "\nconst char * CMAKE_${_variableName} = \"${c_value}\";")
+      file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/version.h
            "\nextern const char * CMAKE_${_variableName};")
     endif(${tmp_found} EQUAL -1)
   endforeach()
 
-  file(APPEND ${PROJECT_SOURCE_DIR}/version.h "\n#endif")
-endfunction(WriteToVersion)
+  file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/version.h "\n#endif")
+endfunction(write_to_version)
 
-writetoversion()
+write_to_version()
 
 file(GLOB SOURCE *.cpp)
 set(COMPILE_FEATURES cxx_alias_templates cxx_auto_type)

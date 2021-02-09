@@ -18,8 +18,8 @@ int main( int argc, char *argv[] )
     if ( !thermalStandalone.CreateThermalSimulation() )
         return EXIT_FAILURE;
 
-    thermalStandalone.FreeXml();
     thermalStandalone.InitializeSimulation();
+    thermalStandalone.FreeXml();
 
     while ( !thermalStandalone.HasThermalSimulationEnded() )
     {

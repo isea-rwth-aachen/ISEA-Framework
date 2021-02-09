@@ -45,7 +45,7 @@ class CalendarianAging : public EmpiricalAging
 
     virtual void ResetToPointInTime( double time );
 
-    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.VisitCalendarianAging( *this ); }
+    virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
     const double mTimeExponent;

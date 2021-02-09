@@ -8,14 +8,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 // ETC
 #include "../../electrical/sphericalDiffusion.h"
-
-#include "../../factory/electricalEquationSystem/chooseElectricSystemType.h"
 #include "../../factory/factorybuilder.h"
-
 #include "../../object/const_obj.h"
-
+#include "../../system/dae_sys.h"
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
-
 
 extern template class electrical::SphericalDiffusion< myMatrixType >;
 extern template class systm::StateSystemGroup< myMatrixType >;
@@ -123,7 +119,7 @@ void TestSphericalDiffusion::TestSphericalDiffusionFactoryCreation()
     sd->SetSystem( &stateSystemGroup );
     stateSystemGroup.Initialize();
     // stateSystemGroup.mDglStateSystem.Initialize( maxSize );
-    auto mEqSystem = factory::ChooseElectricEquationSystemType( &stateSystemGroup );
+    auto mEqSystem = boost::make_shared< systm::DifferentialAlgebraicSystem< myMatrixType > >( &stateSystemGroup );
 
     myMatrixType current;
     current.resize( 1, maxSize );

@@ -27,8 +27,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../object/const_obj.h"
 #include "../../state/soc.h"
 #include "../../state/thermal_state.h"
+#include "../../system/constantstepdglsystemsolver.h"
+#include "../../system/dae_sys.h"
 #include "../../system/stateSystemGroup.h"
-#include "../../system/system.h"
+#include "../../system/variablestepdglsystemsolver.h"
 
 std::vector< std::vector< double > > TestDaeSystem::CopyToVector( const double data[7][4] )
 {

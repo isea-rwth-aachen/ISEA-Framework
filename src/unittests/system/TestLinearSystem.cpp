@@ -4,8 +4,8 @@
 * Last Modified : Do 20 Nov 2014 14:26:34 CET
 * Created By : Friedrich Hust
 _._._._._._._._._._._._._._._._._._._._._.*/
-#include "../../misc/matrixInclude.h"
 #include "TestLinearSystem.h"
+#include "../../misc/matrixInclude.h"
 
 // BOOST
 #include <boost/scoped_ptr.hpp>
@@ -26,8 +26,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../object/const_obj.h"
 #include "../../state/soc.h"
 #include "../../state/thermal_state.h"
+#include "../../system/constantstepdglsystemsolver.h"
 #include "../../system/stateSystemGroup.h"
-#include "../../system/system.h"
 
 std::vector< std::vector< double > > TestLinearSystem::CopyToVector( const double data[7][4] )
 {
@@ -56,7 +56,7 @@ void TestLinearSystem::testParallelRCAlgElement()
     parallel->SetInitialCurrent( Current );
     parallel->UpdateStateSystemGroup();
 
-    systm::LinearSystemSolver< myMatrixType > solver( &stateSystemGroup, dt );
+    systm::ConstantStepDglSystemSolver< myMatrixType > solver( &stateSystemGroup, dt );
     stateSystemGroup.mStateVector.coeffRef( 0, 0 ) = 1;
     while ( t < 15.50 )
     {
@@ -213,7 +213,7 @@ void TestLinearSystem::testSingleAlgCellellement()
     cellelem->SetInitialCurrent( Current );
     cellelem->UpdateStateSystemGroup();
 
-    systm::LinearSystemSolver< myMatrixType > solver( &stateSystemGroup, dt );
+    systm::ConstantStepDglSystemSolver< myMatrixType > solver( &stateSystemGroup, dt );
 
     for ( int i = 0; i < 50; ++i )
     {

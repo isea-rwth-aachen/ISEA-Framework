@@ -133,6 +133,8 @@ void AgingTwoPort< MatrixType >::CalculateAging( const double &timestep, const d
     }
     else
     {
+        mTwoportState.mCellAge = mAgingState->GetCellAge() + timestep * scaleFactor;
+        mTwoportState.mChargeThroughput = mAgingState->GetChargeThroughput() + mChargeThroughputSinceAgingStep * scaleFactor;
 
         double capacityFactor = 1;
         double socOffset = 0;
@@ -181,8 +183,7 @@ void AgingTwoPort< MatrixType >::SetAgingEffects( const std::vector< boost::shar
 template < typename MatrixType >
 void AgingTwoPort< MatrixType >::ApplyAging( const double &timestep, const double &scaleFactor )
 {
-    mElectricalTwoPort->GetSoc()->template SetCapacityFactor< state::SocSetFormat::ABSOLUT >(
-     this->mAgingState->GetCapacityFactor() );
+    mElectricalTwoPort->GetSoc()->template SetCapacityFactor< state::SocSetFormat::ABSOLUT >( this->mAgingState->GetCapacityFactor() );
     mElectricalTwoPort->SetResistanceFactor( this->mAgingState->GetResistanceFactor() );
     mElectricalTwoPort->GetSoc()->template SetOffset< state::SocSetFormat::ABSOLUT >( this->mAgingState->GetSocOffset() );
 
@@ -233,8 +234,7 @@ void AgingTwoPort< MatrixType >::CalculateCellCapacity()
     double storedChargeAnode = anodeSoc->GetValue< state::SocGetFormat::AS >();
     double storedChargeCathode = cathodeSoc->GetValue< state::SocGetFormat::AS >();
     double anodeChargeUntilMinimum = storedChargeAnode - anodeSoc->GetMinimumValue< state::SocGetFormat::AS >();
-    double cathodeChargeUntilMinimum =
-     storedChargeCathode - cathodeSoc->GetMinimumValue< state::SocGetFormat::AS >();
+    double cathodeChargeUntilMinimum = storedChargeCathode - cathodeSoc->GetMinimumValue< state::SocGetFormat::AS >();
 
     // set the charge to the lowest possible value and then increase it until the minimum voltage is reached
     double chargeUntilMinimum = std::min( anodeChargeUntilMinimum, cathodeChargeUntilMinimum );
@@ -280,10 +280,14 @@ void AgingTwoPort< MatrixType >::CalculateCellCapacity()
     anodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode );
     cathodeSoc->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeCathode );
 
+    double cellCapacity = maxAnodeCharge - minAnodeCharge;
+    double cellSocValue = storedChargeAnode - minAnodeCharge;
+    double cellSocOffset = cellSocValue - cellSoc->GetValue< state::SocGetFormat::AS >();
+
     // finally set the new cell capacity
     // cellSoc->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( storedChargeAnode - minAnodeCharge );
-    this->mAgingState->SetCapacityFactor( ( maxAnodeCharge - minAnodeCharge ) /
-                                          cellSoc->GetInitialCapacity< state::SocGetFormat::AS >() );
+    this->mAgingState->SetCapacityFactor( cellCapacity / cellSoc->GetInitialCapacity< state::SocGetFormat::AS >() );
+    this->mAgingState->SetSocOffset( cellSocOffset, state::AgingStateSetFormat::DELTA );
 }
 
 template < typename MatrixType >

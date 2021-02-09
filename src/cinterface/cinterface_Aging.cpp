@@ -3,6 +3,7 @@
 
 #include "../aging/aging_simulation.h"
 #include "../aging/aging_twoport.h"
+#include "../electrical/electrical_simulation.h"
 #include "../factory/factorybuilder_without_electrical_elements.h"
 #include "../misc/matrixInclude.h"
 #include "../thermal/simulation_data_outline.h"

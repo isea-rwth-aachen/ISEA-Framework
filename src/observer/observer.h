@@ -25,7 +25,7 @@ template < typename T, template < typename > class TConcrete, typename ArgumentT
 class Observer
 {
     public:
-    Observer();
+    Observer( const std::string& uuid );
     virtual ~Observer(){};
     virtual void operator()( double t );
     void AddFilter( Filter< T, TConcrete, ArgumentType >* filt );
@@ -40,12 +40,14 @@ class Observer
 
     Filter< T, TConcrete, ArgumentType >* mBegin;
     Filter< T, TConcrete, ArgumentType >* mEnd;
+    const std::string mUUID;
 };
 
 template < typename T, template < typename > class TConcrete, typename ArgumentType >
-Observer< T, TConcrete, ArgumentType >::Observer()
+Observer< T, TConcrete, ArgumentType >::Observer( const std::string& uuid )
     : mBegin( 0 )
     , mEnd( 0 )
+    , mUUID( uuid )
 {
 }
 

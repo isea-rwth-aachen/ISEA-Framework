@@ -1,6 +1,7 @@
 import os
 import subprocess
-import compareMatfiles, compareTextfiles
+import compareMatfiles
+import compareTextfiles
 
 
 class ExecutableTest:
@@ -9,6 +10,7 @@ class ExecutableTest:
         self.command = command
         self.textfiles = []
         self.matfiles = []
+        self.ignoredFiles = []
         self.success = True
 
     def addTextfile(self, outputFile, referenceFile):
@@ -17,11 +19,17 @@ class ExecutableTest:
     def addMatfile(self, outputFile, referenceFile):
         self.matfiles.append((outputFile, referenceFile))
 
+    def addIgnoredFile(self, outputFile, referenceFile):
+        self.ignoredFiles.append((outputFile, referenceFile))
+
     def isUnexceptedFile(self, filename):
         for knownFile in self.textfiles:
             if filename == knownFile[0] or filename == knownFile[1]:
                 return False
         for knownFile in self.matfiles:
+            if filename == knownFile[0] or filename == knownFile[1]:
+                return False
+        for knownFile in self.ignoredFiles:
             if filename == knownFile[0] or filename == knownFile[1]:
                 return False
         return True

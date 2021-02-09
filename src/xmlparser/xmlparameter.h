@@ -140,6 +140,12 @@ class XmlParameter
     /// Adds a child at the end of the element and returns the new child
     virtual boost::shared_ptr< XmlParameter > AddChild( const char* childName ) = 0;
 
+    /// Returns the child with the given name if it exists, or adds a new child and returns it
+    virtual boost::shared_ptr< XmlParameter > GetOrCreateElementChild( const char* childName ) = 0;
+
+    /// Removes all children from the element
+    virtual void DeleteChildren() = 0;
+
     /// Writes the whole document to a file
     virtual void SaveDocument( const char* filename ) const = 0;
 };

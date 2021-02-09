@@ -1,11 +1,13 @@
 #include "electrical_standalone.h"
 
 #include "../../src/factory/factorybuilder.h"
+#include "../../src/observer/filter/metadataFilter.h"
 
 extern template class electrical::TwoPort< myMatrixType >;
 extern template class simulation::ElectricalSimulation< myMatrixType, double, true >;
 extern template class electrical::Cellelement< myMatrixType >;
 extern template class factory::FactoryBuilder< myMatrixType, ScalarUnit >;
+extern template class observer::MetadataFilter< myMatrixType, electrical::TwoPort, observer::PreparationType< myMatrixType > >;
 
 namespace standalone
 {
@@ -21,7 +23,7 @@ bool ElectricalStandalone::CreateElectricalSimulation( factory::FactoryBuilder< 
     {
         mElectricalSimulation.reset(
          new simulation::ElectricalSimulation< myMatrixType, double, true >( mParser->GetRoot(), mStepTime, mProfileLength,
-                                                                             mSocStopCriterion, &mCells, factoryBuilder ) );
+                                                                             mSocStopCriterion, &mCells, factoryBuilder, mUUID ) );
 
         if ( mElectricalSimulation->mObserver->GetObservedTwoPortsPtr().empty() )
         {
@@ -154,6 +156,11 @@ void ElectricalStandalone::InitializeSimulation()
             mElectricalSimulation->mObserver->AddFilter( new observer::DecimateFilterTwoPort< myMatrixType >( this->mOutputDecimation ) );
         }
         mElectricalSimulation->mObserver->AddFilter( new observer::StdoutFilterTwoPort< myMatrixType >() );
+    }
+    if ( !this->mNoMetadata )
+    {
+        mElectricalSimulation->mObserver->AddFilter(
+         new observer::MetadataFilterTwoPort< myMatrixType >( "simulation.xml", *mParser, *mProfile ) );
     }
 
     // initial observer calls

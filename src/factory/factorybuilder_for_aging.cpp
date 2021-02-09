@@ -61,6 +61,8 @@ Factory< aging::AgingBase, ArgumentTypeAging >* FactoryBuilderForAging< MatrixT,
                               "AnodeOverhang" );
     agingFactory->AddWrapper( new AgingClassWrapper< aging::GenericAging >( objectFactory, stateFactory ),
                               "GenericAging" );
+    agingFactory->AddWrapper( new AgingClassWrapper< aging::AgingLAM >( objectFactory, stateFactory ), "LAM" );
+    agingFactory->AddWrapper( new AgingClassWrapper< aging::AgingLLI >( objectFactory, stateFactory ), "LLI" );
 
     return agingFactory;
 }

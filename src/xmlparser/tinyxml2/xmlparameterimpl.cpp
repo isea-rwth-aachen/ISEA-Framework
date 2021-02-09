@@ -649,15 +649,20 @@ boost::shared_ptr< XmlParameter > XmlParameterImpl::AddChild( const char* childN
     return boost::shared_ptr< XmlParameter >( new XmlParameterImpl( childElement ) );
 }
 
-void XmlParameterImpl::SaveDocument( const char* filename ) const { mNodePtr->GetDocument()->SaveFile( filename ); }
-
-std::string XmlParameterImpl::GetSourceFilename( ::tinyxml2::XMLElement* param ) const
+boost::shared_ptr< XmlParameter > XmlParameterImpl::GetOrCreateElementChild( const char* childName )
 {
-    ::tinyxml2::XMLElement* filenameElement = param->GetDocument()->FirstChildElement( "__FILENAME" );
-    if ( filenameElement )
-        return filenameElement->GetText();
-    return "";
+    tinyxml2::XMLElement* child = GetRawElement( childName, false );
+    if ( !child )
+    {
+        child = mNodePtr->GetDocument()->NewElement( childName );
+        mNodePtr->InsertEndChild( child );
+    }
+    return boost::shared_ptr< XmlParameter >( new XmlParameterImpl( child ) );
 }
+
+void XmlParameterImpl::DeleteChildren() { mNodePtr->DeleteChildren(); }
+
+void XmlParameterImpl::SaveDocument( const char* filename ) const { mNodePtr->GetDocument()->SaveFile( filename ); }
 
 }    // End namespace tinyxml2
 

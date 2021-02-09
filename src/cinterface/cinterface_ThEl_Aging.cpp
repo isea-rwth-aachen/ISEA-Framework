@@ -4,9 +4,11 @@
 
 #include "../aging/aging_simulation.h"
 #include "../aging/aging_twoport.h"
+#include "../electrical/electrical_simulation.h"
 #include "../factory/factorybuilder_for_aging.h"
 #include "../misc/matrixInclude.h"
 #include "../thermal/simulation_data_outline.h"
+#include "../thermal/thermal_simulation.h"
 #include "../xmlparser/tinyxml2/xmlparserimpl.h"
 
 #include <boost/scoped_ptr.hpp>

@@ -6,20 +6,17 @@
 _._._._._._._._._._._._._._._._._._._._._.*/
 #include "TestSpiceExport.h"
 
+#include "../../export/esbVisualizer.h"
+#include "../../export/spiceExport.h"
+#include "../../factory/factorybuilder.h"
 #include "../../misc/matrixInclude.h"
+#include "../../system/constantstepdglsystemsolver.h"
+#include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 
 // BOOST
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <sstream>
-
-#include "../../factory/factorybuilder.h"
-
-#include "../../export/esbVisualizer.h"
-#include "../../xmlparser/tinyxml2/xmlparserimpl.h"
-
-#include "../../export/spiceExport.h"
-#include "../../system/system.h"
 
 void TestSpiceExport::testStreamConstructor()
 {

@@ -14,7 +14,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../electrical/voltagesource.h"
 #include "../../electrical/zarc.h"
 #include "../../object/const_obj.h"
-#include "../../system/system.h"
+#include "../../system/constantstepdglsystemsolver.h"
 
 #include "../../observer/filter/csvfilter.h"
 #include "../../observer/filter/decimatefilter.h"
@@ -180,7 +180,7 @@ void TestObserver::testObserverOperationsSingleCell()
 
     k( t );
 
-    systm::System< myMatrixType > system( &stateSystemGroup, dt );
+    systm::ConstantStepDglSystemSolver< myMatrixType > system( &stateSystemGroup, dt );
 
     while ( t < 30 )
     {
@@ -217,7 +217,7 @@ void TestObserver::testFilters()
 void TestObserver::testFilterCreation( std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > &twoPorts,
                                        const boost::shared_ptr< electrical::TwoPort< myMatrixType > > &rootPort = nullptr )
 {
-    boost::iostreams::stream< boost::iostreams::null_sink > nullStream((boost::iostreams::null_sink()));
+    boost::iostreams::stream< boost::iostreams::null_sink > nullStream( ( boost::iostreams::null_sink() ) );
 
     observer::TwoPortObserver< myMatrixType > tpObserver( twoPorts, rootPort );
     tpObserver.AddFilter( boost::shared_ptr< observer::StdoutFilterTwoPort< myMatrixType > >(

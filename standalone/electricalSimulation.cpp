@@ -11,8 +11,8 @@ int main( int argc, char *argv[] )
     if ( !electricalStandalone.CreateElectricalSimulation() )
         return EXIT_FAILURE;
 
-    electricalStandalone.FreeXml();
     electricalStandalone.InitializeSimulation();
+    electricalStandalone.FreeXml();
 
     // Run simulation
     while ( !electricalStandalone.HasElectricalSimulationEnded() )

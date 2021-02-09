@@ -21,6 +21,9 @@ class SimulationStandalone : public Standalone
     virtual void ReadXmlOptions();
     void FreeXml();
     double GetProfileLength();
+    static void CheckHash( const std::string& filename );
+    static void PrintHash( const std::string& filename );
+    static void AddHash( const std::string& filename );
 
     // options from command line and XML
     double mStepTime;
@@ -30,6 +33,7 @@ class SimulationStandalone : public Standalone
     bool mQuiet;
     /// steptime for the default stdout filters. Default = -1.0, which means the StepTime parameter from the XML is used. 0.0 means no decimation
     double mOutputDecimation;
+    bool mNoMetadata;
     size_t mCycles;
 
     boost::scoped_ptr< xmlparser::XmlParser > mParser;
@@ -40,6 +44,7 @@ class SimulationStandalone : public Standalone
     boost::scoped_ptr< electrical::TimeSeries< double, electrical::EvalNoInterpolation > > mProfile;
     std::string mXmlFilename;
     std::string mProfileFilename;
+    const std::string mUUID;
     double mProfileLength;
     double mProfileChangeTime;
 

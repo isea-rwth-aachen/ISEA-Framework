@@ -46,7 +46,8 @@ class ThermalSimulation
     ThermalSimulation( const boost::shared_ptr< xmlparser::XmlParameter > &rootXmlNode, T recommendedDeltaTime, T simulationDuration,
                        T thermalStateStopCriterion, boost::shared_ptr< observer::ThermalObserver< T > > *thermalVisualizer,
                        std::vector< boost::shared_ptr< ThermalState< T > > > *thermalStates,
-                       std::vector< std::vector< boost::shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks );
+                       std::vector< std::vector< boost::shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks,
+                       const std::string &uuid = "" );
     /// Updates thermal equation system and sets temperature vector and air
     /// temperature
     void UpdateSystem();
@@ -97,7 +98,7 @@ ThermalSimulation< Matrix, T, filterTypeChoice >::ThermalSimulation(
  const boost::shared_ptr< xmlparser::XmlParameter > &rootXmlNode, T recommendedDeltaTime, T simulationDuration,
  T thermalStateStopCriterion, boost::shared_ptr< observer::ThermalObserver< T > > *thermalVisualizer,
  std::vector< boost::shared_ptr< ThermalState< T > > > *thermalStates,
- std::vector< std::vector< boost::shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks )
+ std::vector< std::vector< boost::shared_ptr< ThermalState< T > > > > *thermalStatesOfCellBlocks, const std::string &uuid )
     : mTime( 0.0 )
     , mLastTime( 0.0 )
     , mDeltaTime( recommendedDeltaTime )
@@ -327,7 +328,8 @@ ThermalSimulation< Matrix, T, filterTypeChoice >::ThermalSimulation(
         *thermalVisualizer =
          CreateThermalObserver< double, filterTypeChoice >( rootXmlNode.get(), thermalElementsOfAreas, areas, volumes,
                                                             volumeNames, vertices, mThermalProbes, conductivity,
-                                                            thermalModel.ConvectionArea(), thermalModel.GetTotalHeatCapacity() );
+                                                            thermalModel.ConvectionArea(),
+                                                            thermalModel.GetTotalHeatCapacity(), uuid );
     }
 }
 

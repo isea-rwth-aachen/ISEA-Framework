@@ -10,8 +10,6 @@
 #include <string>
 
 #include "../electrical/electrical_data_struct.h"
-#include "../expressionparser/expressionparser.h"
-#include "../misc/matrixInclude.h"
 #include "../state/soc.h"
 #include "../state/thermal_state.h"
 #include "../visitor/visitor.h"
@@ -25,7 +23,9 @@ enum AgingType
     CALENDARIAN,
     CYCLICAL,
     ANODE_OVERHANG,
-    GENERIC
+    GENERIC,
+    LAM,
+    LLI
 };
 
 struct TwoportState

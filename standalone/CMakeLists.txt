@@ -21,17 +21,17 @@ if(BUILD_NUMERIC)
   option(BUILD_VISUALIZER "Build a quick visualizer executable" OFF)
   option(BUILD_DOT_EXPORT "Build Dot-Export" OFF)
   option(BUILD_QUICKVERIFICATION
-         "Build a quick test for electrical and thermal simulation" OFF)
+         "Build a quick test for electrical and thermal simulation" ON)
   option(BUILD_SVG_EXPORT "Build Standalone SVG export" OFF)
   option(BUILD_ELECTRICAL_SIMULATION
-         "Build commandline tool for electrical Simulation" OFF)
+         "Build commandline tool for electrical Simulation" ON)
   option(BUILD_THERMAL_SIMULATION
-         "Builds a commandline tool for thermal only simulation" OFF)
+         "Builds a commandline tool for thermal only simulation" ON)
   option(BUILD_THERMAL_ELECTRICAL_SIMULATION
-         "Build a commandline tool for thermal-electrical simulation" OFF)
+         "Build a commandline tool for thermal-electrical simulation" ON)
   if(BUILD_AGING)
     option(BUILD_AGING_SIMULATION
-           "Builds a commandline tool for aging simulation" OFF)
+           "Builds a commandline tool for aging simulation" ON)
   endif()
   option(BUILD_GETTOTALCAPACITY
          "Build a quick test for checking the total capacity of an ECM" OFF)

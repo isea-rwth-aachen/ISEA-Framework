@@ -76,13 +76,12 @@ void XmlParserImpl::ReadFromFile( const char* fileName )
         abort();
 #endif
 
-    mFilename = std::string( fileName );
-    XMLElement* filenameElement = mDoc.NewElement( "__FILENAME" );
-    filenameElement->SetText( mFilename.c_str() );
-    mDoc.InsertEndChild( filenameElement );
+    mFilename = fileName;
 }
 
 void XmlParserImpl::ReadFromFile( const std::string fileName ) { ReadFromFile( fileName.c_str() ); }
+
+const std::string& XmlParserImpl::GetFilename() const { return mFilename; }
 
 void XmlParserImpl::ReadFromMem( const char* xmlData )
 {
@@ -155,6 +154,13 @@ boost::shared_ptr< XmlParameter > XmlParserImpl::GetRoot()
     return boost::shared_ptr< XmlParameter >( new XmlParameterImpl( root ) );
 }
 
+boost::shared_ptr< XmlParameter > XmlParserImpl::CreateRootElement( const char* name )
+{
+    XMLElement* newElement = mDoc.NewElement( name );
+    mDoc.InsertEndChild( newElement );
+    return boost::shared_ptr< XmlParameter >( new XmlParameterImpl( newElement ) );
+}
+
 void XmlParserImpl::CreateXmlFile( const char* filename )
 {
     std::string sFilename( filename );
@@ -179,5 +185,13 @@ void XmlParserImpl::CreateXmlFile( const char* filename )
 void XmlParserImpl::CreateXmlFile( const std::string filename ) { CreateXmlFile( filename.c_str() ); }
 
 void XmlParserImpl::SaveFile() { mDoc.SaveFile( mFilename.c_str() ); }
+
+std::string XmlParserImpl::ToString()
+{
+    XMLPrinter printer;
+    mDoc.Print( &printer );
+    return std::string( printer.CStr() );
+}
+
 }    // namespace tinyxml2
 } /* namespace xmlparser */

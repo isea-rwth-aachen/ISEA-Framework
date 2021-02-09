@@ -17,7 +17,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include <stdexcept>
 
-extern const char *VERSION_NUMBER;
+extern const char *VERSION_STRING;
 
 
 enum FcnParameters
@@ -82,7 +82,7 @@ extern "C"
     void VersionInfo()
     {
 #ifndef _DS1006
-        printf( "%s\n", VERSION_NUMBER );
+        printf( "%s\n", VERSION_STRING );
 #endif
     }
 

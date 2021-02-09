@@ -1,0 +1,33 @@
+<div class="fragment">
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#0000FF">&lt;Object</font></b> <font color="#009900">class</font><font color="#990000">=</font><font color="#FF0000">"ExpressionObj"</font><b><font color="#0000FF">&gt;</font></b>
+    <b><font color="#0000FF">&lt;Expression&gt;</font></b>Soc / 2 + T / 3<b><font color="#0000FF">&lt;/Expression&gt;</font></b>
+    <b><font color="#0000FF">&lt;Rescale&gt;</font></b>
+        <b><font color="#0000FF">&lt;InputRangeMinimum&gt;</font></b>10<b><font color="#0000FF">&lt;/InputRangeMinimum&gt;</font></b>
+        <b><font color="#0000FF">&lt;InputRangeMaximum&gt;</font></b>60<b><font color="#0000FF">&lt;/InputRangeMaximum&gt;</font></b>
+        <b><font color="#0000FF">&lt;OutputRangeMinimum&gt;</font></b>0<b><font color="#0000FF">&lt;/OutputRangeMinimum&gt;</font></b>
+        <b><font color="#0000FF">&lt;OutputRangeMaximum&gt;</font></b>5<b><font color="#0000FF">&lt;/OutputRangeMaximum&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Rescale&gt;</font></b>
+    <b><font color="#0000FF">&lt;Parameters&gt;</font></b>
+        <b><font color="#0000FF">&lt;Param</font></b> <font color="#009900">cacheref</font><font color="#990000">=</font><font color="#FF0000">"Soc"</font><b><font color="#0000FF">&gt;</font></b>
+            <b><font color="#0000FF">&lt;Rescale&gt;</font></b>
+                <b><font color="#0000FF">&lt;InputRangeMinimum&gt;</font></b>0<b><font color="#0000FF">&lt;/InputRangeMinimum&gt;</font></b>
+                <b><font color="#0000FF">&lt;InputRangeMaximum&gt;</font></b>100<b><font color="#0000FF">&lt;/InputRangeMaximum&gt;</font></b>
+                <b><font color="#0000FF">&lt;OutputRangeMinimum&gt;</font></b>10<b><font color="#0000FF">&lt;/OutputRangeMinimum&gt;</font></b>
+                <b><font color="#0000FF">&lt;OutputRangeMaximum&gt;</font></b>90<b><font color="#0000FF">&lt;/OutputRangeMaximum&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Rescale&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Param&gt;</font></b>
+        <b><font color="#0000FF">&lt;Param</font></b> <font color="#009900">cacheref</font><font color="#990000">=</font><font color="#FF0000">"ThermalState"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"T"</font><b><font color="#0000FF">&gt;</font></b>
+            <b><font color="#0000FF">&lt;Rescale&gt;</font></b>
+                <b><font color="#0000FF">&lt;InputRangeMinimum&gt;</font></b>0<b><font color="#0000FF">&lt;/InputRangeMinimum&gt;</font></b>
+                <b><font color="#0000FF">&lt;InputRangeMaximum&gt;</font></b>30<b><font color="#0000FF">&lt;/InputRangeMaximum&gt;</font></b>
+                <b><font color="#0000FF">&lt;OutputRangeMinimum&gt;</font></b>10<b><font color="#0000FF">&lt;/OutputRangeMinimum&gt;</font></b>
+                <b><font color="#0000FF">&lt;OutputRangeMaximum&gt;</font></b>50<b><font color="#0000FF">&lt;/OutputRangeMaximum&gt;</font></b>
+            <b><font color="#0000FF">&lt;/Rescale&gt;</font></b>
+        <b><font color="#0000FF">&lt;/Param&gt;</font></b>
+    <b><font color="#0000FF">&lt;/Parameters&gt;</font></b>
+<b><font color="#0000FF">&lt;/Object&gt;</font></b></tt></pre>
+</div>

@@ -1,102 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration>
-   <MetaData>
-      <electrical>
-         <Date>29-Mar-2019 15:48:10</Date>
-         <Creator>sbi</Creator>
-         <CellName>SAM_I3_02</CellName>
-         <ModelName>R2RC</ModelName>
-      </electrical>
-      <thermal>
-         <Date>29-Mar-2018 11:28:54</Date>
-         <Creator>pde</Creator>
-         <CellName>BMW_i3_generic</CellName>
-         <ModelName>single_cell</ModelName>
-      </thermal>
-      <CXML>
-         <Date>02-Jul-2019 10:52:00</Date>
-         <Creator>pde-aep</Creator>
-         <CommitHash>100832b951ffbb34dab956701b362d4d76173ec2</CommitHash>
-      </CXML>
-   </MetaData>
-   <Options>
-      <SampleRate>1</SampleRate>
-      <AirTemperature ReadFromFile="false">25</AirTemperature>
-      <ConvectionActivated advancedAreaAggregation="true">true</ConvectionActivated>
-      <RadiationActivated>true</RadiationActivated>
-      <GeometricalTolerance angleInDegrees="0.001" length="1e-06" percentOfQuantity="0.1"/>
-   </Options>
-   <Observer>
-      <Electrical>
-         <Filter1 class="MatlabFilter">
-            <Filename>SampleOutput.mat</Filename>
-         </Filter1>
-      </Electrical>
-      <Thermal>
-         <Filter1 class="DecimateFilter">
-            <TimeDelay>0.1</TimeDelay>
-         </Filter1>
-         <Filter2 class="MatlabFilter">
-            <Filename>Patch_Temperatures.mat</Filename>
-            <VerticesFile>Patch_Vertices.csv</VerticesFile>
-            <VolumesFile>Patch_Volumes.csv</VolumesFile>
-            <VolumeNamesFile>Patch_VolumeNames.csv</VolumeNamesFile>
-            <AreasFile>Patch_Areas.csv</AreasFile>
-         </Filter2>
-      </Thermal>
-   </Observer>
-   <ThermalMaterials>
-      <ActiveMaterialInner cache="true" class="MaterialCartesian">
-         <Density>2322</Density>
-         <SpecificCapacity>1000</SpecificCapacity>
-         <ConductivityX>0.6</ConductivityX>
-         <ConductivityY>30</ConductivityY>
-         <ConductivityZ>30</ConductivityZ>
-      </ActiveMaterialInner>
-      <Air cache="true" class="Material">
-         <Density>1.2041</Density>
-         <SpecificCapacity>1.005</SpecificCapacity>
-         <Conductivity>0.0262</Conductivity>
-      </Air>
-      <Foam cache="true" class="Material">
-         <Density>815</Density>
-         <SpecificCapacity>1200</SpecificCapacity>
-         <Conductivity>0.12</Conductivity>
-      </Foam>
-      <Aluminium cache="true" class="Material">
-         <Density>2700</Density>
-         <SpecificCapacity>897</SpecificCapacity>
-         <Conductivity>235</Conductivity>
-      </Aluminium>
-      <Copper cache="true" class="Material">
-         <Density>8920</Density>
-         <SpecificCapacity>385</SpecificCapacity>
-         <Conductivity>400</Conductivity>
-      </Copper>
-      <Kunststoff cache="true" class="Material">
-         <Density>8920</Density>
-         <SpecificCapacity>385</SpecificCapacity>
-         <Conductivity>400</Conductivity>
-      </Kunststoff>
-   </ThermalMaterials>
-  <CoolingBlocks>
-   	  <MyCoolingPlate class="CoolingPrismatic" cache="true">
-		 <Vertices>0, 0; 0.173, 0; 0.173, 0.045; 0, 0.045</Vertices> 		<!-- Eckpunkte des Kühlblocks -->
-		 <LowerZCoordinate>-0.01</LowerZCoordinate>                          	 <!-- Untere z-Koordinate des Kuehlblocks [m] -->
-		 <UpperZCoordinate>0</UpperZCoordinate>                          	 <!-- Obere z-Koordinate des Kuehblocks [m]-->
-		 <Cooling class="DirichletBoundaryCondition">                    	 <!-- Definition der Kuehlungsart: Hier isotherm (Dirichlet) -->
-			<SurfaceTemperature>20.0</SurfaceTemperature>               	 <!-- Konstante Temperatur des Kuehlblocks [°C] -->
-		 </Cooling>
-	  </MyCoolingPlate>
-   </CoolingBlocks>
-   <CachedCoolings>
-    </CachedCoolings>
-   <CustomDefinitions>
-      <MyOhmicResistanceser class="OhmicResistance">
-         <Object class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+    <MetaData>
+        <electrical>
+            <Date>29-Mar-2019 15:48:10</Date>
+            <Creator>sbi</Creator>
+            <CellName>SAM_I3_02</CellName>
+            <ModelName>R2RC</ModelName>
+        </electrical>
+        <thermal>
+            <Date>29-Mar-2018 11:28:54</Date>
+            <Creator>pde</Creator>
+            <CellName>BMW_i3_generic</CellName>
+            <ModelName>single_cell</ModelName>
+        </thermal>
+        <CXML>
+            <Date>02-Jul-2019 10:52:00</Date>
+            <Creator>pde-aep</Creator>
+            <CommitHash>100832b951ffbb34dab956701b362d4d76173ec2</CommitHash>
+        </CXML>
+        <Hash>5a8e4bc3d027f6fec9e8c3264e63fba9485e72e4</Hash>
+    </MetaData>
+    <Options>
+        <SampleRate>1</SampleRate>
+        <AirTemperature ReadFromFile="false">25</AirTemperature>
+        <ConvectionActivated advancedAreaAggregation="true">true</ConvectionActivated>
+        <RadiationActivated>true</RadiationActivated>
+        <GeometricalTolerance angleInDegrees="0.001" length="1e-06" percentOfQuantity="0.1"/>
+    </Options>
+    <Observer>
+        <Electrical>
+            <Filter1 class="MatlabFilter">
+                <Filename>SampleOutput.mat</Filename>
+            </Filter1>
+        </Electrical>
+        <Thermal>
+            <Filter1 class="DecimateFilter">
+                <TimeDelay>0.1</TimeDelay>
+            </Filter1>
+            <Filter2 class="MatlabFilter">
+                <Filename>Patch_Temperatures.mat</Filename>
+                <VerticesFile>Patch_Vertices.csv</VerticesFile>
+                <VolumesFile>Patch_Volumes.csv</VolumesFile>
+                <VolumeNamesFile>Patch_VolumeNames.csv</VolumeNamesFile>
+                <AreasFile>Patch_Areas.csv</AreasFile>
+            </Filter2>
+        </Thermal>
+    </Observer>
+    <ThermalMaterials>
+        <ActiveMaterialInner cache="true" class="MaterialCartesian">
+            <Density>2322</Density>
+            <SpecificCapacity>1000</SpecificCapacity>
+            <ConductivityX>0.6</ConductivityX>
+            <ConductivityY>30</ConductivityY>
+            <ConductivityZ>30</ConductivityZ>
+        </ActiveMaterialInner>
+        <Air cache="true" class="Material">
+            <Density>1.2041</Density>
+            <SpecificCapacity>1.005</SpecificCapacity>
+            <Conductivity>0.0262</Conductivity>
+        </Air>
+        <Foam cache="true" class="Material">
+            <Density>815</Density>
+            <SpecificCapacity>1200</SpecificCapacity>
+            <Conductivity>0.12</Conductivity>
+        </Foam>
+        <Aluminium cache="true" class="Material">
+            <Density>2700</Density>
+            <SpecificCapacity>897</SpecificCapacity>
+            <Conductivity>235</Conductivity>
+        </Aluminium>
+        <Copper cache="true" class="Material">
+            <Density>8920</Density>
+            <SpecificCapacity>385</SpecificCapacity>
+            <Conductivity>400</Conductivity>
+        </Copper>
+        <Kunststoff cache="true" class="Material">
+            <Density>8920</Density>
+            <SpecificCapacity>385</SpecificCapacity>
+            <Conductivity>400</Conductivity>
+        </Kunststoff>
+    </ThermalMaterials>
+    <CoolingBlocks>
+        <MyCoolingPlate class="CoolingPrismatic" cache="true">
+            <Vertices>0, 0; 0.173, 0; 0.173, 0.045; 0, 0.045</Vertices>
+            <!-- Eckpunkte des Kühlblocks -->
+            <LowerZCoordinate>-0.01</LowerZCoordinate>
+            <!-- Untere z-Koordinate des Kuehlblocks [m] -->
+            <UpperZCoordinate>0</UpperZCoordinate>
+            <!-- Obere z-Koordinate des Kuehblocks [m]-->
+            <Cooling class="DirichletBoundaryCondition">
+                <!-- Definition der Kuehlungsart: Hier isotherm (Dirichlet) -->
+                <SurfaceTemperature>20.0</SurfaceTemperature>
+                <!-- Konstante Temperatur des Kuehlblocks [°C] -->
+            </Cooling>
+        </MyCoolingPlate>
+    </CoolingBlocks>
+    <CachedCoolings/>
+    <CustomDefinitions>
+        <MyOhmicResistanceser class="OhmicResistance">
+            <Object class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008;
 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.000799999999999999, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008, 0.0008;
 0.000799999999999998, 0.000799999999999999, 0.000799999999999999, 0.0008, 0.000736334880002178, 0.000703054759274158, 0.000687843262860711, 0.000673549932706793, 0.000662219036820957, 0.000661342301445329, 0.000663049362822199, 0.000664676028959236, 0.0006661060030843, 0.000667952620030213, 0.000671757444597672, 0.000681771332962733, 0.000685521660431054, 0.000688334627173864, 0.00068979021711967, 0.000688641887421151, 0.000685132568968317, 0.000680795599283107, 0.000682961763047588;
@@ -105,19 +110,19 @@
 0.000588635240351527, 0.000550159562157278, 0.000511683883963031, 0.000501601369213986, 0.000496423037523981, 0.000493589444467335, 0.000489730843511232, 0.000487342723018856, 0.000484964464045191, 0.000483342616218076, 0.000481899992556761, 0.000481227531295209, 0.00048055687472381, 0.000479749793038312, 0.000478332188584006, 0.000476564435938103, 0.000475076223620998, 0.000474246785256703, 0.000474204179314971, 0.000473306631983809, 0.000473193153903235, 0.000472768032113671, 0.00047332428055292;
 0.000409280989994881, 0.000412775566461035, 0.000416270142927189, 0.000419764719393343, 0.000423259295859497, 0.000426753872325651, 0.000430248448791805, 0.000433743025257958, 0.000437237601724112, 0.000440236211135009, 0.000438820809931334, 0.00043785597617263, 0.000436932858901293, 0.000436069816292981, 0.000434841406959929, 0.000434098346073741, 0.000433151781052386, 0.000432435946532994, 0.000432143057138627, 0.000431837933635363, 0.000431917567170963, 0.000431101874597538, 0.000428232761373967
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </Object>
-      </MyOhmicResistanceser>
-      <MyParallelRC_1 class="ParallelRC">
-         <LookupOhmicResistance class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+            </Object>
+        </MyOhmicResistanceser>
+        <MyParallelRC_1 class="ParallelRC">
+            <LookupOhmicResistance class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 0.013078199609791, 0.0116729930917187, 0.0102677865736465, 0.00886258005557421, 0.00745737353750195, 0.00611109400154456, 0.00569106584580192, 0.00531976203617064, 0.0049698140269332, 0.00477839406997639, 0.0047236918788632, 0.00465479018291251, 0.00464386916356986, 0.00457144116116123, 0.00456753300175794, 0.00458450683530663, 0.00451661100054845, 0.00449845759017018, 0.00454741377382956, 0.00502782792194268, 0.00461342516372649, 0.00585108124810388, 0.0121753247769372;
 0.0131518087805095, 0.010841263922528, 0.00853071906454638, 0.00622017420656481, 0.00390962934858324, 0.00331527479018797, 0.00315425530513002, 0.00299444958461051, 0.00280692789518899, 0.00267681921811929, 0.00261357889463716, 0.00257220216544467, 0.00251169106386778, 0.00247123800420817, 0.00253506120256983, 0.00259298586657299, 0.00266289304364898, 0.0027154262733819, 0.00274046839568624, 0.00272862979105316, 0.00267534267656864, 0.00264601373994808, 0.011498324944441;
 0.0149758890615503, 0.011083125078762, 0.00719036109597359, 0.00329759711318521, 0.00209858876063479, 0.00178462082476865, 0.00176111129285977, 0.00177660871588321, 0.00172331333642955, 0.00161824900653639, 0.00154809293305105, 0.00147548530131277, 0.00141818077530748, 0.00138919374106979, 0.00146009540990241, 0.00160103652260109, 0.00172093858117091, 0.00176231362129418, 0.00169118832200499, 0.0016297530732508, 0.00159135835139921, 0.00146706215126667, 0.0107168963251775;
@@ -126,17 +131,17 @@
 -0.0219363131477148, -0.00587523397703239, 0.01018584519365, 0.00147264721702935, 0.000549361981221831, 0.000485028215153332, 0.00050991097150364, 0.000497758657104666, 0.000539540593875261, 0.000545800569321931, 0.000481381897095162, 0.000437860589647615, 0.000412726766396674, 0.000413479425092705, 0.000513905607719824, 0.000834112645888028, 0.000778948758318223, 0.000689509258387652, 0.000596657662017751, 0.000519535163510353, 0.000474404238112581, 0.000464095880033197, 0.00463739407515013;
 0.00307313005271497, 0.00278053222992036, 0.00248793440712575, 0.00219533658433114, 0.00190273876153653, 0.00161014093874192, 0.00131754311594731, 0.0010249452931527, 0.000732347470358093, 0.000461410218122805, 0.000386826028513125, 0.000328262124593751, 0.000302853110179455, 0.000311091591869778, 0.000395793187176653, 0.000646010018733461, 0.000543990301392328, 0.000456643768002225, 0.000396246666575541, 0.000356344609163517, 0.000337166384947879, 0.000617793729272836, 0.00345460166947012
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </LookupOhmicResistance>
-         <LookupTau class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+            </LookupOhmicResistance>
+            <LookupTau class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 21.2845753483402, 17.1625377096688, 13.0405000709974, 8.91846243232603, 4.79642479365464, 0.912041305297783, 0.772332959019721, 0.948440846435416, 0.82314370223374, 0.851981067851808, 0.864310782813779, 0.826293529449858, 0.754824955935376, 0.760130698834478, 0.72241166179643, 0.734958996752332, 0.718335208337621, 0.705771919157025, 0.767991103351355, 1.70130468820688, 0.65627781481389, 1.81239917605925, 10.9762147743273;
 46.1459647794377, 35.3088659978001, 24.4717672161625, 13.6346684345249, 2.79756965288733, 1.11389059543657, 1.28860750370755, 2.7694682513767, 3.72923644487593, 3.26379575979352, 2.85688754123761, 2.33072793605172, 1.88093169284333, 1.45539397048257, 1.33882611306512, 1.73666383330089, 3.27480053253064, 4.52562497937466, 5.00058923477942, 4.61905267765157, 3.15960308551495, 1.39249214863078, 13.4667015899842;
 175.614928080431, 123.974817632596, 72.3347071847605, 20.6945967369251, 10.0501922928803, 4.42453476382541, 6.69375352411131, 11.7337475889524, 15.2056204142313, 13.0478921871364, 11.4490282510719, 9.13714218243508, 7.74979045709482, 6.7627816278986, 5.26983035150917, 10.3461245136279, 15.7372314608568, 18.1549140469234, 15.1344577834783, 12.8714285735673, 11.294910138429, 6.06713957018488, 15.2360990429363;
@@ -145,19 +150,19 @@
 -7314.87474017202, -3176.14259209935, 962.589555973318, 153.426888966812, 27.8742207416227, 21.6731606533491, 24.9200092132392, 32.8886937735903, 39.7118225780499, 39.6170775781887, 33.0773398594754, 29.8066790904774, 26.7016743460656, 21.279587950283, 22.9663036269103, 68.5934043818588, 50.5416559756147, 37.691461136753, 31.1829667128869, 27.1949464103742, 25.3427076793012, 21.5527935153665, 2.41040910441523;
 1046.26976107875, 934.439160112154, 822.608559145553, 710.777958178952, 598.947357212351, 487.116756245749, 375.286155279148, 263.455554312547, 151.624953345946, 49.7427556685973, 37.8370668153647, 30.2361959183562, 25.5902833051479, 20.6520427801523, 23.0218389715836, 60.7907966268825, 36.8471305207243, 28.2448336676474, 25.8792733215615, 24.8089187801632, 23.6494486680481, 17.4014521393151, 1.25577501252973
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </LookupTau>
-      </MyParallelRC_1>
-      <MyParallelRC_2 class="ParallelRC">
-         <LookupOhmicResistance class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+            </LookupTau>
+        </MyParallelRC_1>
+        <MyParallelRC_2 class="ParallelRC">
+            <LookupOhmicResistance class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 110.70078633457, 89.0117326785642, 67.3226790225582, 45.6336253665523, 23.9445717105463, 3.37638172374747, 0.530139374310785, 0.228588782322647, 0.0989352854374419, 0.0608154748271717, 0.0489287731730997, 0.0392563505080732, 0.044335879638179, 0.058074864776906, 0.116501912983584, 0.0995195538840116, 0.0511636835657179, 0.0302564411448944, 0.0233338932127178, 0.090573461775926, 0.871662915317128, 6.43671619953132, 21.6578665329873;
 16.2633384085108, 12.3580544922743, 8.45277057603777, 4.54748665980124, 0.642202743564701, 0.392535276280899, 0.364329382664794, 0.208118685883595, 0.0911036937745366, 0.0501075084697375, 0.0399142798043442, 0.0373200344069577, 0.032217546215214, 0.0412158371502374, 0.12702372854846, 0.0757520450690245, 0.0447821550355235, 0.0284132766880178, 0.0238390300873469, 0.031135287203036, 0.0450374269037222, 0.439619954269593, 2.38432597281843;
 1187.56001592456, 802.544160884498, 417.528305844437, 32.5124508043768, 2.92783206217915, 0.483968066197253, 0.383612145504595, 0.290367023651094, 0.110824279527555, 0.0468329442586032, 0.038699546181301, 0.0318997140745702, 0.0350321802691997, 0.0562455138149064, 0.168264583226991, 0.0693279093265813, 0.0375887118191853, 0.0229744758768589, 0.01731446953965, 0.0222597462039343, 0.0540770104281458, 0.0816752242934072, 0.847380450938518;
@@ -166,17 +171,17 @@
 197.221793133184, 102.154754486885, 7.08771584058483, 1.76881055714253, 0.345574729427249, 1.21763701790755, 1.14797251217212, 1.09108772630121, 0.333787174412367, 0.119406545896988, 0.0592780278813104, 0.0656335881471924, 0.0957353538284326, 0.160816758576984, 0.26696901303485, 0.0888542112578327, 0.0535866807084043, 0.0420246739039553, 0.0610510113485544, 0.0600008182811135, 0.113183589093883, 0.342892675846813, 0.69249278014293;
 203.267770633641, 180.710756662478, 158.153742691316, 135.596728720153, 113.03971474899, 90.4827007778276, 67.925686806665, 45.3686728355023, 22.8116588643397, 2.28441520405816, 0.23391522800072, 0.0799277728888361, 0.0916615371315288, 0.193560350394817, 0.219549195556442, 0.104229444726914, 0.0985887500766485, 0.0577250416649402, 0.0521322875633116, 0.0829382900438772, 0.283030586702866, 0.543338495151215, 0.757875699128424
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </LookupOhmicResistance>
-         <LookupTau class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+            </LookupOhmicResistance>
+            <LookupTau class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 24212411.0075824, 19416819.1300467, 14621227.2525111, 9825635.37497543, 5030043.49743977, 493989.027425653, 50317.1085051769, 19952.6499916899, 10816.2020494817, 8271.50729180266, 8892.63085842802, 8767.8991798659, 11437.3399183476, 14712.4012821197, 21117.6548067215, 12175.1315014608, 5382.69779912067, 3192.90085239703, 2925.01158909478, 13737.8332026042, 58578.6361039092, 634214.068574555, 3840914.40223323;
 1961825.87759491, 1500403.30874975, 1038980.73990458, 577558.171059419, 116135.602214255, 51849.7233706654, 36137.7240461864, 21194.0806569808, 12674.0510489281, 9366.70513616125, 9719.84634070447, 10822.2845584625, 9613.73844294383, 11568.4152628683, 21443.5332396031, 10434.5578404991, 7419.60947941229, 6086.46127038847, 6212.95814649284, 8709.12560479523, 10881.7667712754, 39852.3847799956, 418420.787729113;
 53065240.5267415, 36264440.7082099, 19463640.8896784, 2662841.07114688, 648417.010298532, 72471.3519636399, 41195.6546407453, 33919.4726240903, 20378.0510090437, 11972.221684741, 12809.5572100975, 11680.5189899951, 13440.2711509205, 19404.5016992362, 30043.36482166, 11947.061160313, 8330.64512046239, 6935.87243630817, 5900.05068393346, 7451.13950305006, 15814.4587456904, 14714.3924277317, 141747.003781893;
@@ -185,19 +190,19 @@
 4720582.20742091, 2449212.34285391, 177842.478286918, 236491.423284724, 73817.6117616311, 168546.160752884, 141821.68143284, 156741.685307796, 73712.219241082, 41674.4850901118, 25666.0600567743, 31444.6008848405, 44353.0794063552, 54073.5380574165, 58691.8670965339, 25858.701104495, 20268.6605378538, 21332.8579433523, 35149.6322721672, 29149.583415671, 39591.2273683702, 66839.2027068024, 114372.482411619;
 40650612.6457413, 36190106.6826064, 31729600.7194715, 27269094.7563366, 22808588.7932017, 18348082.8300668, 13887576.8669319, 9427070.90379697, 4966564.94066207, 868538.072811505, 108668.707294105, 39042.9944441155, 41192.5676366265, 66258.2615072374, 48198.2150953153, 33595.2034280519, 40347.0288166286, 30710.8109678729, 29789.4603255725, 38294.516808153, 93217.1654319588, 103982.485136699, 120449.016833673
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </LookupTau>
-      </MyParallelRC_2>
-      <MyOCV class="VoltageSource">
-         <Object class="LookupObj2dWithState">
-            <RowState cacheref="Soc"/>
-            <ColState cacheref="ThermalState"/>
-            <LookupData>
+            </LookupTau>
+        </MyParallelRC_2>
+        <MyOCV class="VoltageSource">
+            <Object class="LookupObj2dWithState">
+                <RowState cacheref="Soc"/>
+                <ColState cacheref="ThermalState"/>
+                <LookupData>
 3.6158296127426, 3.54326746235541, 3.49937765144394, 3.48454371470453, 3.49914918683352, 3.54357760252724, 3.61821004427616, 3.70991859802468, 3.77454705158203, 3.80991213070378, 3.83381535642868, 3.85413363365646, 3.87423410358876, 3.89495342306921, 3.92280373037999, 3.97784865383929, 4.01140105558174, 4.03217709104125, 4.04738227944635, 4.06264526783488, 4.08142543080269, 4.11302756613879, 4.176034032476;
 2.47574630894081, 2.99011295717468, 3.28900451058628, 3.4376127443884, 3.50112943379378, 3.5447463540152, 3.62016992048836, 3.71148730590194, 3.77692465084322, 3.81173788001946, 3.83565910288528, 3.85641583157183, 3.87581130026396, 3.89680471186741, 3.92515946594257, 3.98046575890535, 4.01221743844118, 4.03423695265183, 4.04939449681824, 4.06463832979753, 4.08403687574935, 4.11397600100304, 4.1768991707121;
 -0.244243848295244, 1.87130651818267, 2.97701603633436, 3.40819273551098, 3.50014464506369, 3.54196187874396, 3.61674034464191, 3.70886595350302, 3.77691650410617, 3.81337235214419, 3.83735255315005, 3.85762375240293, 3.87682319493949, 3.89763546105053, 3.92626810751935, 3.98085891326369, 4.01105792917154, 4.03417702058817, 4.05007384192647, 4.06536865401971, 4.08615156829183, 4.1164897722847, 4.17901396614094;
@@ -206,66 +211,62 @@
 -2.53136764834059, 1.42766653177647, 3.05121865534072, 3.4293423324767, 3.50306187496444, 3.54285213338878, 3.61505918225199, 3.69718540532325, 3.77222151402027, 3.81646596443894, 3.84193229884199, 3.86184896979911, 3.88050304003104, 3.89851653502276, 3.92904282567801, 3.97522687160678, 4.00455991221946, 4.0289174777372, 4.04753798321955, 4.06425056369156, 4.08486090104634, 4.11451198847469, 4.17212911731622;
 -0.061813294491333, 0.964339832139351, 1.78941235304248, 2.43586323922528, 2.92615146169499, 3.28273599145886, 3.52807579952411, 3.68462985689798, 3.77485713458772, 3.82121660360056, 3.84616317409977, 3.86676369203667, 3.8849697318774, 3.90236769359548, 3.92987120111797, 3.97775867797626, 4.00483894289874, 4.02934209488711, 4.04794049478322, 4.06570131438884, 4.08790687149953, 4.12015288293363, 4.17558104754682
 </LookupData>
-            <MeasurementPointsRow desc="StateOfCharge">
+                <MeasurementPointsRow desc="StateOfCharge">
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPointsRow>
-            <MeasurementPointsColumn desc="ThermalState">
+                <MeasurementPointsColumn desc="ThermalState">
 -15, -5, 5, 15, 25, 35, 45
 </MeasurementPointsColumn>
-         </Object>
-      </MyOCV>
-      <MyPrismaticCell class="RectangularBlock">
-         <Material cacheref="ActiveMaterialInner"/>
-         <Dimensions>0.173, 0.045, 0.115</Dimensions>
-         <SizeX>30</SizeX>
-         <SizeY>30</SizeY>
-         <SizeZ>30</SizeZ>
-         <InitialTemperature>23.3</InitialTemperature>
-      </MyPrismaticCell>
-      <MyR2RC class="CellElement" observable="True">
-         <Children>
-            <OhmicResistance ref="MyOhmicResistanceser"/>
-            <ParallelRC ref="MyParallelRC_1"/>
-            <ParallelRC ref="MyParallelRC_2"/>
-            <VoltageSource ref="MyOCV"/>
-         </Children>
-         <Soc cache="True" class="Soc">
-            <InitialCapacity>65.0364</InitialCapacity>
-            <InitialSoc>100</InitialSoc>
-            <MeasurementPoints>
+            </Object>
+        </MyOCV>
+        <MyPrismaticCell class="RectangularBlock">
+            <Material cacheref="ActiveMaterialInner"/>
+            <Dimensions>0.173, 0.045, 0.115</Dimensions>
+            <SizeX>30</SizeX>
+            <SizeY>30</SizeY>
+            <SizeZ>30</SizeZ>
+            <InitialTemperature>23.3</InitialTemperature>
+        </MyPrismaticCell>
+        <MyR2RC class="CellElement" observable="True">
+            <Children>
+                <OhmicResistance ref="MyOhmicResistanceser"/>
+                <ParallelRC ref="MyParallelRC_1"/>
+                <ParallelRC ref="MyParallelRC_2"/>
+                <VoltageSource ref="MyOCV"/>
+            </Children>
+            <Soc cache="True" class="Soc">
+                <InitialCapacity>65.0364</InitialCapacity>
+                <InitialSoc>100</InitialSoc>
+                <MeasurementPoints>
 -10, -5, 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 </MeasurementPoints>
-         </Soc>
-         <ThermalState cache="True" class="ThermalState">
-            <InitialTemperature>23.3</InitialTemperature>
-         </ThermalState>
-         <ThermalBlock ref="MyPrismaticCell"/>
-      </MyR2RC>
-	  
-	  	<CellConnector1 class="RectangularBlock">
-         <Material cacheref="Aluminium"/>
-         <Dimensions>0.01, 0.01, 0.005</Dimensions>
-         <SizeX>4</SizeX>
-         <SizeY>4</SizeY>
-         <SizeZ>4</SizeZ>
-         <InitialTemperature>20</InitialTemperature>
-      </CellConnector1>
-	  
-	  <MyParallelString1 class="ParallelTwoPort">
-         <Children count="1">
-            <Cell1 dx="0.0" dy="0" ref="MyR2RC"/>
-         </Children>
-      </MyParallelString1>
-	  
-   </CustomDefinitions>
-   <RootElement class="SerialTwoPort">
-    <AdditionalBlocks>
-      	<Connector1 ref="CellConnector1" dx="0.04" dy="0.0175" dz="0.115"/>		
-		<Connector2 ref="CellConnector1" dx="0.133" dy="0.0175" dz="0.115"/>	
-   </AdditionalBlocks>
-   
-      <Children count="1">
-         <Pack ref="MyR2RC"/>
-      </Children>
-   </RootElement>
+            </Soc>
+            <ThermalState cache="True" class="ThermalState">
+                <InitialTemperature>23.3</InitialTemperature>
+            </ThermalState>
+            <ThermalBlock ref="MyPrismaticCell"/>
+        </MyR2RC>
+        <CellConnector1 class="RectangularBlock">
+            <Material cacheref="Aluminium"/>
+            <Dimensions>0.01, 0.01, 0.005</Dimensions>
+            <SizeX>4</SizeX>
+            <SizeY>4</SizeY>
+            <SizeZ>4</SizeZ>
+            <InitialTemperature>20</InitialTemperature>
+        </CellConnector1>
+        <MyParallelString1 class="ParallelTwoPort">
+            <Children count="1">
+                <Cell1 dx="0.0" dy="0" ref="MyR2RC"/>
+            </Children>
+        </MyParallelString1>
+    </CustomDefinitions>
+    <RootElement class="SerialTwoPort">
+        <AdditionalBlocks>
+            <Connector1 ref="CellConnector1" dx="0.04" dy="0.0175" dz="0.115"/>
+            <Connector2 ref="CellConnector1" dx="0.133" dy="0.0175" dz="0.115"/>
+        </AdditionalBlocks>
+        <Children count="1">
+            <Pack ref="MyR2RC"/>
+        </Children>
+    </RootElement>
 </Configuration>

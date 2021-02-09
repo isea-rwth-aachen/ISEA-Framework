@@ -20,6 +20,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 namespace matlab
 {
 
+MatioData::MatioData() {}
+
 MatioData::MatioData( matvar_t *matvar )
     : mMatlabVar( matvar )
 {
@@ -28,45 +30,14 @@ MatioData::MatioData( matvar_t *matvar )
     mName = matvar->name;
 };
 
-MatioData::MatioData( std::vector< double > &data, std::string name )
+MatioData::MatioData( typename DataVector< 1 >::DataT &data, std::string name ) { LoadFromVector< 1 >( data, name ); }
+
+MatioData::MatioData( typename DataVector< 2 >::DataT &data, std::string name ) { LoadFromVector< 2 >( data, name ); }
+
+MatioData::MatioData( std::string &data, std::string name )
 {
-    size_t dims[2] = {1, data.size()};
-    mMatlabVar = Mat_VarCreate( SetNames( name ).c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &data[0], 0 );
-}
-
-
-MatioData::MatioData( std::vector< std::vector< double > > &data, std::string name )
-{
-
-    for ( size_t i = 1; i < data.size(); ++i )
-    {
-        if ( data[i].size() != data[0].size() )
-            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "matioEmptyVariable", data[i].size(),
-                                                 data[0].size() );
-    }
-    size_t dims[2];
-    if ( data.size() == 0 )
-    {
-        dims[0] = 0;
-        dims[1] = 0;
-    }
-    else
-    {
-        dims[0] = data.size();
-        dims[1] = data.at( 0 ).size();
-    }
-
-    std::vector< double > finalVec( dims[0] * dims[1] );
-
-    for ( size_t j = 0; j < dims[0]; ++j )
-    {
-        for ( size_t i = 0; i < dims[1]; ++i )
-        {
-            finalVec[j + i * dims[0]] = data[j][i];
-        }
-    }
-
-    mMatlabVar = Mat_VarCreate( SetNames( name ).c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &finalVec[0], 0 );
+    size_t dims[2] = {1, data.size() + 1};
+    mMatlabVar = Mat_VarCreate( SetNames( name ).c_str(), MAT_C_CHAR, MAT_T_UTF8, 2, dims, &data[0], 0 );
 }
 
 std::string MatioData::SetNames( std::string &name )
@@ -93,11 +64,6 @@ void MatioData::CheckSanity() const
 {
     if ( !mMatlabVar )
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "matioEmptyVariable" );
-
-    if ( mMatlabVar->rank != 2 )
-    {
-        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "unsupportedDimension" );
-    }
 }
 
 double &MatioData::operator()( size_t x, size_t y )
@@ -155,6 +121,35 @@ MatioData &MatioData::operator[]( std::string variableName )
     return *mReturnMember;
 }
 
-} /* matlab */
+template <>
+void MatioData::LoadFromVector< 1 >( typename DataVector< 1 >::DataT &data, std::string name )
+{
+    size_t dims[2];
+    dims[0] = 1;
+    GetDimensions< 1 >( data, dims + 1 );
+    mMatlabVar = Mat_VarCreate( SetNames( name ).c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dims, &data[0], 0 );
+}
+
+template <>
+void CopyData< 1 >( typename DataVector< 1 >::DataT &vecIn, std::vector< double > &vecOut, size_t *dims, size_t position, size_t stepsize )
+{
+    size_t length = vecIn.size();
+    if ( length != dims[0] )
+    {
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "matioEmptyVariable", length, dims[0] );
+    }
+    for ( size_t i = 0; i < length; ++i )
+    {
+        vecOut[position + i * stepsize] = vecIn[i];
+    }
+}
+
+template <>
+void GetDimensions< 1 >( typename DataVector< 1 >::DataT &data, size_t *dims )
+{
+    dims[0] = data.size();
+}
+
+}    // namespace matlab
 
 #endif /* _DS1006 */

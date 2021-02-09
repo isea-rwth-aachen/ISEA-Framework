@@ -1,0 +1,27 @@
+<Object class="ExpressionObj">
+    <Expression>Soc / 2 + T / 3</Expression>
+    <Rescale>
+        <InputRangeMinimum>10</InputRangeMinimum>
+        <InputRangeMaximum>60</InputRangeMaximum>
+        <OutputRangeMinimum>0</OutputRangeMinimum>
+        <OutputRangeMaximum>5</OutputRangeMaximum>
+    </Rescale>
+    <Parameters>
+        <Param cacheref="Soc">
+            <Rescale>
+                <InputRangeMinimum>0</InputRangeMinimum>
+                <InputRangeMaximum>100</InputRangeMaximum>
+                <OutputRangeMinimum>10</OutputRangeMinimum>
+                <OutputRangeMaximum>90</OutputRangeMaximum>
+            </Rescale>
+        </Param>
+        <Param cacheref="ThermalState" name="T">
+            <Rescale>
+                <InputRangeMinimum>0</InputRangeMinimum>
+                <InputRangeMaximum>30</InputRangeMaximum>
+                <OutputRangeMinimum>10</OutputRangeMinimum>
+                <OutputRangeMaximum>50</OutputRangeMaximum>
+            </Rescale>
+        </Param>
+    </Parameters>
+</Object>

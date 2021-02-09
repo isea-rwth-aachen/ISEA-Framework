@@ -10,7 +10,7 @@ void TestCalendarianAging::testNoAging()
     auto socState = boost::make_shared< state::Soc >( 10.0, 10.0, 50.0 );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( 20.0 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
-    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams;
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams;
     const auto obj = boost::make_shared< object::ExpressionObject< double > >( "0.0001", objParams );
     {    // calculation time of zero seconds
         aging::CalendarianAging aging( 10, 0, 0, obj, obj, 1, 1, true, 1 );
@@ -49,9 +49,9 @@ void TestCalendarianAging::testAgingCalculation()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
-                                                                                     {"T", temperatureValueState},
-                                                                                     {"SOC", socValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"V", voltageValueState},
+                                                                                    {"T", temperatureValueState},
+                                                                                    {"SOC", socValueState}};
     const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (V + T - 300)", objParams );
     const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (V + T - 300)", objParams );
 
@@ -92,9 +92,9 @@ void TestCalendarianAging::testReset()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
-                                                                                     {"T", temperatureValueState},
-                                                                                     {"SOC", socValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"V", voltageValueState},
+                                                                                    {"T", temperatureValueState},
+                                                                                    {"SOC", socValueState}};
     const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (V + T - 300)", objParams );
     const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (V + T - 300)", objParams );
 
@@ -153,9 +153,9 @@ void TestCalendarianAging::testFormulaVariables()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto temperatureValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::ParameterT > objParams{{"V", voltageValueState},
-                                                                                     {"T", temperatureValueState},
-                                                                                     {"SOC", socValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"V", voltageValueState},
+                                                                                    {"T", temperatureValueState},
+                                                                                    {"SOC", socValueState}};
     {
         const auto obj = boost::make_shared< object::ExpressionObject< double > >( "V", objParams );
         aging::CalendarianAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0 );

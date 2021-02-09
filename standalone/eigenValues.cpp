@@ -11,10 +11,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <string>
 
 // ETC
+#include "../src/electrical/electrical_simulation.h"
 #include "../src/export/numericExport.h"
 #include "../src/misc/StrCont.h"
 #include "../src/misc/matrixInclude.h"
-#include "../src/electrical/electrical_simulation.h"
 #include "../src/xmlparser/tinyxml2/xmlparserimpl.h"
 #include "standalone/standalone.h"
 
@@ -40,7 +40,7 @@ int main( int argc, char *argv[] )
         return EXIT_FAILURE;
     }
 
-    boost::scoped_ptr< simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false > > electricalSimulation;
+    boost::scoped_ptr< simulation::ElectricalSimulation< myMatrixType, double, false > > electricalSimulation;
 
     try
     {
@@ -49,7 +49,7 @@ int main( int argc, char *argv[] )
 
         std::vector< boost::shared_ptr< ::electrical::TwoPort< myMatrixType > > > cells;
         electricalSimulation.reset(
-         new simulation::ElectricalSimulation< myMatrixType, ScalarUnit, false >( rootXmlNode, 0.01, 0.01, 0.1, &cells ) );
+         new simulation::ElectricalSimulation< myMatrixType, double, false >( rootXmlNode, 0.01, 0.01, 0.1, &cells ) );
         parser.reset();
     }
     catch ( std::exception &e )

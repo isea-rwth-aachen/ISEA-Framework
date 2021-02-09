@@ -8,12 +8,10 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "TestRmphn.h"
 #include "../../electrical/parallelrc.h"
 #include "../../electrical/rmphn.h"
-
-#include "../../factory/electricalEquationSystem/chooseElectricSystemType.h"
 #include "../../factory/factorybuilder.h"
-
+#include "../../misc/matrixInclude.h"
 #include "../../object/const_obj.h"
-
+#include "../../system/dae_sys.h"
 #include "../../xmlparser/tinyxml2/xmlparserimpl.h"
 
 extern template class electrical::Rmphn< myMatrixType >;
@@ -374,7 +372,7 @@ void TestRmphn::testRmphnFactoryPower()
     sd->SetSystem( &differenceGroup );
     // differenceGroup.mDglStateSystem.Initialize( maxSize );
     differenceGroup.Initialize();
-    auto mEqSystem = factory::ChooseElectricEquationSystemType( &differenceGroup );
+    auto mEqSystem = boost::make_shared< systm::DifferentialAlgebraicSystem< myMatrixType > >( &differenceGroup );
 
     myMatrixType current;
     current.resize( 1, maxSize );

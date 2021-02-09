@@ -2,6 +2,10 @@
 
 #include "../../src/container/matio_file.h"
 
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <cstdlib>
+
 extern template class electrical::TimeSeries< double, electrical::EvalNoInterpolation >;
 
 namespace standalone
@@ -15,19 +19,23 @@ SimulationStandalone::SimulationStandalone( const std::string &name )
     , mThermalStopCriterion( 5.0 )
     , mQuiet( false )
     , mOutputDecimation( -1.0 )
+    , mNoMetadata( false )
     , mCycles( 1 )
-    , mProfileChangeTime( 0.0 )
+    , mUUID( boost::uuids::to_string( boost::uuids::random_generator()() ) )
     , mProfileLength( 0.0 )
+    , mProfileChangeTime( 0.0 )
 {
 }
 
 void SimulationStandalone::AddOptions()
 {
     Standalone::AddOptions();
-    mApp.add_option( "xml-file", mXmlFilename, "XML configuration file" )->required();
-    mApp.add_option( "current-profile", mProfileFilename, "Current profile" )->required();
+    auto xmlOption = mApp.add_option( "xml-file", mXmlFilename, "XML configuration file" );
+    auto profileOption = mApp.add_option( "current-profile", mProfileFilename, "Current profile" );
+    xmlOption->needs( profileOption );
     mApp.add_flag( "-q,--quiet", mQuiet, "Suppress almost all output" );
     mApp.add_option( "-d,--decimation", mOutputDecimation, "Decimation for the default stdout filters" );
+    mApp.add_flag( "--no-metadata", mNoMetadata, "Disable output of simulation metadata" );
 }
 
 bool SimulationStandalone::ParseCommandLine( int argc, char *argv[] )
