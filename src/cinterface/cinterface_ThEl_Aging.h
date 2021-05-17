@@ -22,7 +22,7 @@ extern "C"
                                       real_T *powerOutputVec, real_T *socOutputVec, real_T *socSurfaceOutputVec );
 
     void GetRealSizes_ThEl_Aging( const char *configStr, const size_t *pointerStructureAddress, size_t *stateSize,
-                                  size_t *numberOfCells, size_t *probeSize, size_t *agingTwoportSize );
+                                  size_t *numberOfCells, size_t *probeSize, size_t *agingTwoportSize, size_t *realObserverSize );
 
     /// Apply the aging input to the cells
     void SetAging_ThEl_Aging( const size_t *pointerStructureAddress, const real_T *capFactors, const real_T *resFactors,

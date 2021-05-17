@@ -86,21 +86,40 @@ extern "C"
     {
         PointerStructure_ThEl_Aging *pointerStructure = (PointerStructure_ThEl_Aging *)*pointerStructureAddress;
 
-        std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > > outputTwoports;
-        const auto &agingTwoports = pointerStructure->mAgingSimulation->mAgingTwoPorts;
-        outputTwoports.reserve( agingTwoports.size() );
-        for ( const auto &twoport : agingTwoports )
+        size_t numberOfCellelements = pointerStructure->mElectricalSimulation->mCellElements.size();
+        const auto &observedTwoports = pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts();
+        if ( observedTwoports.size() > numberOfCellelements )
         {
-            outputTwoports.push_back( twoport->GetTwoPort() );
+            // Reorder the observed twoports so that all elements inside one cell end up in the same row in the output
+            // matrix. The vector is interpreted as a column-major matrix with the number of rows equal to the number of cells
+            std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size(), nullptr );
+            size_t outputRows = numberOfCellelements;
+            size_t outputColumns = std::ceil( (double)observedTwoports.size() / outputRows );
+            // first column has all the cellements, so they can just be copied
+            for ( size_t i = 0; i < numberOfCellelements; ++i )
+            {
+                twoportVector[i] = observedTwoports[i];
+            }
+            for ( size_t i = numberOfCellelements; i < observedTwoports.size(); ++i )
+            {
+                size_t row = ( i - numberOfCellelements ) / ( outputColumns - 1 );
+                size_t column = ( i - numberOfCellelements ) % ( outputColumns - 1 ) + 1;
+                twoportVector[column * outputRows + row] = observedTwoports[i];
+            }
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &twoportVector, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
         }
-
-        pointerStructure->mElectricalSimulation->mObserver =
-         CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
-          &outputTwoports, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        else
+        {
+            pointerStructure->mElectricalSimulation->mObserver =
+             CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(
+              &observedTwoports, 0, voltageOutputVec, currentOutputVec, powerOutputVec, socOutputVec, socSurfaceOutputVec );
+        }
     }
 
     void GetRealSizes_ThEl_Aging( const char *configStr, const size_t *pointerStructureAddress, size_t *stateSize,
-                                  size_t *numberOfCells, size_t *probeSize, size_t *agingTwoportSize )
+                                  size_t *numberOfCells, size_t *probeSize, size_t *agingTwoportSize, size_t *observerSize )
     {
         xmlparser::tinyxml2::XmlParserImpl parser;
         parser.ReadFromMem( configStr );
@@ -114,6 +133,7 @@ extern "C"
             PointerStructure_ThEl_Aging *pointerStructure = (PointerStructure_ThEl_Aging *)*pointerStructureAddress;
             electricalStateSize = pointerStructure->mElectricalSimulation->mStateSystemGroup.GetStateCount();
             *agingTwoportSize = pointerStructure->mAgingSimulation->mAgingTwoPorts.size();
+            *observerSize = pointerStructure->mElectricalSimulation->mObserver->GetObservedTwoPorts().size();
         }
         else
         {
@@ -126,6 +146,7 @@ extern "C"
                                                                          nullptr, {}, 0, &factoryBuilder ) );
             electricalStateSize = pointerStructure.mElectricalSimulation->mStateSystemGroup.GetStateCount();
             *agingTwoportSize = pointerStructure.mAgingSimulation->mAgingTwoPorts.size();
+            *observerSize = pointerStructure.mElectricalSimulation->mObserver->GetObservedTwoPorts().size();
         }
         if ( stateSize )
             *stateSize = themalStateSize + electricalStateSize;

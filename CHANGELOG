@@ -1,3 +1,8 @@
+Version 2.24.1
+===========
+- Fix S-functions build for windows
+- Fix observer output for individual twoports in the aging S-function
+
 Version 2.24.0
 ===========
 - Expression object can rescale parameters and output value
