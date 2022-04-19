@@ -76,6 +76,9 @@ class TimeSeries
 
     void StartNewCycle();
 
+    /// Moves forward in load profile and updates mValue, used if votlage limits are reached.
+    bool MoveToNextProfileValue( T time, double &duration );
+
     /// Gets internal time
     T GetTime() const;
     /// Gets the last time step in the series
@@ -100,6 +103,7 @@ class TimeSeries
     bool inline LoopConditionForIndexIncrement() const;
     vector< T > mTimesData;
     vector< T > mValuesData;
+    vector< T > mTimesDataInitial;
     T mTime;
     T mValue;
     T mCycleLength;
@@ -182,6 +186,8 @@ TimeSeries< T, EVALUATOR >::TimeSeries( std::istream &stream, T timeScalingFacto
     mEvaluator.CalculateValue( true, mTimesData, mValuesData, mTime, mIndex, mValue );
 
     mCycleLength = GetMaxTime();
+
+    mTimesDataInitial = mTimesData;
 }
 #endif
 
@@ -202,6 +208,7 @@ TimeSeries< T, EVALUATOR >::TimeSeries( const vector< T > &timesData, const vect
     , mType( TimeSeriesType::CURRENT )
 {
     ResetData( timesData, valuesData, timeScalingFactor, valueScalingFactor );
+    mTimesDataInitial = mTimesData;
 }
 
 
@@ -242,12 +249,36 @@ void TimeSeries< T, EVALUATOR >::SetTimeAndTriggerEvaluation( T time )
 template < typename T, template < typename > class EVALUATOR >
 void TimeSeries< T, EVALUATOR >::StartNewCycle()
 {
-    std::vector< T > increaseVector( mTimesData.size(), mCycleLength );
+    std::vector< T > increaseVector( mTimesDataInitial.size(), mCycleLength );
 
-    std::transform( mTimesData.begin(), mTimesData.end(), increaseVector.begin(), mTimesData.begin(), std::plus< T >() );
+    // In case the mTimesData was modified use saved TimesDataInitial
+    std::transform( mTimesDataInitial.begin(), mTimesDataInitial.end(), increaseVector.begin(), mTimesData.begin(),
+                    std::plus< T >() );
 
     ResetData( mTimesData, mValuesData );
+    mTimesDataInitial = mTimesData;
 }
+
+template < typename T, template < typename > class EVALUATOR >
+bool TimeSeries< T, EVALUATOR >::MoveToNextProfileValue( T time, double &duration )
+{
+
+    // size_t indexSave = mIndex;
+    if ( mIndex + 1 < mTimesData.size() )
+    {
+        // Calculate the difference between the current time and the next timestep.
+        double remainingTimeInStep = mTimesData[mIndex + 1] - time;
+        // Substract the time difference from all time values higher than the current step
+        for ( size_t i = mIndex + 1; i < mTimesData.size(); ++i )
+            mTimesData[i] = mTimesData[i] - remainingTimeInStep;
+        // Set time and evaluate trigger
+        SetTimeAndTriggerEvaluation( time );
+        duration = remainingTimeInStep;
+        return true;
+    }
+    return false;
+}
+
 
 template < typename T, template < typename > class EVALUATOR >
 T TimeSeries< T, EVALUATOR >::GetMaxTime() const

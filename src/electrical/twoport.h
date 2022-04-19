@@ -83,6 +83,8 @@ class TwoPort
     ScalarUnit GetCurrentValue() const;    ///< Returns the precalculated current
     ScalarUnit GetVoltageValue() const;    ///< Returns the precalculated voltage
     ScalarUnit GetPowerValue() const;      ///< Returns the precalculated power
+    double GetLostChargeAh() const;        /// Returns the lost load in charge direction by changing the profile
+    double GetLostDischargeAh() const;     /// Returns the lost load in dsicharge direction by changing the profile
 
 #ifndef _SYMBOLIC_
 
@@ -95,6 +97,7 @@ class TwoPort
     virtual const char* GetName() const;
     virtual void SetResistanceFactor( const double factor );    // Sets a factor which all resistances are multiplied by
     const DataType& GetElectricalData() const;
+    virtual void AddRemainingLoadTime( const double lostTime );    // Adds time to lost ah counter, used in root two port
 
     protected:
     /// Calculate the current of the previous simulation step.
@@ -111,6 +114,10 @@ class TwoPort
     ScalarUnit& mCurrentValue;
     ScalarUnit& mVoltageValue;
     ScalarUnit& mPowerValue;
+
+    double mLostChargeValue;
+    double mLostDischargeValue;
+
 
     systm::StateSystemGroup< T >* mStateSystemGroup;
 

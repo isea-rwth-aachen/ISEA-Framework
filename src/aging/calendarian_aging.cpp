@@ -6,12 +6,13 @@
 namespace aging
 {
 CalendarianAging::CalendarianAging( const double agingStepTime, const double minAlphaCapacity, const double minAlphaResistance,
+                                    const double maxAlphaCapacity, const double maxAlphaResistance,
                                     const boost::shared_ptr< object::Object< double > >& alphaCapacity,
                                     const boost::shared_ptr< object::Object< double > >& alphaResistance,
                                     const double initialCapacityFactor, const double initialResistanceFactor,
                                     const bool isEnabled, const double timeExponent )
-    : EmpiricalAging( agingStepTime, minAlphaCapacity, minAlphaResistance, alphaCapacity, alphaResistance,
-                      initialCapacityFactor, initialResistanceFactor, isEnabled )
+    : EmpiricalAging( agingStepTime, minAlphaCapacity, minAlphaResistance, maxAlphaCapacity, maxAlphaResistance,
+                      alphaCapacity, alphaResistance, initialCapacityFactor, initialResistanceFactor, isEnabled )
     , mTimeExponent( timeExponent )
     , mActualVoltage( 0.0 )
     , mActualTemperature( 0.0 )
@@ -39,10 +40,8 @@ void CalendarianAging::CalculateAging( const TwoportState& twoportState, double 
             dt = mTimeValues[i] - previousTime;
             alphaCap = this->mCapacityStressFactor->GetValue();
             alphaRes = this->mResistanceStressFactor->GetValue();
-            if ( alphaCap < this->mMinStressFactorCapacity )
-                alphaCap = this->mMinStressFactorCapacity;
-            if ( alphaRes < this->mMinStressFactorResistance )
-                alphaRes = this->mMinStressFactorResistance;
+            alphaCap = clamp( alphaCap, this->mMinStressFactorCapacity, this->mMaxStressFactorCapacity );
+            alphaRes = clamp( alphaRes, this->mMinStressFactorResistance, this->mMaxStressFactorResistance );
             alphaCapSum += alphaCap * dt;
             alphaResSum += alphaRes * dt;
             previousTime = mTimeValues[i];

@@ -68,6 +68,18 @@ ScalarUnit TwoPort< T >::GetPowerValue() const
     return mPowerValue;
 }
 
+template < typename T >
+double TwoPort< T >::GetLostChargeAh() const
+{
+    return mLostChargeValue;
+}
+
+template < typename T >
+double TwoPort< T >::GetLostDischargeAh() const
+{
+    return mLostDischargeValue;
+}
+
 
 template < typename T >
 inline ScalarUnit ReturnFirstElement( T& mat )
@@ -103,6 +115,8 @@ TwoPort< T >::TwoPort( const bool observable, DataType dataValues )
     , mCurrentValue( mDataStruct->mCurrentValue )
     , mVoltageValue( mDataStruct->mVoltageValue )
     , mPowerValue( mDataStruct->mPowerValue )
+    , mLostChargeValue( 0.0 )
+    , mLostDischargeValue( 0.0 )
     , mStateSystemGroup( 0 )
     , mObservable( observable )
 {
@@ -182,6 +196,23 @@ void TwoPort< T >::SetCurrent( const T current )
     mVoltage.resize( mCurrent.rows(), mCurrent.cols() );
     mVoltage.setZero();
 }
+
+
+template < typename T >
+void TwoPort< T >::AddRemainingLoadTime( const double lostTime )
+{
+#ifndef _SYMBOLIC_
+    if ( mCurrentValue < 0 )
+    {
+        mLostDischargeValue = mLostDischargeValue + abs( mCurrentValue * lostTime / 3600 );
+    }
+    else
+    {
+        mLostChargeValue = mLostChargeValue + abs( mCurrentValue * lostTime / 3600 );
+    }
+#endif
+}
+
 
 template < typename T >
 const T TwoPort< T >::GetCurrent() const

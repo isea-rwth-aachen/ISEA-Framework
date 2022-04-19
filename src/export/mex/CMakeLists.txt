@@ -19,7 +19,7 @@ endif()
 
 if(BUILD_SIMULINK_MATRIX_MODEL)
   if(NOT Matlab_LIBRARIES)
-    find_package(Matlab REQUIRED COMPONENTS MAT_LIBRARY SIMULINK)
+    find_package(Matlab REQUIRED COMPONENTS MAT_LIBRARY)
   endif()
 
   function(create_mex mex_name sourcefile)

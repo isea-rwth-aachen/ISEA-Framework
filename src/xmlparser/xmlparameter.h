@@ -80,8 +80,10 @@ class XmlParameter
     /// Finds a node with the given name and returns its value as bool
     virtual bool GetElementBoolValue( const char* elementName = nullptr, bool defaultValue = false ) const = 0;
 
-    /// Finds a node with the given name and returns it's value as double. Throws ParameterNotFoundException
-    virtual double GetElementDoubleValue( const char* elementName = nullptr, double defaultValue = 0 ) const = 0;
+    /// Finds a node with the given name and returns its value as double. Returns default value if node is not found.
+    virtual double GetElementDoubleValue( const char* elementName, double defaultValue ) const = 0;
+    /// Finds a node with the given name and returns its value as double. Throws ParameterNotFoundException.
+    virtual double GetElementDoubleValue( const char* elementName = 0 ) const = 0;
 
     /// Finds a node with the given name and returns its value as int. Throws ParameterNotFoundException
     virtual int GetElementIntValue( const char* elementName = nullptr, int defaultValue = 0 ) const = 0;
@@ -110,17 +112,25 @@ class XmlParameter
     /// Finds an attribute with the given name and return its value. Throws AttributeNotFoundException
     virtual const char* GetElementAttributeCharPtrValue( const char* attributeName ) const = 0;
 
-    /// Finds an attribute with the given name and return its value as bool
-    virtual bool GetElementAttributeBoolValue( const char* attributeName, bool defaultValue = false ) const = 0;
+    /// Finds an attribute with the given name and return its value as bool. Returns default value if attribute is not found.
+    virtual bool GetElementAttributeBoolValue( const char* attributeName, bool defaultValue ) const = 0;
+    /// Finds an attribute with the given name and return its value as bool. Throws exception if attribute is not found.
+    virtual bool GetElementAttributeBoolValue( const char* attributeName ) const = 0;
 
-    /// Finds an attribute with the given name and return its value as int
-    virtual int GetElementAttributeIntValue( const char* attributeName, int defaultValue = 0 ) const = 0;
+    /// Finds an attribute with the given name and return its value as int. Returns default value if attribute is not found.
+    virtual int GetElementAttributeIntValue( const char* attributeName, int defaultValue ) const = 0;
+    /// Finds an attribute with the given name and return its value as int. Throws exception if attribute is not found.
+    virtual int GetElementAttributeIntValue( const char* attributeName ) const = 0;
 
-    /// Finds an attribute with the given name and return its value as size_t
-    virtual size_t GetElementAttributeUnsignedIntValue( const char* attributeName, size_t defaultValue = 0 ) const = 0;
+    /// Finds an attribute with the given name and return its value as size_t. Returns default value if attribute is not found.
+    virtual size_t GetElementAttributeUnsignedIntValue( const char* attributeName, size_t defaultValue ) const = 0;
+    /// Finds an attribute with the given name and return its value as size_t. Throws exception if attribute is not found.
+    virtual size_t GetElementAttributeUnsignedIntValue( const char* attributeName ) const = 0;
 
-    /// Finds an attribute with the given name and return its value as double
-    virtual double GetElementAttributeDoubleValue( const char* attributeName, double defaultValue = 0 ) const = 0;
+    /// Finds an attribute with the given name and return its value as double. Returns default value if attribute is not found.
+    virtual double GetElementAttributeDoubleValue( const char* attributeName, double defaultValue ) const = 0;
+    /// Finds an attribute with the given name and return its value as double. Throws exception if attribute is not found.
+    virtual double GetElementAttributeDoubleValue( const char* attributeName ) const = 0;
 
 
     /* Writing to the xml file */

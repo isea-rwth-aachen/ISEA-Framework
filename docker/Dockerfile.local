@@ -1,0 +1,6 @@
+FROM iseaframe_cicd:latest
+
+COPY . /usr/src/iseaframe
+
+WORKDIR /usr/src/iseaframe
+

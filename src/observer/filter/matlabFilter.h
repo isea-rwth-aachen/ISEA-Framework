@@ -42,6 +42,7 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
         , mMaxSize( maxSize )
         , mDataLocation( "diga.daten." )
         , mFilenamePrefix( filenamePrefix )
+        , mIsVoltageLimited( false ) 
         , mMatrixSizes( 0 ){};
 
     virtual ~MatlabFilter() { this->WriteToDisk(); }
@@ -92,6 +93,7 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
     /// Set the matlab struct that all data is written to, e.g. diga.daten
     virtual void SetDataLocation( const std::string &location ) { this->mDataLocation = location + "."; }
     virtual void SetFilenamePrefix( const std::string &prefix ) { this->mFilenamePrefix = prefix; }
+    virtual void SetIsVoltageLimited() { this->mIsVoltageLimited = true; }
 
     virtual void MaxSampleReached( size_t nextNumber );
     virtual void PrepareFilter( ArgumentType &prepData )
@@ -115,6 +117,7 @@ class MatlabFilter : public Filter< T, TConcrete, ArgumentType >
     std::string mDataLocation;
     std::string mFilenamePrefix;
     size_t mMatrixSizes;
+    bool mIsVoltageLimited;
 
     std::string MakeFilename( size_t cycle )
     {
@@ -242,6 +245,11 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
             this->mMatlabVectors["Spannung"].push_back( port->GetVoltageValue() );
             this->mMatlabVectors["Strom"].push_back( port->GetCurrentValue() );
             this->mMatlabVectors["ThermischLeistung"].push_back( port->GetPowerValue() );
+            if ( this->mIsVoltageLimited )
+            {
+                this->mMatlabVectors["VerloreneLadeladung"].push_back( port->GetLostChargeAh() );
+                this->mMatlabVectors["VerloreneEntladeladung"].push_back( port->GetLostDischargeAh() );
+            }
         }
         MatlabFilter< T, electrical::TwoPort, PreparationType< T > >::ProcessData( data, t );
     }

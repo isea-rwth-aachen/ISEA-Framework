@@ -26,6 +26,9 @@ function PrintHelp
     PrintMessage "-b <builddir>\t\tSpecify the build dir. Default is \"build\""
     PrintMessage "-c\t\tOnly configure, do not start the build process."
     PrintMessage "-j <n>\t\tUse n threads for building. Default is 20."
+    PrintMessage "-m\t\tDo not include Matlab-dependent builds"
+    PrintMessage "-s\t\tDo not include s-functions"
+    PrintMessage "-e <e>\t\tAppend e to cmake command line options. Default is ''."
 }
 
 function RunCMake
@@ -43,7 +46,18 @@ function RunCMake
     CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_BUILD_TYPE:STRING=Release -DARCH_TYPE:STRING=64 -DBUILD_AGING:BOOL=ON -DBUILD_NUMERIC:BOOL=ON -DBUILD_SYMBOLIC:BOOL=ON -DBUILD_UNITTESTS:BOOL=ON -DBUILD_DOCS:BOOL=ON -DCREATE_RELEASE_DIRS:BOOL=ON"
     CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_VISUALIZER:BOOL=ON -DBUILD_DOT_EXPORT:BOOL=ON -DBUILD_QUICKVERIFICATION:BOOL=ON -DBUILD_SVG_EXPORT:BOOL=ON -DBUILD_ELECTRICAL_SIMULATION:BOOL=ON -DBUILD_THERMAL_SIMULATION:BOOL=ON -DBUILD_THERMAL_ELECTRICAL_SIMULATION:BOOL=ON -DBUILD_AGING_SIMULATION:BOOL=ON -DBUILD_GETTOTALCAPACITY:BOOL=ON"
     CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_EIGENWERTE:BOOL=ON -DBUILD_SYMBOLICOPTIMIZATION:BOOL=ON -DBUILD_SYMBOLIC_2_TEX:BOOL=ON -DBUILD_SYSTEM_2_TEX:BOOL=ON -DBUILD_SYSTEM_2_MATLAB:BOOL=ON -DBUILD_SYSTEM_2_SYMBOLIC:BOOL=ON"
-    CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_S_FUNCTIONS:BOOL=ON -DBUILD_SIMULINK_MATRIX_MODEL:BOOL=ON"
+    if [ $MATLAB -eq 1 ]
+    then
+        if [ $SFUNCTIONS -eq 1 ]
+        then
+            CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_S_FUNCTIONS:BOOL=ON -DBUILD_SIMULINK_MATRIX_MODEL:BOOL=ON"
+        else
+            CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_S_FUNCTIONS:BOOL=OFF -DBUILD_SIMULINK_MATRIX_MODEL:BOOL=ON"
+        fi
+    else
+        CMAKE_OPTIONS="$CMAKE_OPTIONS -DBUILD_S_FUNCTIONS:BOOL=OFF -DBUILD_SIMULINK_MATRIX_MODEL:BOOL=OFF"
+    fi
+    CMAKE_OPTIONS="$CMAKE_OPTIONS $CMAKE_EXTRA_OPTIONS"
 
     cmake $CMAKE_OPTIONS ..
     cmake $CMAKE_OPTIONS ..
@@ -66,7 +80,9 @@ function main
     ONLY_CONFIGURE=0
     BUILDDIR=build
     THREADS=20
-    while getopts "hwb:cj:" opt; do
+    MATLAB=1
+    SFUNCTIONS=1
+    while getopts "hwb:cj:e:ms" opt; do
         case "$opt" in
         h)  PrintHelp
             exit 0
@@ -78,6 +94,12 @@ function main
         c)  ONLY_CONFIGURE=1
             ;;
         j)  THREADS=$OPTARG
+            ;;
+        m)  MATLAB=0
+            ;;
+        s)  SFUNCTIONS=0
+            ;;
+        e)  CMAKE_EXTRA_OPTIONS=$OPTARG
             ;;
         esac
     done
@@ -124,4 +146,4 @@ function main
     fi
 }
 
-main $@
+main "$@"

@@ -12,7 +12,7 @@ find_path(
 find_library(
   MATIO_LIBRARY
   NAMES matio${ARCH_TYPE} libmatio${ARCH_TYPE} matio libmatio
-  PATHS ${FRAMEWORK_EXTENSION_FOLDER}/lib/ $ENV{HOME}/lib)
+  PATHS ${FRAMEWORK_EXTENSION_FOLDER}/lib/ ${FRAMEWORK_EXTENSION_FOLDER}/lib/64 $ENV{HOME}/lib)
 
 mark_as_advanced(MATIO_INCLUDE_DIR)
 mark_as_advanced(MATIO_LIBRARY)

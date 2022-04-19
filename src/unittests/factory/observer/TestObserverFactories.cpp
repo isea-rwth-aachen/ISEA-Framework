@@ -95,7 +95,9 @@ void TestObserverFactories::TestObserverFactoryMatlabFilterCreation()
                         <maxSampleSize> 1 </maxSampleSize> \
                     </Filter1>\
                 </Observer>\
-             </Configuration>";
+                <Options>\
+                </Options>\
+            </Configuration>";
         boost::scoped_ptr< xmlparser::XmlParser > parser( new xmlparser::tinyxml2::XmlParserImpl() );
         parser->ReadFromMem( xmlConfig );
         std::vector< boost::shared_ptr< xmlparser::XmlParameter > > children =

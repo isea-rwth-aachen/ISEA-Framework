@@ -309,6 +309,15 @@ class ObserverClassWrapperTwoPort< MatrixT, observer::MatlabFilterTwoPort >
             filter->SetDataLocation( param->GetElementStringValue( "DataLocation" ) );
         }
 
+        // Options that influnce the filtering can be read here
+        boost::shared_ptr< xmlparser::XmlParameter > optionsNode =
+         param->GetConfigurationRoot()->GetElementChild( "Options" );
+        if ( optionsNode->HasElementDirectChild( "MaximalOperationalCellVoltageV" ) ||
+             optionsNode->HasElementDirectChild( "MinimalOperationalCellVoltageV" ) )
+        {
+            filter->SetIsVoltageLimited();
+        }
+
         return filter;
     }
 };

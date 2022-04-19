@@ -1,0 +1,10 @@
+--- gcc.jam.old	2022-04-06 14:06:18.807536645 +0200
++++ gcc.jam.new	2022-04-06 14:26:20.709209341 +0200
+@@ -93,6 +93,7 @@
+ import cygwin ;
+ import feature ;
+ import fortran ;
++import mc ;
+ import generators ;
+ import os ;
+ import pch ;

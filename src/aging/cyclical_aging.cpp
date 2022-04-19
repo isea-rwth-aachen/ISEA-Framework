@@ -6,12 +6,13 @@
 namespace aging
 {
 CyclicalAging::CyclicalAging( const double agingStepTime, const double minBetaCapacity, const double minBetaResistance,
+                              const double maxBetaCapacity, const double maxBetaResistance,
                               const boost::shared_ptr< object::Object< double > >& alphaCapacity,
                               const boost::shared_ptr< object::Object< double > >& alphaResistance,
                               const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
                               const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance )
-    : EmpiricalAging( agingStepTime, minBetaCapacity, minBetaResistance, alphaCapacity, alphaResistance,
-                      initialCapacityFactor, initialResistanceFactor, isEnabled )
+    : EmpiricalAging( agingStepTime, minBetaCapacity, minBetaResistance, maxBetaCapacity, maxBetaResistance,
+                      alphaCapacity, alphaResistance, initialCapacityFactor, initialResistanceFactor, isEnabled )
     , mChargeThroughputExponentCapacity( chargeThroughputExponentCapacity )
     , mChargeThroughputExponentResistance( chargeThroughputExponentResistance )
     , mActualDod( 0.0 )
@@ -50,6 +51,8 @@ void CyclicalAging::CalculateAging( const TwoportState& twoportState, double tim
         mActualVoltage = GetAverageVoltage( cycleStart, cycleEnd );
         double betaCapacity = this->mCapacityStressFactor->GetValue();
         double betaResistance = this->mResistanceStressFactor->GetValue();
+        betaCapacity = clamp( betaCapacity, this->mMinStressFactorCapacity, this->mMaxStressFactorCapacity );
+        betaResistance = clamp( betaResistance, this->mMinStressFactorResistance, this->mMaxStressFactorResistance );
         if ( betaCapacity < this->mMinStressFactorCapacity )
             betaCapacity = this->mMinStressFactorCapacity;
         if ( betaResistance < this->mMinStressFactorResistance )

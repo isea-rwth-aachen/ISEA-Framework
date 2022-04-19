@@ -28,7 +28,7 @@ class AgingStandalone : public ThermalElectricalStandalone
     size_t mAgingCycles;
     size_t mAgingSteps;
     size_t mSteadyStateCycles;
-    size_t mAgingStepTime;
+    size_t mAgingStepTime; /// Duration of one Aging Step in Days
     bool mResetThElStates;
 
     private:

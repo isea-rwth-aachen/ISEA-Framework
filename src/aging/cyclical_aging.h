@@ -30,8 +30,8 @@ class CyclicalAging : public EmpiricalAging
 
     public:
     /// Constructor
-    CyclicalAging( const double agingStepTime, const double minBetaCapacity, const double minBetaResistance,
-                   const boost::shared_ptr< object::Object< double > >& alphaCapacity,
+    CyclicalAging( const double agingStepTime, const double minBetaCapacity, const double minBetaResistance, const double maxBetaCapacity,
+                   const double maxBetaResistance, const boost::shared_ptr< object::Object< double > >& alphaCapacity,
                    const boost::shared_ptr< object::Object< double > >& alphaResistance,
                    const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
                    const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance );

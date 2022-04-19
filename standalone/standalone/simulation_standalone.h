@@ -21,6 +21,7 @@ class SimulationStandalone : public Standalone
     virtual void ReadXmlOptions();
     void FreeXml();
     double GetProfileLength();
+    void UpdateProfileLength();
     static void CheckHash( const std::string& filename );
     static void PrintHash( const std::string& filename );
     static void AddHash( const std::string& filename );
@@ -49,6 +50,9 @@ class SimulationStandalone : public Standalone
     double mProfileChangeTime;
 
     // electrical simulation
+    double mMaxCellVoltage;
+    double mMinCellVoltage;
+
 };
 }    // namespace standalone
 

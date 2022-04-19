@@ -59,7 +59,9 @@ class XmlParameterImpl : public xmlparser::XmlParameter
 
     bool GetElementBoolValue( const char* elementName = 0, bool defaultValue = false ) const;
 
-    double GetElementDoubleValue( const char* elementName = 0, double defaultValue = 0 ) const;
+    double GetElementDoubleValue( const char* elementName = 0 ) const;
+
+    double GetElementDoubleValue( const char* elementName, double defaultValue ) const;
 
     int GetElementIntValue( const char* elementName = 0, int defaultValue = 0 ) const;
 
@@ -78,13 +80,17 @@ class XmlParameterImpl : public xmlparser::XmlParameter
 
     const char* GetElementAttributeCharPtrValue( const char* attributeName ) const;
 
-    bool GetElementAttributeBoolValue( const char* attributeName, bool defaultValue = false ) const;
+    bool GetElementAttributeBoolValue( const char* attributeName, bool defaultValue ) const;
+    bool GetElementAttributeBoolValue( const char* attributeName ) const;
 
-    int GetElementAttributeIntValue( const char* attributeName, int defaultValue = 0 ) const;
+    int GetElementAttributeIntValue( const char* attributeName, int defaultValue ) const;
+    int GetElementAttributeIntValue( const char* attributeName ) const;
 
-    size_t GetElementAttributeUnsignedIntValue( const char* attributeName, size_t defaultValue = 0 ) const;
+    size_t GetElementAttributeUnsignedIntValue( const char* attributeName, size_t defaultValue ) const;
+    size_t GetElementAttributeUnsignedIntValue( const char* attributeName ) const;
 
-    double GetElementAttributeDoubleValue( const char* attributeName, double defaultValue = 0 ) const;
+    double GetElementAttributeDoubleValue( const char* attributeName, double defaultValue ) const;
+    double GetElementAttributeDoubleValue( const char* attributeName ) const;
 
 
     // Writing to the xml file

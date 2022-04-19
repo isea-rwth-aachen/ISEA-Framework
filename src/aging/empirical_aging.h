@@ -14,6 +14,7 @@ class EmpiricalAging : public AgingBase
     public:
     /// Constructor
     EmpiricalAging( const double agingStepTime, const double minStressFactorCapacity, const double minStressFactorResistance,
+                    const double maxStressFactorCapacity, const double maxStressFactorResistance,
                     const boost::shared_ptr< object::Object< double > >& capacityStressFactor,
                     const boost::shared_ptr< object::Object< double > >& resistanceStressFactor,
                     const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled );
@@ -27,6 +28,8 @@ class EmpiricalAging : public AgingBase
 
     protected:
     virtual void CalculateChargeLoss( const TwoportState& twoportState, double previousCapFactor );
+    // helper function, can be replaced by std::clamp in C++17 or newer
+    static double clamp( double value, double min, double max );
 
     double mCapacityFactor;
     double mResistanceFactor;
@@ -34,6 +37,8 @@ class EmpiricalAging : public AgingBase
 
     const double mMinStressFactorCapacity;
     const double mMinStressFactorResistance;
+    const double mMaxStressFactorCapacity;
+    const double mMaxStressFactorResistance;
 
     const std::string mFormulaStressFactorCapacity;
     const std::string mFormulaStressFactorResistance;

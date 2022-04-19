@@ -5,6 +5,7 @@ build*/
 *.swp
 *.gch
 *.csv
+!/scenariotest/simulink_test/*.csv
 *.diff
 *.mat
 !/src/unittests/container/*.mat
@@ -40,3 +41,5 @@ __pycache__/
 !/scenariotest/standalone_test/*.csv
 !/scenariotest/simulink_test/reference/*/*.mat
 !/scenarios/*/*.csv
+secrets/
+testing/*

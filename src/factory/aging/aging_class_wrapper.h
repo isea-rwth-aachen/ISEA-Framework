@@ -87,9 +87,9 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
         boost::shared_ptr< object::Object< double > > alphaCapacity;
         boost::shared_ptr< object::Object< double > > alphaResistance;
 
-        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{{"V", voltageState},
-                                                                                               {"T", temperatureState},
-                                                                                               {"SOC", socState}};
+        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{ { "V", voltageState },
+                                                                                                { "T", temperatureState },
+                                                                                                { "SOC", socState } };
         // Collects the calendarian data from the cell-specific aging node
         if ( param->HasElementDirectChild( "AlphaCapacity" ) )
         {
@@ -111,8 +111,10 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
         }
         const bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
         const double timeExponent = param->GetElementDoubleValue( "TimeExponent" );
-        const double minAlphaCap = param->GetElementDoubleValue( "MinAlphaCapacity" );
-        const double minAlphaRes = param->GetElementDoubleValue( "MinAlphaResistance" );
+        const double minAlphaCap = param->GetElementDoubleValue( "MinAlphaCapacity", 0 );
+        const double minAlphaRes = param->GetElementDoubleValue( "MinAlphaResistance", 0 );
+        const double maxAlphaCap = param->GetElementDoubleValue( "MaxAlphaCapacity", std::numeric_limits< double >::max() );
+        const double maxAlphaRes = param->GetElementDoubleValue( "MaxAlphaResistance", std::numeric_limits< double >::max() );
 
         double initialCapacityFactor = 1;
         double initialResistanceFactor = 1;
@@ -128,8 +130,9 @@ class AgingClassWrapper< aging::CalendarianAging > : public AgingClassWrapperBas
 
         // Creates an object of the class "aging::CalendarianAging"
         boost::shared_ptr< aging::CalendarianAging > calendarianAging =
-         boost::make_shared< aging::CalendarianAging >( agingStepTime, minAlphaCap, minAlphaRes, alphaCapacity, alphaResistance,
-                                                        initialCapacityFactor, initialResistanceFactor, isEnabled, timeExponent );
+         boost::make_shared< aging::CalendarianAging >( agingStepTime, minAlphaCap, minAlphaRes, maxAlphaCap, maxAlphaRes,
+                                                        alphaCapacity, alphaResistance, initialCapacityFactor,
+                                                        initialResistanceFactor, isEnabled, timeExponent );
 
         *voltageState = state::ValueStateWrapper< double >( &calendarianAging->mActualVoltage );
         *temperatureState = state::ValueStateWrapper< double >( &calendarianAging->mActualTemperature );
@@ -162,10 +165,10 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         boost::shared_ptr< object::Object< double > > betaCapacity;
         boost::shared_ptr< object::Object< double > > betaResistance;
 
-        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{{"deltaDOD", dodState},
-                                                                                               {"meanV", voltageState},
-                                                                                               {"meanSOC", socState},
-                                                                                               {"meanI", currentState}};
+        std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{ { "deltaDOD", dodState },
+                                                                                                { "meanV", voltageState },
+                                                                                                { "meanSOC", socState },
+                                                                                                { "meanI", currentState } };
         // Collects the cyclical data from the cell-specific aging node
         if ( param->HasElementDirectChild( "BetaCapacity" ) )
         {
@@ -191,6 +194,8 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         const double chargeExponentResistance = param->GetElementDoubleValue( "ChargeExponentResistance" );
         const double minBetaCap = param->GetElementDoubleValue( "MinBetaCapacity" );
         const double minBetaRes = param->GetElementDoubleValue( "MinBetaResistance" );
+        const double maxBetaCap = param->GetElementDoubleValue( "MaxBetaCapacity", std::numeric_limits< double >::max() );
+        const double maxBetaRes = param->GetElementDoubleValue( "MaxBetaResistance", std::numeric_limits< double >::max() );
 
         double initialCapacityFactor = 1;
         double initialResistanceFactor = 1;
@@ -206,7 +211,7 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
 
         // Creates an object of the class "aging::CyclicalAging"
         boost::shared_ptr< aging::CyclicalAging > cyclicalAging =
-         boost::make_shared< aging::CyclicalAging >( agingStepTime, minBetaCap, minBetaRes, betaCapacity,
+         boost::make_shared< aging::CyclicalAging >( agingStepTime, minBetaCap, minBetaRes, maxBetaCap, maxBetaRes, betaCapacity,
                                                      betaResistance, initialCapacityFactor, initialResistanceFactor,
                                                      isEnabled, chargeExponentCapacity, chargeExponentResistance );
 

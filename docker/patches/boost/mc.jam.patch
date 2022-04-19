@@ -1,0 +1,30 @@
+--- mc.jam.old	2021-10-01 09:58:27.815410417 +0200
++++ mc.jam.new	2021-09-29 17:04:08.025418898 +0200
+@@ -17,6 +17,9 @@
+ import type ;
+ import rc ;
+ 
++feature.feature mc-compiler : mc windmc : propagated ;
++feature.set-default mc-compiler : mc ;
++
+ rule init ( )
+ {
+ }
+@@ -36,9 +39,15 @@
+ flags mc.compile MCFLAGS <mc-set-customer-bit>no : ;
+ flags mc.compile MCFLAGS <mc-set-customer-bit>yes : -c ;
+ 
+-generators.register-standard mc.compile : MC : H RC ;
++generators.register-standard mc.compile.mc : MC : H RC : <mc-compiler>mc ;
++generators.register-standard mc.compile.windmc : MC : H RC : <mc-compiler>windmc ;
+ 
+-actions compile
++actions compile.mc
+ {
+     mc $(MCFLAGS) -h "$(<[1]:DW)" -r "$(<[2]:DW)" "$(>:W)"
+ }
++
++actions compile.windmc
++{
++    windmc $(MCFLAGS) -h "$(<[1]:DW)" -r "$(<[2]:DW)" "$(>:W)"
++}

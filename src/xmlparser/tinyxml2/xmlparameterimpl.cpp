@@ -237,7 +237,7 @@ size_t XmlParameterImpl::GetElementUnsignedIntValue( const char* elementName, si
     return size_t( abs( res ) );
 }
 
-double XmlParameterImpl::GetElementDoubleValue( const char* elementName, double defaultValue ) const
+double XmlParameterImpl::GetElementDoubleValue( const char* elementName ) const
 {
     XMLElement* node = elementName ? GetRawElement( elementName ) : mNodePtr;
 
@@ -246,12 +246,28 @@ double XmlParameterImpl::GetElementDoubleValue( const char* elementName, double 
 
     if ( err )
     {
-        if ( defaultValue )
-            return defaultValue;
+        ErrorFunction< std::logic_error >( __FUNCTION__, __LINE__, __FILE__, "CouldNotParseXmlContentException",
+                                           elementName, this->GetElementName() );
+    }
 
-        else
-            ErrorFunction< std::logic_error >( __FUNCTION__, __LINE__, __FILE__, "CouldNotParseXmlContentException",
-                                               elementName, this->GetElementName() );
+    return res;
+}
+
+double XmlParameterImpl::GetElementDoubleValue( const char* elementName, double defaultValue ) const
+{
+    XMLElement* node = elementName ? GetRawElement( elementName, false ) : mNodePtr;
+
+    if ( !node )
+    {
+        return defaultValue;
+    }
+
+    double res;
+    XMLError err = node->QueryDoubleText( &res );
+
+    if ( err )
+    {
+        return defaultValue;
     }
 
     return res;
@@ -430,12 +446,15 @@ bool XmlParameterImpl::GetElementAttributeBoolValue( const char* attributeName, 
 
     if ( !ctmp )
     {
-        if ( defaultValue )
-            return defaultValue;
-        else
-            return false;
+        return defaultValue;
     }
 
+    return !misc::CaseInsensitiveStringCompare( (const char*)ctmp, "TRUE" );
+}
+
+bool XmlParameterImpl::GetElementAttributeBoolValue( const char* attributeName ) const
+{
+    const char* ctmp = GetAttribute( mNodePtr, attributeName, true );
     return !misc::CaseInsensitiveStringCompare( (const char*)ctmp, "TRUE" );
 }
 
@@ -445,31 +464,28 @@ int XmlParameterImpl::GetElementAttributeIntValue( const char* attributeName, in
 
     if ( !ctmp )
     {
-        if ( defaultValue )
-            return defaultValue;
-
-        else
-            return 0;
+        return defaultValue;
     }
+    return atoi( GetAttribute( mNodePtr, attributeName ) );
+}
+
+int XmlParameterImpl::GetElementAttributeIntValue( const char* attributeName ) const
+{
+    const char* ctmp = GetAttribute( mNodePtr, attributeName, true );
     return atoi( GetAttribute( mNodePtr, attributeName ) );
 }
 
 size_t XmlParameterImpl::GetElementAttributeUnsignedIntValue( const char* attributeName, size_t defaultValue ) const
 {
     const size_t attribute = size_t( abs( this->GetElementAttributeIntValue( attributeName, defaultValue ) ) );
-
-    if ( attribute < 1 )
-    {
-        if ( defaultValue )
-            return defaultValue;
-
-        else
-            return 0;
-    }
-    else
-        return attribute;
+    return attribute;
 }
 
+size_t XmlParameterImpl::GetElementAttributeUnsignedIntValue( const char* attributeName ) const
+{
+    const size_t attribute = size_t( abs( this->GetElementAttributeIntValue( attributeName ) ) );
+    return attribute;
+}
 
 double XmlParameterImpl::GetElementAttributeDoubleValue( const char* attributeName, double defaultValue ) const
 {
@@ -477,12 +493,14 @@ double XmlParameterImpl::GetElementAttributeDoubleValue( const char* attributeNa
 
     if ( !ctmp )
     {
-        if ( defaultValue )
-            return defaultValue;
-
-        else
-            return 0;
+        return defaultValue;
     }
+    return atof( GetAttribute( mNodePtr, attributeName ) );
+}
+
+double XmlParameterImpl::GetElementAttributeDoubleValue( const char* attributeName ) const
+{
+    const char* ctmp = GetAttribute( mNodePtr, attributeName, true );
     return atof( GetAttribute( mNodePtr, attributeName ) );
 }
 

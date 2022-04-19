@@ -1,3 +1,8 @@
+Version 2.25.0
+===========
+- Add MaxAlphaCapacity, MaxAlphaResistance, MaxBetaCapacity, and MaxBetaResistance XML parameters to specify maximum aging coefficients
+- Add XML options MaximalOperationalCellVoltageV and MinimalOperationalCellVoltageV to skip parts of the current profile that would over- or undercharge a cell
+
 Version 2.24.1
 ===========
 - Fix S-functions build for windows

@@ -13,7 +13,7 @@ void TestCyclicalAging::testNoAging()
     std::vector< typename object::ExpressionObject< double >::Parameter > objParams;
     const auto obj = boost::make_shared< object::ExpressionObject< double > >( "0.0001", objParams );
     {    // calculation time of zero seconds
-        aging::CyclicalAging aging( 10, 0, 0, obj, obj, 1.0, 1.0, true, 1, 1 );
+        aging::CyclicalAging aging( 10, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, true, 1, 1 );
         aging.CalculateAging( tpState, 3.0, 1.0 );
         TS_ASSERT_EQUALS( aging.GetCapacityFactor(), 1.0 );
         TS_ASSERT_EQUALS( aging.GetSocOffset(), 0.0 );
@@ -27,7 +27,7 @@ void TestCyclicalAging::testNoAging()
         TS_ASSERT_EQUALS( aging.GetResistanceFactor(), 1.0 );
     }
     {    // aging disabled
-        aging::CyclicalAging aging( 10, 0, 0, obj, obj, 1.0, 1.0, false, 1, 1 );
+        aging::CyclicalAging aging( 10, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, false, 1, 1 );
 
         aging.CollectData( tpState, tpState, 10 );
         aging.CalculateAging( tpState, 3.0, 1.0 );
@@ -54,14 +54,14 @@ void TestCyclicalAging::testAgingCalculation()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto currentValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"deltaDOD", dodValueState},
-                                                                                    {"meanV", voltageValueState},
-                                                                                    {"meanSOC", socValueState},
-                                                                                    {"meanI", currentValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{ { "deltaDOD", dodValueState },
+                                                                                     { "meanV", voltageValueState },
+                                                                                     { "meanSOC", socValueState },
+                                                                                     { "meanI", currentValueState } };
     const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (meanV + deltaDOD)", objParams );
     const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (meanV + deltaDOD)", objParams );
 
-    aging::CyclicalAging aging( steptime, 0, 0, objCap, objRes, initialCap, initialRes, true, exponentCap, exponentRes );
+    aging::CyclicalAging aging( steptime, 0, 0, 1e3, 1e3, objCap, objRes, initialCap, initialRes, true, exponentCap, exponentRes );
     *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
     *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
     *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
@@ -107,14 +107,14 @@ void TestCyclicalAging::testReset()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto currentValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"deltaDOD", dodValueState},
-                                                                                    {"meanV", voltageValueState},
-                                                                                    {"meanSOC", socValueState},
-                                                                                    {"meanI", currentValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{ { "deltaDOD", dodValueState },
+                                                                                     { "meanV", voltageValueState },
+                                                                                     { "meanSOC", socValueState },
+                                                                                     { "meanI", currentValueState } };
     const auto objCap = boost::make_shared< object::ExpressionObject< double > >( "0.0001 * (meanV + deltaDOD)", objParams );
     const auto objRes = boost::make_shared< object::ExpressionObject< double > >( "0.00015 * (meanV + deltaDOD)", objParams );
 
-    aging::CyclicalAging aging( steptime, 0, 0, objCap, objRes, initialCap, initialRes, true, exponentCap, exponentRes );
+    aging::CyclicalAging aging( steptime, 0, 0, 1e3, 1e3, objCap, objRes, initialCap, initialRes, true, exponentCap, exponentRes );
     *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
     *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
     *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
@@ -166,13 +166,13 @@ void TestCyclicalAging::testFormulaVariables()
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto socValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
     auto currentValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
-    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{{"deltaDOD", dodValueState},
-                                                                                    {"meanV", voltageValueState},
-                                                                                    {"meanSOC", socValueState},
-                                                                                    {"meanI", currentValueState}};
+    std::vector< typename object::ExpressionObject< double >::Parameter > objParams{ { "deltaDOD", dodValueState },
+                                                                                     { "meanV", voltageValueState },
+                                                                                     { "meanSOC", socValueState },
+                                                                                     { "meanI", currentValueState } };
     {
         const auto obj = boost::make_shared< object::ExpressionObject< double > >( "meanV", objParams );
-        aging::CyclicalAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
+        aging::CyclicalAging aging( 1.0, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
         *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
         *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
         *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
@@ -188,7 +188,7 @@ void TestCyclicalAging::testFormulaVariables()
     }
     {
         const auto obj = boost::make_shared< object::ExpressionObject< double > >( "meanSOC", objParams );
-        aging::CyclicalAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
+        aging::CyclicalAging aging( 1.0, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
         *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
         *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
         *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
@@ -204,7 +204,7 @@ void TestCyclicalAging::testFormulaVariables()
     }
     {
         const auto obj = boost::make_shared< object::ExpressionObject< double > >( "deltaDOD", objParams );
-        aging::CyclicalAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
+        aging::CyclicalAging aging( 1.0, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
         *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
         *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
         *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );
@@ -220,7 +220,7 @@ void TestCyclicalAging::testFormulaVariables()
     }
     {
         const auto obj = boost::make_shared< object::ExpressionObject< double > >( "meanI", objParams );
-        aging::CyclicalAging aging( 1.0, 0, 0, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
+        aging::CyclicalAging aging( 1.0, 0, 0, 1e3, 1e3, obj, obj, 1.0, 1.0, true, 1.0, 1.0 );
         *dodValueState = state::ValueStateWrapper< double >( &aging.mActualDod );
         *voltageValueState = state::ValueStateWrapper< double >( &aging.mActualVoltage );
         *socValueState = state::ValueStateWrapper< double >( &aging.mActualSoc );

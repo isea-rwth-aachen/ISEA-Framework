@@ -29,6 +29,7 @@ class CalendarianAging : public EmpiricalAging
     public:
     /// Constructor
     CalendarianAging( const double agingStepTime, const double minAlphaCapacity, const double minAlphaResistance,
+                      const double maxAlphaCapacity, const double maxAlphaResistance,
                       const boost::shared_ptr< object::Object< double > >& alphaCapacity,
                       const boost::shared_ptr< object::Object< double > >& alphaResistance, const double initialCapacityFactor,
                       const double initialResistanceFactor, const bool isEnabled, const double timeExponent );

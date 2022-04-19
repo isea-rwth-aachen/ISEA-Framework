@@ -134,6 +134,8 @@ FormulaCapacity                         | string        |           | Formula us
 FormulaResistance                       | string        |           | Formula used to calculate the value of alpha. The symbols V, T and SOC can be used for the cell's voltage, temperature and SOC
 MinAlphaCapacity                        | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinAlphaResistance                      | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
+MaxAlphaCapacity                        | double        |           | Maximum value for the stress factor. If a higher value is calculated, this value is used instead.
+MaxAlphaResistance                      | double        |           | Maximum value for the stress factor. If a higher value is calculated, this value is used instead.
 InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 
@@ -150,6 +152,8 @@ FormulaCapacity                         | string        |           | Formula us
 FormulaResistance                       | string        |           | Formula used to calculate the value of beta. The symbols meanV, deltaDOD, meanSOC and meanI can be used for the cell's average voltage, depth of discharge, average SOC and average current
 MinBetaCapacity                         | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
 MinBetaResistance                       | double        |           | Minimum value for the stress factor. If a lower value is calculated, this value is used instead.
+MaxBetaCapacity                         | double        |           | Maximum value for the stress factor. If a higher value is calculated, this value is used instead.
+MaxBetaResistance                       | double        |           | Maximum value for the stress factor. If a higher value is calculated, this value is used instead.
 InitialCapacityFactor                   | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 InitialResistanceFactor                 | double        | 0 - 1     | Initial value for the capacity factor. Optional, default = 1.
 

@@ -237,8 +237,8 @@ class ElectricalClassWrapperBase : public ClassWrapperBase< TwoPort< MatrixT >, 
 
         auto thermalState = arg->mParentCell->GetThermalState();
         boost::shared_ptr< ElectrodeElement< MatrixT > > electrodeElement;
-        const bool observable =
-         param->GetElementAttributeBoolValue( "observable" ) || param->GetElementAttributeBoolValue( "SurfaceEffect" );
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false );
 
         if ( isAnodeElement )
         {
@@ -341,8 +341,8 @@ class ElectricalClassWrapper< MatrixT, Capacity > : public ElectricalClassWrappe
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "Object" ) );
@@ -372,8 +372,8 @@ class ElectricalClassWrapper< MatrixT, OhmicResistance > : public ElectricalClas
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "Object" ) );
@@ -403,8 +403,8 @@ class ElectricalClassWrapper< MatrixT, ConstantPhaseElement > : public Electrica
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "Object" ) );
@@ -434,8 +434,8 @@ class ElectricalClassWrapper< MatrixT, Inductance > : public ElectricalClassWrap
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "Object" ) );
@@ -483,8 +483,8 @@ class ElectricalClassWrapper< MatrixT, VoltageSource > : public ElectricalClassW
                 argObject->mSetReverseLookUp = arg->mSetReverseLookup;
         }
 
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "Object" ) );
@@ -509,8 +509,8 @@ class ElectricalClassWrapper< MatrixT, ParallelRC > : public ElectricalClassWrap
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > robjparam( param->GetElementChild( "LookupOhmicResistance" ) );
@@ -555,8 +555,8 @@ class ElectricalClassWrapper< MatrixT, Rmphn > : public ElectricalClassWrapperBa
     boost::shared_ptr< TwoPort< MatrixT > >
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > rmpobjparam( param->GetElementChild( "OhmicResistance_RMP" ) );
@@ -630,8 +630,8 @@ class ElectricalClassWrapper< MatrixT, SphericalDiffusion > : public ElectricalC
     {
         auto elecData = this->CreateElectricalData();
 
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         int iMaxElements = param->GetElementAttributeIntValue( "RCCounter", 5 );    // default is 5 RC Elements
@@ -731,8 +731,8 @@ class ElectricalClassWrapper< MatrixT, WarburgCotanh > : public ElectricalClassW
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
         auto elecData = this->CreateElectricalData();
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
         const bool withCapacity = param->GetElementAttributeBoolValue( "withCapacity", true );
         int iMaxElements = param->GetElementAttributeIntValue( "RCCounter", 5 );    // default is 5 RC Elements
@@ -867,8 +867,8 @@ class ElectricalClassWrapper< MatrixT, WarburgTanh > : public ElectricalClassWra
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
         auto elecData = this->CreateElectricalData();
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
         int iMaxElements = param->GetElementAttributeIntValue( "RCCounter", 5 );    // default is 5 RC Elements
         size_t maxElements( iMaxElements );
@@ -926,8 +926,8 @@ class ElectricalClassWrapper< MatrixT, ParallelRCAlg > : public ElectricalClassW
     {
         auto elecData = this->CreateElectricalData();
 
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
 
         boost::shared_ptr< xmlparser::XmlParameter > robjparam( param->GetElementChild( "RObject" ) );
@@ -1025,8 +1025,8 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
             count = param->GetElementChild( "Children" )->GetElementAttributeUnsignedIntValue( "count", 1 );
         }
 
-        const bool observable =
-         param->GetElementAttributeBoolValue( "observable" ) || param->GetElementAttributeBoolValue( "SurfaceEffect" );
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false );
 
         const size_t numberOfCellElements =
          param->HasElementDirectChild( "ThermalBlock" ) ?
@@ -1224,8 +1224,8 @@ class ElectricalClassWrapper< MatrixT, Zarc > : public ElectricalClassWrapperBas
 
         auto elecData = this->CreateElectricalData();
 
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
         double dtValue = 0.001;
 
@@ -1274,8 +1274,8 @@ class ElectricalClassWrapper< MatrixT, ZarcAlg > : public ElectricalClassWrapper
 
         auto elecData = this->CreateElectricalData();
 
-        const bool observable = param->GetElementAttributeBoolValue( "observable" ) ||
-                                param->GetElementAttributeBoolValue( "SurfaceEffect" ) ||
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
                                 ( arg && arg->mMakeAllECMElementsObservable );
         double sampleRate = 0.001;
         if ( param->GetConfigurationRoot()->HasElementDirectChild( "Options" ) &&

@@ -60,6 +60,7 @@ bool ElectricalStandalone::CreateElectricalSimulation( factory::FactoryBuilder< 
 
 void ElectricalStandalone::SetCurrent()
 {
+
     if ( mElectricalSimulation->mTime >= mProfileChangeTime )
     {
         mProfile->SetTimeAndTriggerEvaluation( mElectricalSimulation->mTime );
@@ -70,6 +71,27 @@ void ElectricalStandalone::SetCurrent()
             return;
         }
     }
+    // If max. or min. voltage reached modify plan
+    else if ( mElectricalSimulation->IsStopElectricalCriterionFulfilled() )
+    {
+        printf( "Move to the next Step\n" );
+        double remainingTime = 0.0;
+        if ( mProfile->MoveToNextProfileValue( mElectricalSimulation->mTime, remainingTime ) )
+        {
+            mElectricalSimulation->mRootTwoPort->AddRemainingLoadTime( remainingTime );
+            // Update time limits when profile length has changed
+            UpdateProfileLength();
+            mElectricalSimulation->UpdateSimulationDuration( mProfile->GetMaxTime() );
+            mProfileChangeTime = mProfile->GetTimeUntilMaxValueDeviation( 0.0 );
+            if ( mProfile->GetType() == electrical::TimeSeriesType::CURRENT )
+            {
+                mElectricalSimulation->mRootTwoPort->SetCurrent( mProfile->GetValue() );
+                mElectricalSimulation->mRootTwoPort->CalculateStateDependentValues();
+                return;
+            }
+        }
+    }
+
 
     if ( mProfile->GetType() == electrical::TimeSeriesType::POWER )
     {

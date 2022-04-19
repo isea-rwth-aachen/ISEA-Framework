@@ -54,7 +54,7 @@ class ElectricalSimulation
     /// Returns true if current simulation step needs to end, if so it resets mDeltaTime for the next simulation step
     bool CheckLoopConditionAndSetDeltaTime( T currentChangeTime );
     /// Returns true if mTime has exceeded mSimulationDuration
-    bool CheckIfSimulationTimeHasEnded();
+    bool CheckIfSimulationTimeHasEnded() const;
     /// Gets the time passed since mLoopStartTime (mLoopStartTime is the start time of this simulation step)
     T GetCurrentSimulationStepTime() const;
     /// Executes actions needed at the end of a simulation step
@@ -67,8 +67,12 @@ class ElectricalSimulation
     void ResetAllThermalStatesPowerDissipation();
     /// Initializes stop criterions and sets the step start time
     void StartNewTimeStep();
-    /// Returns true if SoC or power stop criterion is met
+    ///  Checks true if any stop criterion is met
     bool IsStopCriterionFulfilled() const;
+    /// Returns true if SoC or power stop criterion is met
+    bool IsStopThermalCriterionFulfilled() const;
+    /// Returns true if voltage limits of cell elements are exceeded
+    bool IsStopElectricalCriterionFulfilled() const;
     /// Saves states if stop criterion of thermal simulation is triggered
     void SaveStatesForLaterReset();
     /// Resets states and SoCs to states saved at a certain point of time
@@ -109,6 +113,13 @@ class ElectricalSimulation
     T mStepStartTime;
     // Soc stop criterion
     double mSocStopCriterion;
+    // Voltage stop criterion
+    double mMinVoltageStopCriterion;
+    double mMaxVoltageStopCriterion;
+
+    size_t mVoltageLimitDelay;
+    size_t mVoltageLimitCount;
+
     // Stop criterion if following a power profile
     double mPowerStopCriterion;
     std::vector< std::vector< T > > mSocValuesSteps;
@@ -132,6 +143,9 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
     , mMaxSimulationStepDuration( maxSimulationStepDuration )
     , mStepStartTime( 0.0 )
     , mSocStopCriterion( socStopCriterion )
+    , mMinVoltageStopCriterion( 0.0 )
+    , mMaxVoltageStopCriterion( 10.0 )
+    , mVoltageLimitDelay( 5 )
     , mPowerStopCriterion( 0.0 )
     , mNumberOfSteps( 0 )
 {
@@ -273,6 +287,19 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
         if ( mSocStopCriterion <= 0.0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "SocStopCriterionInPercentNegative" );
     }
+    // VoltageStopCriterion
+    if ( optionsNode->HasElementDirectChild( "MinimalOperationalCellVoltageV" ) )
+    {
+        mMinVoltageStopCriterion = optionsNode->GetElementDoubleValue( "MinimalOperationalCellVoltageV" );
+        if ( mMinVoltageStopCriterion < 0.0 )
+            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "MinimalVoltageCriterionIsNegative" );
+    }
+    if ( optionsNode->HasElementDirectChild( "MaximalOperationalCellVoltageV" ) )
+    {
+        mMaxVoltageStopCriterion = optionsNode->GetElementDoubleValue( "MaximalOperationalCellVoltageV" );
+        if ( mMaxVoltageStopCriterion < 0.0 )
+            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "MinimalVoltageCriterionIsNegative" );
+    }
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
@@ -307,7 +334,7 @@ bool ElectricalSimulation< Matrix, T, filterTypeChoice >::CheckLoopConditionAndS
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
-bool ElectricalSimulation< Matrix, T, filterTypeChoice >::CheckIfSimulationTimeHasEnded()
+bool ElectricalSimulation< Matrix, T, filterTypeChoice >::CheckIfSimulationTimeHasEnded() const
 {
     return mTime >= mSimulationDuration;
 }
@@ -356,10 +383,36 @@ void ElectricalSimulation< Matrix, T, filterTypeChoice >::StartNewTimeStep()
 #endif
 }
 
+
 template < typename Matrix, typename T, bool filterTypeChoice >
-bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopCriterionFulfilled() const
+bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopElectricalCriterionFulfilled() const
 {
     bool isStop = false;
+#ifndef _SYMBOLIC_
+    if ( mNumberOfSteps > mVoltageLimitDelay )
+    {
+        // Check voltage
+        for ( size_t i = 0; i < mCellElements.size(); ++i )
+        {
+            double cellVoltage = mCellElements[i]->GetVoltageValue();
+            if ( cellVoltage > mMaxVoltageStopCriterion || cellVoltage < mMinVoltageStopCriterion )
+            {
+                isStop = true;
+                break;
+            }
+        }
+    }
+#endif
+    return isStop;
+}
+
+
+template < typename Matrix, typename T, bool filterTypeChoice >
+bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopThermalCriterionFulfilled() const
+{
+    bool isStop = false;
+
+    // Check SOC Difference
     for ( size_t i = 0; i < mSocStates.size(); ++i )
     {
         if ( fabs( mSocValuesSteps[0][i] - mSocStates[i]->GetValue() ) > mSocStopCriterion )
@@ -368,6 +421,7 @@ bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopCriterionFulfill
             break;
         }
     }
+
 
 #ifndef _SYMBOLIC_
     if ( mPowerStopCriterion > 0.0 )
@@ -380,6 +434,12 @@ bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopCriterionFulfill
 #endif
 
     return isStop;
+}
+
+template < typename Matrix, typename T, bool filterTypeChoice >
+bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopCriterionFulfilled() const
+{
+    return ( IsStopElectricalCriterionFulfilled() || IsStopThermalCriterionFulfilled() );
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >

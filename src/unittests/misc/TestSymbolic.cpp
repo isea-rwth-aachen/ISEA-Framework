@@ -338,6 +338,23 @@ void TestSymbolic::TestSolve()
     matB.coeffRef( 1, 0 ) = symbolic::Symbolic< OutType >( "x2" );
     matB.coeffRef( 2, 0 ) = symbolic::Symbolic< OutType >( "x3" );
     SymbolicMatrix< OutType > sol = Eigen::solve123( matA, matB );
+
+
+//    std::cout << "Here is the matrix A:\n" << matA << std::endl;
+//    std::cout << "Here is the matrix B:\n" << matB << std::endl;
+//    std::cout << "Here is the solution for coeffRef(0,0):\n" << sol.coeffRef( 0, 0 ) << std::endl;
+//    std::cout << "Here is the solution for coeffRef(1,0):\n" << sol.coeffRef( 1, 0 ) << std::endl;
+//    std::cout << "Here is the solution for coeffRef(2,0):\n" << sol.coeffRef( 2, 0 ) << std::endl;
+
+
+    TS_ASSERT_EQUALS( sol.coeffRef( 0, 0 ),
+                      symbolic::Symbolic< OutType >( "MUL(SUB(SUB(x1,MUL(MUL(SUB(SUB(x3,MUL(x1,MUL(g,DIV(1.000000,a)))),MUL(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))))),DIV(1,ADD(ADD(i,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,c))),MUL(MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))),MUL(-1,SUB(f,MUL(c,MUL(d,DIV(1.000000,a))))))))),c)),MUL(MUL(SUB(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(MUL(SUB(SUB(x3,MUL(x1,MUL(g,DIV(1.000000,a)))),MUL(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))))),DIV(1,ADD(ADD(i,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,c))),MUL(MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))),MUL(-1,SUB(f,MUL(c,MUL(d,DIV(1.000000,a))))))))),SUB(f,MUL(c,MUL(d,DIV(1.000000,a)))))),DIV(1,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))),b)),DIV(1,a))" ) );
+    TS_ASSERT_EQUALS( sol.coeff( 1, 0 ),
+                      symbolic::Symbolic< OutType >( "MUL(SUB(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(MUL(SUB(SUB(x3,MUL(x1,MUL(g,DIV(1.000000,a)))),MUL(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))))),DIV(1,ADD(ADD(i,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,c))),MUL(MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))),MUL(-1,SUB(f,MUL(c,MUL(d,DIV(1.000000,a))))))))),SUB(f,MUL(c,MUL(d,DIV(1.000000,a)))))),DIV(1,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b)))))" ) );
+    TS_ASSERT_EQUALS( sol.coeff( 2, 0 ),
+                      symbolic::Symbolic< OutType >( "MUL(SUB(SUB(x3,MUL(x1,MUL(g,DIV(1.000000,a)))),MUL(SUB(x2,MUL(x1,MUL(d,DIV(1.000000,a)))),MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))))),DIV(1,ADD(ADD(i,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,c))),MUL(MUL(ADD(h,MUL(MUL(g,DIV(1.000000,a)),MUL(-1,b))),DIV(1.000000,ADD(e,MUL(MUL(d,DIV(1.000000,a)),MUL(-1,b))))),MUL(-1,SUB(f,MUL(c,MUL(d,DIV(1.000000,a)))))))))" ) );
+
+/*
     TS_ASSERT_EQUALS( sol.coeffRef( 0, 0 ),
                       symbolic::Symbolic< OutType >(
                        "MUL(SUB(SUB(x1,MUL(MUL(SUB(SUB(x3,MUL(x1,MUL(g,DIV(1.000000,a)))),MUL(SUB(x2,MUL(x1,MUL(d,DIV("
@@ -367,6 +384,8 @@ void TestSymbolic::TestSolve()
                        ",-1),e))))),DIV(1,ADD(MUL(ADD(MUL(MUL(ADD(MUL(MUL(MUL(g,DIV(1.000000,a)),b),-1),h),DIV(1."
                        "000000,ADD(MUL(MUL(MUL(d,DIV(1.000000,a)),b),-1),e))),SUB(f,MUL(c,MUL(d,DIV(1.000000,a))))),"
                        "MUL(MUL(g,DIV(1.000000,a)),c)),-1),i)))" ) );
+*/
+
 
     // MATLAB / Octave code
     //    a = 1; b=2; c = -1; d=2; e=2; f=2; g = 1; h = -1; i = 2;

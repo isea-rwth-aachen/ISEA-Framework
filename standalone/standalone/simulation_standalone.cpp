@@ -96,6 +96,14 @@ void SimulationStandalone::ReadXmlOptions()
         mThermalStopCriterion = optionsNode->GetElementDoubleValue( "ThermalStopCriterionInDegreeC" );
     if ( optionsNode->HasElementDirectChild( "Cycles" ) )
         mCycles = optionsNode->GetElementUnsignedIntValue( "Cycles" );
+    if ( optionsNode->HasElementDirectChild( "MaximalOperationalCellVoltageV" ) )
+        mMaxCellVoltage = optionsNode->GetElementDoubleValue( "MaximalOperationalCellVoltageV" );
+    else
+        mMaxCellVoltage = 10.0;    // Default voltage limit electrical simulation
+    if ( optionsNode->HasElementDirectChild( "MinimalOperationalCellVoltageV" ) )
+        mMinCellVoltage = optionsNode->GetElementDoubleValue( "MinimalOperationalCellVoltageV" );
+    else
+        mMinCellVoltage = 0.0;        // Default voltage limit electrical simulation
     if ( mOutputDecimation < 0.0 )    // set default value if no decimation was given on the command line
         mOutputDecimation = mStepTime;
 }
@@ -103,5 +111,7 @@ void SimulationStandalone::ReadXmlOptions()
 void SimulationStandalone::FreeXml() { mParser.reset(); }
 
 double SimulationStandalone::GetProfileLength() { return mProfileLength; }
+
+void SimulationStandalone::UpdateProfileLength() { mProfileLength = mProfile->GetMaxTime(); }
 
 }    // namespace standalone
