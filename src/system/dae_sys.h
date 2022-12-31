@@ -226,54 +226,6 @@ void DifferentialAlgebraicSystem< matlab::MMatrix< mxDOUBLE_CLASS > >::CopyDGLRe
  const matlab::MMatrix< mxDOUBLE_CLASS >& sourceVector );
 #endif
 
-#ifdef _ARMADILLO_
-
-template <>
-void DifferentialAlgebraicSystem< Mat< double > >::CopyALGResultsToMatrixAndVector( const size_t dglUIDCount, const size_t algUIDCount,
-                                                                                    const Mat< double >& sourceMatrix,
-                                                                                    const Mat< double >& sourceVector,
-                                                                                    const Mat< double >& invertedMat );
-
-template <>
-void DifferentialAlgebraicSystem< Mat< double > >::CopyDGLResultsToMatrixAndVector( const size_t dglUIDCount, const size_t algUIDCount,
-                                                                                    const Mat< double >& sourceMatrix,
-                                                                                    const Mat< double >& sourceVector );
-
-
-/// Class for creating a Differential Algebraic System from a electric circuit
-template <>
-class DifferentialAlgebraicSystem< arma::SpMat< double > >
-{
-    public:
-    DifferentialAlgebraicSystem( StateSystemGroup< arma::SpMat< double > >* stateSystemGroup );
-    virtual ~DifferentialAlgebraicSystem(){};
-
-    virtual const arma::SpMat< double > GetA() const;    ///< Get MatrixA
-    virtual const arma::SpMat< double > GetC() const;    ///< Get VectorC
-
-    virtual const arma::SpMat< double > GetAODE() const;    ///< Get MatrixA
-    virtual const arma::SpMat< double > GetCODE() const;    ///< Get VectorC
-
-    void PrepareEquationSystem();
-    void operator()( const arma::SpMat< double >& x, arma::SpMat< double >& dxdt, const double /* t */ );
-    void operator()( const arma::Mat< double >& x, arma::Mat< double >& dxdt, const double /* t */ );
-    void operator()( const std::vector< double >& x, std::vector< double >& dxdt, const double /* t */ );
-
-    virtual const char* GetName() const { return "DifferentialAlgebraicSystem"; }
-
-    private:
-    void CalculateInitialState();    ///< output x vector with all DGL values set to zero
-    //        void ODEifyEquations(); ///<  make ode equations out of the linear ones (alg1,alg2)
-
-    arma::Mat< double > mMatrixA;
-    arma::Mat< double > mVectorC;
-    StateSystemGroup< arma::SpMat< double > >* mStateSystemGroup;
-    StateSystem< arma::SpMat< double > >* mDglStateSystem;
-    StateSystem< arma::SpMat< double > >* mAlgStateSystem;
-};
-
-#endif /* _ARMADILLO_ */
-
 
 #ifdef _SYMBOLIC_
 typedef symbolic::Symbolic< double > _Scalar;
@@ -387,26 +339,7 @@ class DifferentialAlgebraicSystem< MatrixType >
         dxdt.bottomRows( algUIDCount ) = ret;
     }
 
-#if defined( _DS1006 ) || !defined( _SYMBOLIC_ )
-    void operator()( const arma::Mat< double >& x, arma::Mat< double >& dxdt, const double /* t */ )
-    {
-        // Read from arma matrix
-        // TODO:Use memcpy in future
-        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > x2( x.n_rows, x.n_cols );
-        for ( size_t i = 0; i < x.n_rows; ++i )
-            x2.coeffRef( i, 0 ) = x( i, 0 );
 
-        dxdt.resize( x.n_rows, x.n_cols );
-        Eigen::Matrix< _Scalar, Eigen::Dynamic, 1 > dxdt2( dxdt.n_rows, dxdt.n_cols );
-
-        // Do the job
-        operator()( x2, dxdt2, 0 );
-
-        // Write back to arma matrix
-        for ( size_t i = 0; i < dxdt.n_rows; ++i )
-            dxdt( i, 0 ) = dxdt2( i, 0 );
-    }
-#endif
     void operator()( const std::vector< _Scalar >& x, std::vector< _Scalar >& dxdt, const double /* t */ )
     {
         const size_t stateCount = mStateSystemGroup->GetStateCount();

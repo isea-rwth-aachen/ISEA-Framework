@@ -15,7 +15,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include <iostream>
 #include <string>
 
-#include "../../container/armadillo_wrapper.h"
 #include "../../electrical/capacity.h"
 #include "../../electrical/cellelement.h"
 #include "../../electrical/ohmicresistance.h"
@@ -30,7 +29,7 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "../../system/constantstepdglsystemsolver.h"
 #include "../../system/dae_sys.h"
 #include "../../system/stateSystemGroup.h"
-#include "../../system/variablestepdglsystemsolver.h"
+//#include "../../system/variablestepdglsystemsolver.h"
 
 std::vector< std::vector< double > > TestDaeSystem::CopyToVector( const double data[7][4] )
 {
@@ -919,58 +918,58 @@ void TestDaeSystem::testMultiCellellementBalancing()
     TS_ASSERT_DELTA( cellelem2->GetCurrentValue(), 6, 0.001 )
 }
 
-void TestDaeSystem::testVariableStepSolverWithParallelRCMindingResults()
-{
-#if defined( _EIGEN_ ) || defined( _ARMADILLO_ )
-    boost::shared_ptr< electrical::SerialTwoPort<> > serial( new electrical::SerialTwoPort<>() );
-
-    boost::shared_ptr< object::Object< double > > objR( new object::ConstObj< double >( 0.6 ) );
-    boost::shared_ptr< object::Object< double > > objTau( new object::ConstObj< double >( 0.6 * 0.5 ) );
-    boost::shared_ptr< electrical::ParallelRC<> > parallelRC( new electrical::ParallelRC<>( objR, objTau, true ) );
-
-    serial->AddChild( parallelRC );
-
-
-    double t = 0.0;
-
-    systm::StateSystemGroup< myMatrixType > stateSystemGroup;
-    serial->SetSystem( &stateSystemGroup );
-    stateSystemGroup.Initialize();
-    serial->SetInitialCurrent( 2.0 );
-    serial->UpdateStateSystemGroup();
-
-    systm::VariableStepDglSystemSolver< myMatrixType > solver(
-     &stateSystemGroup );    // systm::ConstantStepDglSystemSolver< myMatrixType > solver(&stateSystemGroup, 0.001);
-
-    while ( t < 1.0 )
-    {
-        serial->UpdateStateSystemGroup();
-        t = solver.Solve();
-        serial->CalculateStateDependentValues();
-        TS_ASSERT_DELTA( serial->GetVoltageValue(), 2.0 * 0.6 * ( 1 - exp( -( t - 0.0 ) / 0.3 ) ), 0.01 );
-    }
-    double lastCurrentSwitchTime = t;
-    double lastVoltageValue = serial->GetVoltageValue();
-
-    serial->SetCurrent( -0.4 );
-    while ( t < 3.0 )
-    {
-        serial->UpdateStateSystemGroup();
-        t = solver.Solve();
-        serial->CalculateStateDependentValues();
-        TS_ASSERT_DELTA( serial->GetVoltageValue(),
-                         ( lastVoltageValue + 0.4 * 0.6 ) * exp( -( t - lastCurrentSwitchTime ) / 0.3 ) - 0.4 * 0.6, 0.01 );
-    }
-    lastCurrentSwitchTime = t;
-    lastVoltageValue = serial->GetVoltageValue();
-
-    serial->SetCurrent( 0.0 );
-    while ( t < 6.0 )
-    {
-        serial->UpdateStateSystemGroup();
-        t = solver.Solve();
-        serial->CalculateStateDependentValues();
-        TS_ASSERT_DELTA( serial->GetVoltageValue(), lastVoltageValue * exp( -( t - lastCurrentSwitchTime ) / 0.3 ), 0.01 );
-    }
-#endif
-}
+//void TestDaeSystem::testVariableStepSolverWithParallelRCMindingResults()
+//{
+//#if defined( _EIGEN_ )
+//    boost::shared_ptr< electrical::SerialTwoPort<> > serial( new electrical::SerialTwoPort<>() );
+//
+//    boost::shared_ptr< object::Object< double > > objR( new object::ConstObj< double >( 0.6 ) );
+//    boost::shared_ptr< object::Object< double > > objTau( new object::ConstObj< double >( 0.6 * 0.5 ) );
+//    boost::shared_ptr< electrical::ParallelRC<> > parallelRC( new electrical::ParallelRC<>( objR, objTau, true ) );
+//
+//    serial->AddChild( parallelRC );
+//
+//
+//    double t = 0.0;
+//
+//    systm::StateSystemGroup< myMatrixType > stateSystemGroup;
+//    serial->SetSystem( &stateSystemGroup );
+//    stateSystemGroup.Initialize();
+//    serial->SetInitialCurrent( 2.0 );
+//    serial->UpdateStateSystemGroup();
+//
+//    systm::VariableStepDglSystemSolver< myMatrixType > solver(
+//     &stateSystemGroup );    // systm::ConstantStepDglSystemSolver< myMatrixType > solver(&stateSystemGroup, 0.001);
+//
+//    while ( t < 1.0 )
+//    {
+//        serial->UpdateStateSystemGroup();
+//        t = solver.Solve();
+//        serial->CalculateStateDependentValues();
+//        TS_ASSERT_DELTA( serial->GetVoltageValue(), 2.0 * 0.6 * ( 1 - exp( -( t - 0.0 ) / 0.3 ) ), 0.01 );
+//    }
+//    double lastCurrentSwitchTime = t;
+//    double lastVoltageValue = serial->GetVoltageValue();
+//
+//    serial->SetCurrent( -0.4 );
+//    while ( t < 3.0 )
+//    {
+//        serial->UpdateStateSystemGroup();
+//        t = solver.Solve();
+//        serial->CalculateStateDependentValues();
+//        TS_ASSERT_DELTA( serial->GetVoltageValue(),
+//                         ( lastVoltageValue + 0.4 * 0.6 ) * exp( -( t - lastCurrentSwitchTime ) / 0.3 ) - 0.4 * 0.6, 0.01 );
+//    }
+//    lastCurrentSwitchTime = t;
+//    lastVoltageValue = serial->GetVoltageValue();
+//
+//    serial->SetCurrent( 0.0 );
+//    while ( t < 6.0 )
+//    {
+//        serial->UpdateStateSystemGroup();
+//        t = solver.Solve();
+//        serial->CalculateStateDependentValues();
+//        TS_ASSERT_DELTA( serial->GetVoltageValue(), lastVoltageValue * exp( -( t - lastCurrentSwitchTime ) / 0.3 ), 0.01 );
+//    }
+//#endif
+//}

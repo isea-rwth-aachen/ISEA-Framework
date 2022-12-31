@@ -33,7 +33,7 @@ void FastCopyMatrix( Matrix &matrix, const Matrix &matrixToCopyFrom, unsigned in
         matrix.coeffRef( numberOfElementsMatrix + i, 0 ) = array[i];
 }
 
-#if defined( _ARMADILLO_ ) || defined( _MATLAB_ ) || defined( _EIGEN_ )
+#if  defined( _MATLAB_ ) || defined( _EIGEN_ )
 template <>
 void FastCopyMatrix< myMatrixType >( ScalarUnit *array, const myMatrixType &matrix, unsigned int numberOfElements );
 template <>

@@ -12,8 +12,9 @@ SocStopCriterion                        | %         | 5.0           | Maximum va
 ThermalStopCriterionInDegreeC           | °C        | 5.0           | Maximum temperature change in any thermal state during a thermal simulation step before the electrcal simulation is reset.
 Cycles                                  | int > 0   | 1             | Gives the number of times the current/power profile is executed by the [thermal-electrical standalone](xmlexecutable.html)
 SampleRate                              | Hz        | 1.0e6         | Sample rate for the automatic simplification of fast time constants, see [automatic simplification](xmlvereinfachung.html)
-MaximalOperationalCellVoltageV          | V         | no limit      | Maximum voltage of the simulated cells. If any cell voltage goes above this limit, values from the current profile are skipped until a negative value / discharge is found.
-MinimalOperationalCellVoltageV          | V         | no limit      | Minimum voltage of the simulated cells. If any cell voltage goes below this limit, values from the current profile are skipped until a positive value / charge is found.
+MaximalOperationalCellVoltageV          | V         | 10.0          | Maximum voltage of the simulated cells. If any cell voltage goes above this limit, values from the current profile are skipped until a negative value / discharge is found.
+MinimalOperationalCellVoltageV          | V         | 0.0           | Minimum voltage of the simulated cells. If any cell voltage goes below this limit, values from the current profile are skipped until a positive value / charge is found.
+VerificationDelayForVoltageLimitSteps   | Steps     | 4             | Number of electrical simulations steps before the breach of the operational limits is verified again. This allows the electrical model to "leave" the boundaries.
 
 Thermal model
 ===============

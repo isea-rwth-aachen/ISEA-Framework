@@ -16,7 +16,6 @@
 
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/string.hpp>
-#include "../../serialization/armadilloMatrix.h"
 #include "../../serialization/matlabMatrix.h"
 
 namespace threading { namespace daetask

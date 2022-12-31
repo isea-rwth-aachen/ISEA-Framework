@@ -1,6 +1,6 @@
 file(GLOB_RECURSE SOURCEFILES *.cpp)
 
-find_package(MATIO REQUIRED)
+find_package(matio REQUIRED)
 
 add_library(cinterface ${SOURCEFILES})
 target_link_libraries(cinterface PUBLIC ISEAFrameNumeric)

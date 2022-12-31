@@ -157,10 +157,12 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         auto voltageState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
         auto socState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
         auto currentState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
+        auto temperatureState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );
         this->GetStateFactory()->CacheInstance( "deltaDOD", dodState );
         this->GetStateFactory()->CacheInstance( "meanV", voltageState );
         this->GetStateFactory()->CacheInstance( "meanSOC", socState );
         this->GetStateFactory()->CacheInstance( "meanI", currentState );
+        this->GetStateFactory()->CacheInstance( "meanT", temperatureState );
 
         boost::shared_ptr< object::Object< double > > betaCapacity;
         boost::shared_ptr< object::Object< double > > betaResistance;
@@ -168,7 +170,8 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         std::vector< typename object::ExpressionObject< double >::Parameter > objectParameters{ { "deltaDOD", dodState },
                                                                                                 { "meanV", voltageState },
                                                                                                 { "meanSOC", socState },
-                                                                                                { "meanI", currentState } };
+                                                                                                { "meanI", currentState },
+                                                                                                { "meanT", temperatureState} };
         // Collects the cyclical data from the cell-specific aging node
         if ( param->HasElementDirectChild( "BetaCapacity" ) )
         {
@@ -194,6 +197,7 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         const double chargeExponentResistance = param->GetElementDoubleValue( "ChargeExponentResistance" );
         const double minBetaCap = param->GetElementDoubleValue( "MinBetaCapacity" );
         const double minBetaRes = param->GetElementDoubleValue( "MinBetaResistance" );
+        const std::string chargeCountingType = param->GetElementStringValue( "ChargeCountingType", "Ah" );
         const double maxBetaCap = param->GetElementDoubleValue( "MaxBetaCapacity", std::numeric_limits< double >::max() );
         const double maxBetaRes = param->GetElementDoubleValue( "MaxBetaResistance", std::numeric_limits< double >::max() );
 
@@ -213,12 +217,13 @@ class AgingClassWrapper< aging::CyclicalAging > : public AgingClassWrapperBase
         boost::shared_ptr< aging::CyclicalAging > cyclicalAging =
          boost::make_shared< aging::CyclicalAging >( agingStepTime, minBetaCap, minBetaRes, maxBetaCap, maxBetaRes, betaCapacity,
                                                      betaResistance, initialCapacityFactor, initialResistanceFactor,
-                                                     isEnabled, chargeExponentCapacity, chargeExponentResistance );
+                                                     isEnabled, chargeExponentCapacity, chargeExponentResistance, chargeCountingType );
 
         *dodState = state::ValueStateWrapper< double >( &cyclicalAging->mActualDod );
         *voltageState = state::ValueStateWrapper< double >( &cyclicalAging->mActualVoltage );
         *socState = state::ValueStateWrapper< double >( &cyclicalAging->mActualSoc );
         *currentState = state::ValueStateWrapper< double >( &cyclicalAging->mActualCurrent );
+        *temperatureState = state::ValueStateWrapper< double >( &cyclicalAging->mActualTemperature );
 
         return cyclicalAging;
     }
@@ -246,12 +251,14 @@ class AgingClassWrapper< aging::AnodeOverhang > : public AgingClassWrapperBase
         argObject->mSoc = soc;
         boost::shared_ptr< object::Object< double > > voltage =
          this->GetObjectFactory()->CreateInstance( param->GetElementChild( "Voltage" ), argObject.get() );
+        boost::shared_ptr< object::Object< double > > dva =
+         this->GetObjectFactory()->CreateInstance( param->GetElementChild( "DVA" ), argObject.get() );
         double activCoef = param->GetElementDoubleValue( "ActivationCoefficient" );
         double tauCoef = param->GetElementDoubleValue( "TauCoefficient" );
         double zeroOffsetSoc = param->GetElementDoubleValue( "SocWhereOffsetIsZero" );
         bool isEnabled = param->GetElementAttributeBoolValue( "enabled", true );
 
-        return boost::make_shared< aging::AnodeOverhang >( agingStepTime, voltage, activCoef, tauCoef, soc, zeroOffsetSoc, isEnabled );
+        return boost::make_shared< aging::AnodeOverhang >( agingStepTime, voltage, dva, activCoef, tauCoef, soc, zeroOffsetSoc, isEnabled );
     }
 };
 

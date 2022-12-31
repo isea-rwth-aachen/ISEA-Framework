@@ -10,7 +10,7 @@ if(WIN_TARGET AND LINUX_HOST)
   endforeach()
 endif()
 
-find_package(MATIO REQUIRED)
+find_package(matio REQUIRED)
 
 file(GLOB_RECURSE SOURCEFILES standalone/*.cpp)
 add_library(ISEAFrameStandalone STATIC EXCLUDE_FROM_ALL ${SOURCEFILES})
@@ -65,6 +65,7 @@ function(create_numeric_standalone condition standalone_name sourcefile)
   if(${condition})
     add_executable(${standalone_name} ${sourcefile} standalone/standalone.cpp)
     target_link_libraries(${standalone_name} ISEAFrameStandalone)
+
     set_target_properties(
       ${standalone_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                     ${CMAKE_BINARY_DIR}/standalones)

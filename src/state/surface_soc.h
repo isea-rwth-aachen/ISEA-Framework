@@ -7,6 +7,12 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #ifndef _SURFACE_SOC_
 #define _SURFACE_SOC_
 
+#ifdef max
+#pragma push_macro( "max" )
+#undef max
+#define RESTORE_MAX_MACRO
+#endif
+
 // STD
 #include <boost/shared_ptr.hpp>
 #include <limits>
@@ -59,4 +65,10 @@ class SurfaceSoc : public State
     double mCurrentValue;
 };
 }    // namespace state
+
+#ifdef RESTORE_MAX_MACRO
+#pragma pop_macro( "size" )
+#undef RESTORE_MAX_MACRO
+#endif
+
 #endif /* _SURFACE_SOC_ */

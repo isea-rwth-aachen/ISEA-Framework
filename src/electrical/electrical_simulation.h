@@ -83,6 +83,8 @@ class ElectricalSimulation
     void ResetSystemStates();
     /// Sets a maximul deviation in total power generation in percent. 0 means no stop criterion.
     void SetPowerStopCriterion( T maximumDeviation );
+    /// Set limit for cell voltage. Steps in the current profile are skipped if the limits are exceeded.
+    void SetVoltageStopCriterion( T minimumVoltage, T maximumVoltage );
 
     void UpdateSimulationDuration( const T &simulationDuration ) { mSimulationDuration = simulationDuration; }
 
@@ -143,9 +145,9 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
     , mMaxSimulationStepDuration( maxSimulationStepDuration )
     , mStepStartTime( 0.0 )
     , mSocStopCriterion( socStopCriterion )
-    , mMinVoltageStopCriterion( 0.0 )
-    , mMaxVoltageStopCriterion( 10.0 )
-    , mVoltageLimitDelay( 5 )
+    , mMinVoltageStopCriterion( nan( "" ) )
+    , mMaxVoltageStopCriterion( nan( "" ) )
+    , mVoltageLimitDelay( 4 )
     , mPowerStopCriterion( 0.0 )
     , mNumberOfSteps( 0 )
 {
@@ -300,6 +302,13 @@ ElectricalSimulation< Matrix, T, filterTypeChoice >::ElectricalSimulation(
         if ( mMaxVoltageStopCriterion < 0.0 )
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "MinimalVoltageCriterionIsNegative" );
     }
+    if ( optionsNode->HasElementDirectChild( "VerificationDelayForVoltageLimitSteps" ) )
+    {
+        mVoltageLimitDelay = optionsNode->GetElementDoubleValue( "VerificationDelayForVoltageLimitSteps" );
+        if ( mVoltageLimitDelay < 0.0 )
+            ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__,
+                                                 "VerificationDelayForVoltageLimitSteps" );
+    }
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
@@ -314,9 +323,6 @@ template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::UpdateSystemValues()
 {
     mRootTwoPort->CalculateStateDependentValues();
-#if defined( _ARMADILLO_ ) && defined( SPARSE_MATRIX_FORMAT )
-    mStateSystemGroup.ResetSystem();
-#endif
 }
 
 template < typename Matrix, typename T, bool filterTypeChoice >
@@ -389,13 +395,14 @@ bool ElectricalSimulation< Matrix, T, filterTypeChoice >::IsStopElectricalCriter
 {
     bool isStop = false;
 #ifndef _SYMBOLIC_
-    if ( mNumberOfSteps > mVoltageLimitDelay )
+    if ( mNumberOfSteps > mVoltageLimitDelay && !isnan( mMinVoltageStopCriterion ) && !isnan( mMaxVoltageStopCriterion ) )
     {
         // Check voltage
         for ( size_t i = 0; i < mCellElements.size(); ++i )
         {
             double cellVoltage = mCellElements[i]->GetVoltageValue();
-            if ( cellVoltage > mMaxVoltageStopCriterion || cellVoltage < mMinVoltageStopCriterion )
+            if ( ( cellVoltage > mMaxVoltageStopCriterion || cellVoltage < mMinVoltageStopCriterion ) &&
+                 mRootTwoPort->GetCurrentValue() != 0 )
             {
                 isStop = true;
                 break;
@@ -509,7 +516,7 @@ void ElectricalSimulation< Matrix, T, filterTypeChoice >::SaveCapacityForLaterRe
 {
     for ( size_t i = 0; i < mSocStates.size(); ++i )
     {
-        mSavedSocValues[i] = mSocStates[i]->template GetValue< state::SocGetFormat::AS >();
+        mSavedSocValues[i] = mSocStates[i]->template GetValue< state::SocGetFormat::PERCENT >();
         mSavedSocOffsets[i] = mSocStates[i]->template GetOffset< state::SocGetFormat::AS >();
     }
 }
@@ -520,7 +527,7 @@ void ElectricalSimulation< Matrix, T, filterTypeChoice >::LoadCapacityForLaterRe
     for ( size_t i = 0; i < mSocStates.size(); ++i )
     {
         mSocStates[i]->template SetOffset< state::SocSetFormat::ABSOLUT >( mSavedSocOffsets[i] );
-        mSocStates[i]->template SetStoredEnergy< state::SocSetFormat::ABSOLUT >( mSavedSocValues[i] );
+        mSocStates[i]->template SetStoredEnergy< state::SocSetFormat::FACTOR >( mSavedSocValues[i] / 100 );
     }
 }
 
@@ -541,6 +548,13 @@ template < typename Matrix, typename T, bool filterTypeChoice >
 void ElectricalSimulation< Matrix, T, filterTypeChoice >::SetPowerStopCriterion( T maximumDeviation )
 {
     mPowerStopCriterion = maximumDeviation / 100;
+}
+
+template < typename Matrix, typename T, bool filterTypeChoice >
+void ElectricalSimulation< Matrix, T, filterTypeChoice >::SetVoltageStopCriterion( T minimumVoltage, T maximumVoltage )
+{
+    mMinVoltageStopCriterion = minimumVoltage;
+    mMaxVoltageStopCriterion = maximumVoltage;
 }
 
 }    // namespace simulation

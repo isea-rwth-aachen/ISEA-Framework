@@ -2,8 +2,8 @@ option(BUILD_UNITTESTS "Build all unittests" ON)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/unittest)
 
 if(BUILD_UNITTESTS)
-  find_package(CxxTest)
-  find_package(MATIO REQUIRED)
+  find_package(CxxTest REQUIRED)
+  find_package(matio REQUIRED)
   add_custom_target(unittests)
 
   # find all header files to pass to the test generator

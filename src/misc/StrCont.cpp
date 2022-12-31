@@ -58,7 +58,20 @@ StrCont::StrCont( const size_t &inputInt )
 #endif
 }
 
-StrCont::StrCont( const std::ptrdiff_t &inputInt )
+StrCont::StrCont( const long int  &inputInt )
+{
+#ifdef __NO_STRING__
+    char inputString[MAX_SIZE] = {0};
+    real_snprintf( inputString, MAX_SIZE, "%l", inputInt );
+    const size_t sizeOfBuffer = strnlen( inputString, MAX_SIZE ) + 1;
+    mContent.resize( sizeOfBuffer, '\0' );
+    strlcpy( &( mContent[0] ), inputString, sizeOfBuffer );
+#else
+    mContent = boost::lexical_cast< std::string >( inputInt );
+#endif
+}
+
+StrCont::StrCont( const long long int  &inputInt )
 {
 #ifdef __NO_STRING__
     char inputString[MAX_SIZE] = {0};
@@ -86,7 +99,7 @@ StrCont::StrCont( const double &inputDouble )
 #endif
 }
 
-StrCont::~StrCont() {}
+
 
 StrCont::operator const char *() const { return &( mContent[0] ); }
 

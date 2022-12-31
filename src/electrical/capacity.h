@@ -32,7 +32,7 @@ class Capacity : public ElectricalElement< T >
     explicit Capacity( object::Object< double >* obj, const bool observable = false,
                        typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ) );
 
-    virtual ~Capacity(){};
+    virtual ~Capacity()= default;;
 
     virtual T* GetVoltage();    /// Returns Uc = 1
 

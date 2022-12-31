@@ -1,3 +1,9 @@
+Version 2.26.0
+===========
+- Change capacity calculation for the anode overhang to use DVA values
+- Switch from mingw to clang for cross-compiling the Windows version
+- Add optional XML parameters to set voltage limits for cells
+
 Version 2.25.0
 ===========
 - Add MaxAlphaCapacity, MaxAlphaResistance, MaxBetaCapacity, and MaxBetaResistance XML parameters to specify maximum aging coefficients

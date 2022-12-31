@@ -14,7 +14,7 @@ class TestDaeSystem: public CxxTest::TestSuite
     public:
 
         void testDaeSystemMixedSystemCurrentUnsolveable();
-        void testDaeSystemMixedSystemCurrentSolveable();
+        __attribute__( ( unused ) ) __attribute__( ( unused ) ) void testDaeSystemMixedSystemCurrentSolveable();
         void testDaeSystemMixedSystemCurrentSolveableIntegrate();
         void testRC();
         void testRCParallel();
@@ -25,7 +25,7 @@ class TestDaeSystem: public CxxTest::TestSuite
         void testSingleCellellement();
         void testSingleCellellementBalancing();
         void testMultiCellellementBalancing();
-        void testVariableStepSolverWithParallelRCMindingResults();
+        //void testVariableStepSolverWithParallelRCMindingResults();
     private:
         std::vector< std::vector<double> > CopyToVector(const double data[7][4]);
 

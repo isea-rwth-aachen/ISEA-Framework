@@ -17,7 +17,7 @@ class AnodeOverhang : public AgingBase
 {
     public:
     /// Constructor
-    AnodeOverhang( const double agingStepTime, const boost::shared_ptr< object::Object< double > >& voltage,
+    AnodeOverhang( const double agingStepTime, const boost::shared_ptr< object::Object< double > >& voltage, const boost::shared_ptr< object::Object< double > >& dva,
                    const double& activCoef, const double& tauCoef, const boost::shared_ptr< state::Soc >& socState,
                    const double socWhereOffsetIsZero, bool isEnabled = true );
 
@@ -36,11 +36,14 @@ class AnodeOverhang : public AgingBase
     virtual double GetCapacityFactor() { return 1; };
     virtual double GetSocOffset() { return mAnodeOffset; };    // in As
     virtual double GetResistanceFactor() { return 1; };
+    
+    virtual double CalculateLinearCapacitance();
 
     virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
     boost::shared_ptr< object::Object< double > > mVoltage;
+    boost::shared_ptr< object::Object< double > > mDVA;
     const double mActivCoef;
     const double mTauCoef;
     boost::shared_ptr< state::Soc > mSocState;

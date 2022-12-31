@@ -233,7 +233,7 @@ void MatrixSimulinkModel< Matrix, T >::CreateMatrixModel()
     const int returnValue = mexCallMATLAB( 0, plhs, 1, openSystem.data(), "open_system" );
     if ( returnValue )
     {
-        mexPrintf( "Error while opening system %s.\n", mFilename );
+        mexPrintf( "Error while opening system %s.\n", (const char *)mFilename );
         return;
     }
 }
@@ -439,9 +439,8 @@ void MatrixSimulinkModel< Matrix, T >::CreateThermalProbes()
     {
         thermal::ThermalElement< T > *probeElement = ( *mThermalSimulation->mThermalProbes )[i].GetCorrespondingThermalElement();
         auto it = std::find_if( thermalElements.begin(), thermalElements.end(),
-                                [probeElement]( const boost::shared_ptr< thermal::ThermalElement< T > > &element ) {
-                                    return element.get() == probeElement;
-                                } );
+                                [probeElement]( const boost::shared_ptr< thermal::ThermalElement< T > > &element )
+                                { return element.get() == probeElement; } );
         size_t index = std::distance( thermalElements.begin(), it );
         finiteVolumesIndices[i] = index + 1;
     }

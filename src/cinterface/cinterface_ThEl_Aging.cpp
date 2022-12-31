@@ -77,12 +77,13 @@ extern "C"
     {
         DeleteSystem_ThEl( pointerStructureAddress );
         InitializeSystem_ThEl_Aging( configStr, pointerStructureAddress, stateVector );
-        SetOutputVectors_ThEl( pointerStructureAddress, voltageOutputVec, currentOutputVec, powerOutputVec,
+        SetOutputVectors_ThEl_Aging( pointerStructureAddress, voltageOutputVec, currentOutputVec, powerOutputVec,
                                socOutputVec, socSurfaceOutputVec );
     }
 
     void SetOutputVectors_ThEl_Aging( const size_t *pointerStructureAddress, real_T *voltageOutputVec, real_T *currentOutputVec,
                                       real_T *powerOutputVec, real_T *socOutputVec, real_T *socSurfaceOutputVec )
+
     {
         PointerStructure_ThEl_Aging *pointerStructure = (PointerStructure_ThEl_Aging *)*pointerStructureAddress;
 
@@ -95,16 +96,22 @@ extern "C"
             std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > twoportVector( observedTwoports.size(), nullptr );
             size_t outputRows = numberOfCellelements;
             size_t outputColumns = std::ceil( (double)observedTwoports.size() / outputRows );
-            // first column has all the cellements, so they can just be copied
-            for ( size_t i = 0; i < numberOfCellelements; ++i )
+
+	    // first column has all the cellements, so they can just be copied
+            
+	    size_t i=0;
+	    for ( size_t n = 0; n < observedTwoports.size(); n += outputColumns )
             {
-                twoportVector[i] = observedTwoports[i];
+                twoportVector[i] = observedTwoports[n];
+		i++;
             }
-            for ( size_t i = numberOfCellelements; i < observedTwoports.size(); ++i )
+
+            for ( size_t n = 0; n < observedTwoports.size(); ++n )
             {
-                size_t row = ( i - numberOfCellelements ) / ( outputColumns - 1 );
-                size_t column = ( i - numberOfCellelements ) % ( outputColumns - 1 ) + 1;
-                twoportVector[column * outputRows + row] = observedTwoports[i];
+		    if ((n%outputColumns)==0)
+			    continue;
+		    twoportVector[i]=observedTwoports[n];
+		    i++;
             }
             pointerStructure->mElectricalSimulation->mObserver =
              CreateTwoPortObserver< std::vector< boost::shared_ptr< electrical::TwoPort< myUnit > > >, myUnit, false >(

@@ -2054,7 +2054,6 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = BOOST_MPI \
                          BOOST_THREAD \
-                         _ARMADILLO_ \
                          __EXCEPTIONS__ \
                          BUILD_AGING_SIMULATION
 

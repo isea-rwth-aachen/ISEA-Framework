@@ -22,13 +22,9 @@ class ElectricalStandalone : virtual public SimulationStandalone
 
     boost::shared_ptr< simulation::ElectricalSimulation< myMatrixType, double, true > > mElectricalSimulation;
     std::vector< boost::shared_ptr< electrical::TwoPort< myMatrixType > > > mCells;
-#if defined( _ARMADILLO_ ) && !defined( SPARSE_MATRIX_FORMAT )
-    boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< myMatrixType > >::type mStepperElectrical;
-    myMatrixType mStateVector;
-#else
+
     boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< std::vector< double > > >::type mStepperElectrical;
     std::vector< double > mStateVector;
-#endif
 };
 
 }    // namespace standalone

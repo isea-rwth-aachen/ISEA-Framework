@@ -19,7 +19,7 @@ double ScalarMul( const myMatrixType &rowMatrix, const myMatrixType &colMatrix )
 
 #ifdef _SYMBOLIC_
 #include "../misc/symbolic.h"
-#include <eigen3/Eigen/Core>
+#include <Eigen/Core>
 
 
 template <>

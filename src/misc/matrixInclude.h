@@ -8,40 +8,27 @@
 #ifndef MATRIXINCLUDE_H_
 #define MATRIXINCLUDE_H_
 
-#ifdef _ARMADILLO_
-#include <armadillo>
-using namespace arma;
-#include "../container/armadillo_wrapper.h"
+#ifdef _EIGEN_
 
-#ifdef SPARSE_MATRIX_FORMAT
-typedef arma::SpMat< double > myMatrixType;
-#else
-typedef arma::Mat< double > myMatrixType;
-#endif
-#elif _EIGEN_
-#include "../container/armadillo_wrapper.h"
-#include <armadillo>
-
-#include <eigen3/Eigen/Cholesky>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Eigenvalues>
-#include <eigen3/Eigen/LU>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/SparseLU>
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+#include <Eigen/LU>
+#include <Eigen/Sparse>
+#include <Eigen/SparseLU>
 
 // using namespace Eigen;
 typedef Eigen::SparseMatrix< double, Eigen::RowMajor > myMatrixType;
 
 #include "../container/eigen_wrapper.h"
 #elif _SYMBOLIC_
-#include "../stub/armadillo.h"
 #include "symbolic.h"
 
-#include <eigen3/Eigen/Cholesky>
-#include <eigen3/Eigen/Eigenvalues>
-#include <eigen3/Eigen/LU>
-#include <eigen3/Eigen/Sparse>
-#include <eigen3/Eigen/SparseLU>
+#include <Eigen/Cholesky>
+#include <Eigen/Eigenvalues>
+#include <Eigen/LU>
+#include <Eigen/Sparse>
+#include <Eigen/SparseLU>
 // using namespace Eigen;
 
 typedef Eigen::SparseMatrix< symbolic::Symbolic< double >, Eigen::RowMajor > myMatrixType;
@@ -54,7 +41,7 @@ using SymbolicMatrix = Eigen::SparseMatrix< symbolic::Symbolic< Output >, Eigen:
 }
 using namespace symbolic;
 #else
-#Error Either _ARMADILLO_ or _EIGEN_ must be defined
+#Error _EIGEN_ must be defined
 #endif
 
 template < typename MatrixType >

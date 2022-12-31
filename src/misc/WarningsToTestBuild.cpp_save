@@ -1,24 +1,6 @@
 #include "matrixInclude.h"
 
-#ifdef _ARMADILLO_
-    int PseudoFunction(int i)
-    {
-        return i + 1;
-    };
-  #ifdef SPARSE_MATRIX_FORMAT
-      int PseudoFunction2(int i)
-        {
-            return i - 1;
-        };
-    #warning Building with Sparse
-  #else
-      int PseudoFunction2(int i)
-        {
-            return i - 1;
-        };
-    #warning Building with Armadillo
-  #endif
-#elif _MATLAB_
+#ifdef _MATLAB_
     int PseudoFunction(int i)
     {
         return i + 1;
@@ -47,7 +29,7 @@
     {
         return i + 1;
     };
-    #Error Either _ARMADILLO_, _MATLAB_ or _EIGEN_ must be defined
+    #Error Either  _MATLAB_ or _EIGEN_ must be defined
 #endif
 
 

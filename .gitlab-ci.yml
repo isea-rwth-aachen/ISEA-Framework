@@ -11,13 +11,13 @@ stages:
 # configure workflow
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
-    - if: '$CI_COMMIT_BRANCH == "web"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: '$CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # set defaults
 default:
-  tags: [ 'docker' ]
+  tags: ["docker"]
 
 # set varialbes
 variables:
@@ -55,9 +55,9 @@ docker-retag-images:
     - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_linux_compile"  $IMAGE_TAG_LINUX_COMPILE || :'
     - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_linux_test"  $IMAGE_TAG_LINUX_TEST || :'
     - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_windowscc_compile"  $IMAGE_TAG_WINDOWSCC_COMPILE || :'
-    - 'docker push $IMAGE_TAG_LINUX_COMPILE || :'
-    - 'docker push $IMAGE_TAG_LINUX_TEST || :'
-    - 'docker push $IMAGE_TAG_WINDOWSCC_COMPILE || :'
+    - "docker push $IMAGE_TAG_LINUX_COMPILE || :"
+    - "docker push $IMAGE_TAG_LINUX_TEST || :"
+    - "docker push $IMAGE_TAG_WINDOWSCC_COMPILE || :"
 
 # build docker image and push it into GitLab container registry
 docker-build-linux-compile:
@@ -81,7 +81,7 @@ docker-build-linux-test:
   rules:
     - changes:
         - docker/*
-  needs: [ "docker-build-linux-compile" ]
+  needs: ["docker-build-linux-compile"]
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
@@ -98,8 +98,8 @@ docker-build-windowscc-compile:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-   - docker build docker --target iseaframecc --cache-from $IMAGE_TAG_WINDOWSCC_COMPILE --tag $IMAGE_TAG_WINDOWSCC_COMPILE --build-arg BASE_IMAGE="base"
-   - docker push $IMAGE_TAG_WINDOWSCC_COMPILE
+    - docker build docker --target iseaframecc --cache-from $IMAGE_TAG_WINDOWSCC_COMPILE --tag $IMAGE_TAG_WINDOWSCC_COMPILE --build-arg BASE_IMAGE="base"
+    - docker push $IMAGE_TAG_WINDOWSCC_COMPILE
 
 linux_compile:
   stage: build-framework
@@ -148,7 +148,7 @@ linux_standalones:
   image: $IMAGE_TAG_LINUX_COMPILE
   variables:
     TARGET_OS: "linux"
-  needs: [ "linux_compile" ]
+  needs: ["linux_compile"]
   artifacts:
     paths:
       - buildReleaseLinux/standalones
@@ -161,7 +161,7 @@ windows_standalones:
   image: $IMAGE_TAG_WINDOWSCC_COMPILE
   variables:
     TARGET_OS: "windows"
-  needs: [  "windows_compile" ]
+  needs: ["windows_compile"]
   artifacts:
     paths:
       - buildReleaseWindows/standalones
@@ -224,7 +224,7 @@ standalone_test:
 documentation:
   stage: docs
   image: $IMAGE_TAG_LINUX_COMPILE
-  needs: [ "linux_compile" ]
+  needs: ["linux_compile"]
   artifacts:
     paths:
       - buildReleaseLinux/docRelease/html
@@ -236,7 +236,7 @@ documentation:
 development_documentation:
   stage: docs
   image: $IMAGE_TAG_LINUX_COMPILE
-  needs: [ "linux_compile" ]
+  needs: ["linux_compile"]
   artifacts:
     paths:
       - buildReleaseLinux/doc/html
@@ -248,12 +248,12 @@ development_documentation:
 pages:
   stage: deploy-docs
   image: alpine:latest
-  needs: [ "development_documentation" ]
+  needs: ["development_documentation"]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   artifacts:
     paths:
-    - public
+      - public
   script:
     - cp -r buildReleaseLinux/doc/html public
 
@@ -262,7 +262,7 @@ docker-build-linux-interactive:
   # Use the official docker image.
   image: docker:20.10
   stage: build-interactive-docker
-  needs: [ "linux_standalones" ]
+  needs: ["linux_standalones"]
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
   script:

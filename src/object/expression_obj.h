@@ -1,10 +1,10 @@
 #ifndef _EXPRESSION_OBJ_
 #define _EXPRESSION_OBJ_
-
+#include <boost/shared_ptr.hpp>
+#include <array>
 #include "../../libraries/exprtk/exprtk.hpp"
 #include "../state/state.h"
 #include "object.h"
-#include <boost/shared_ptr.hpp>
 
 namespace object
 {

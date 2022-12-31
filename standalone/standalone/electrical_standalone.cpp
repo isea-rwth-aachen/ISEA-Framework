@@ -38,15 +38,13 @@ bool ElectricalStandalone::CreateElectricalSimulation( factory::FactoryBuilder< 
             mElectricalSimulation->SetPowerStopCriterion( mPowerStopCriterion );
         }
 
-// create equation solvers
-#if defined( _ARMADILLO_ ) && not defined( SPARSE_MATRIX_FORMAT )
-        mStepperElectrical =
-         make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< myMatrixType >() );
-#else
+        mElectricalSimulation->SetVoltageStopCriterion( mMinCellVoltage, mMaxCellVoltage );
+
+        // create equation solvers
+
         mStepperElectrical =
          make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< std::vector< double > >() );
         mStateVector = std::vector< double >( mElectricalSimulation->mStateSystemGroup.mStateVector.rows(), 0.0 );
-#endif
     }
     catch ( std::exception &e )
     {
@@ -124,21 +122,7 @@ void ElectricalStandalone::DoElectricalStep()
     {
         mElectricalSimulation->UpdateSystem();
 
-#if defined( _ARMADILLO_ ) && !defined( SPARSE_MATRIX_FORMAT )
-        // Run electrical equation solver
 
-        mStateVector = mElectricalSimulation->mStateSystemGroup.mStateVector.submat(
-         0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 2, 0 );
-        mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
-        while ( mStepperElectrical.try_step( boost::ref( *mElectricalSimulation->mEqSystem ), mStateVector,
-                                             mElectricalSimulation->mTime,
-                                             mElectricalSimulation->mDeltaTime ) != boost::numeric::odeint::success )
-        {
-            mElectricalSimulation->mStateSystemGroup.mStateVector.submat(
-             0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 2, 0 ) = mStateVector;
-            mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
-        }
-#else
         // Run electrical equation solver
         misc::FastCopyMatrix( &mStateVector[0], mElectricalSimulation->mStateSystemGroup.mStateVector, mStateVector.size() );
         mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
@@ -149,7 +133,6 @@ void ElectricalStandalone::DoElectricalStep()
             mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
         }
         misc::FastCopyMatrix( mElectricalSimulation->mStateSystemGroup.mStateVector, &mStateVector[0], mStateVector.size() );
-#endif
 
         mElectricalSimulation->UpdateSystemValues();
 

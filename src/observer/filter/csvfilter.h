@@ -138,7 +138,7 @@ class CsvFilterBase< T, electrical::TwoPort, PreparationType< T > >
     {
         if ( mRootPort )
         {
-            this->mFilestream << "," << -1;
+            this->mFilestream << t << "," << -1;
             PrintData( mRootPort );
         }
 
@@ -275,11 +275,11 @@ class CsvFilterBase< T, thermal::ThermalElement, ThermalPreperation >
         this->mFilestream << "\n";
         this->mFilestream << std::flush;
 
+        this->mProbeFile << t;
         for ( const auto& probe : ( *mThermalProbes ) )
         {
             this->mProbeFile << ", " << probe.GetTemperature();
         }
-
         this->mProbeFile << "\n";
         this->mProbeFile << std::flush;
 

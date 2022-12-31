@@ -1,0 +1,66 @@
+/*
+ * variablestepdglsystemsolver.cpp
+ *
+ *  Created on: 06.01.2014
+ *      Author: chris
+ */
+
+// STD
+#ifdef __EXCEPTIONS__
+#include <stdexcept>
+#include <string>
+#endif /* __EXCEPTIONS__ */
+
+// ETC
+#include "../exceptions/error_proto.h"
+#include "variablestepdglsystemsolver.h_bck"
+#ifndef _DS1006
+namespace systm
+{
+
+
+#ifdef _EIGEN_
+
+VariableStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::VariableStepDglSystemSolver(
+ StateSystemGroup< Eigen::SparseMatrix< double, Eigen::RowMajor > >* stateSystemGroup )
+    : SystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >( stateSystemGroup, 0.0001 )
+    , daeSystem( new systm::DifferentialAlgebraicSystem< Eigen::SparseMatrix< double, Eigen::RowMajor > >( stateSystemGroup ) )
+    , mStepper( make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< arma::Mat< double > >() ) )
+{
+}
+
+double VariableStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve()
+{
+    bool successfull = false;
+
+    daeSystem->PrepareEquationSystem();
+
+    size_t realStates = this->mStateVector.rows() - 1;    // TODO: Uncomment when one is concatenated to state vector
+
+    //    MatrixXd x = this->mStateVector.topRows(realStates);
+    arma::Mat< double > x( realStates, 1 );
+    for ( size_t i = 0; i < realStates; ++i )
+        x( i, 0 ) = this->mStateVector.coeff( i, 0 );
+
+    for ( size_t tries = SOLVER_TRIES; tries > 0 && !successfull; --tries )
+    {
+        successfull = ( mStepper.try_step( boost::ref( *daeSystem ), x, mTime, mDt ) == boost::numeric::odeint::success );
+    }
+
+    for ( size_t i = 0; i < realStates; ++i )
+        this->mStateVector.coeffRef( i, 0 ) = x( i, 0 );
+
+    this->mStateVector.coeffRef( realStates, 0 ) = 1;    // TODO: Uncomment when one is concatenated to state vector
+
+    if ( !successfull )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "ErrorStep" );
+
+    this->ResetStateSystemGroup();
+
+    return mTime;
+}
+
+#endif /* _EIGEN_ */
+
+} /* namespace systm */
+#endif /* _DS1006 */

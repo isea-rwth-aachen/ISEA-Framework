@@ -84,7 +84,7 @@ void CalendarianAging::CollectData( const TwoportState& twoportState, const Twop
         mTimeValues.push_back( mTimeSinceLastAgingStep );
         mVoltageValues.push_back( cellState.mElectricalData->mVoltageValue );
         mTemperatureValues.push_back( twoportState.mThermalState->GetValue< TemperatureGetFormat::KELVIN >() );
-        mSocValues.push_back( twoportState.mSocState->GetValue< state::SocGetFormat::PERCENT >() / 100 );
+        mSocValues.push_back( twoportState.mSocState->GetValue< state::SocGetFormat::PERCENT >() );
     }
 }
 

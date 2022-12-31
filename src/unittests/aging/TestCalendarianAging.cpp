@@ -144,10 +144,10 @@ void TestCalendarianAging::testReset()
 void TestCalendarianAging::testFormulaVariables()
 {
     double voltage = 3.5;
-    double soc = 0.73;
+    double soc = 73; // [%]
     double temperature = 300.0;    // [K]
     auto electricalData = boost::make_shared< ElectricalDataStruct< double > >( 0, voltage, 0 );
-    auto socState = boost::make_shared< state::Soc >( 1.0, 1.0, soc * 100 );
+    auto socState = boost::make_shared< state::Soc >( 1.0, 1.0, soc );
     auto thermalState = boost::make_shared< state::ThermalState< double > >( temperature - 273.15 );
     aging::TwoportState tpState( electricalData, socState, thermalState );
     auto voltageValueState = boost::make_shared< state::ValueStateWrapper< double > >( nullptr );

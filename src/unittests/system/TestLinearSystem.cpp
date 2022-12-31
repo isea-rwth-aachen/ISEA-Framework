@@ -14,7 +14,6 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 // STD
 #include <string>
 
-#include "../../container/armadillo_wrapper.h"
 #include "../../electrical/capacity.h"
 #include "../../electrical/cellelement.h"
 #include "../../electrical/ohmicresistance.h"

@@ -57,21 +57,7 @@ void ThermalElectricalStandalone::DoElectricalStep()
             !mElectricalSimulation->IsStopCriterionFulfilled() )
     {
         mElectricalSimulation->UpdateSystem();
-#if defined( _ARMADILLO_ ) && !defined( SPARSE_MATRIX_FORMAT )
-        // Run electrical equation solver
 
-        mStateVector = mElectricalSimulation->mStateSystemGroup.mStateVector.submat(
-         0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 2, 0 );
-        mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
-        while ( mStepperElectrical.try_step( boost::ref( *mElectricalSimulation->mEqSystem ), mStateVector,
-                                             mElectricalSimulation->mTime,
-                                             mElectricalSimulation->mDeltaTime ) != boost::numeric::odeint::success )
-        {
-            mElectricalSimulation->mStateSystemGroup.mStateVector.submat(
-             0, 0, mElectricalSimulation->mStateSystemGroup.mStateVector.n_rows - 2, 0 ) = mStateVector;
-            mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
-        }
-#else
         // Run electrical equation solver
         misc::FastCopyMatrix( &mStateVector[0], mElectricalSimulation->mStateSystemGroup.mStateVector, mStateVector.size() );
         mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
@@ -82,7 +68,6 @@ void ThermalElectricalStandalone::DoElectricalStep()
             mElectricalSimulation->mStateSystemGroup.mDt = mElectricalSimulation->mDeltaTime;
         }
         misc::FastCopyMatrix( mElectricalSimulation->mStateSystemGroup.mStateVector, &mStateVector[0], mStateVector.size() );
-#endif
 
         mElectricalSimulation->UpdateSystemValues();
 

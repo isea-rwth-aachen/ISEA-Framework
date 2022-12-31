@@ -34,7 +34,8 @@ class CyclicalAging : public EmpiricalAging
                    const double maxBetaResistance, const boost::shared_ptr< object::Object< double > >& alphaCapacity,
                    const boost::shared_ptr< object::Object< double > >& alphaResistance,
                    const double initialCapacityFactor, const double initialResistanceFactor, const bool isEnabled,
-                   const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance );
+                   const double chargeThroughputExponentCapacity, const double chargeThroughputExponentResistance,
+                   const std::string chargeCounting);
 
     /// Returns AgingType::CYCLICAL
     /// Derived from AgingBase
@@ -52,20 +53,23 @@ class CyclicalAging : public EmpiricalAging
     virtual void AcceptVisitor( visitor::Visitor< AgingBase >& visitor ) { visitor.Visit( *this ); }
 
     private:
-    double GetAverageVoltage( double startTime, double endTime );
+    double GetAverageValue(  double startTime, double endTime,  std::vector< double > valuesToAvg  );
 
     const double mChargeThroughputExponentCapacity;
     const double mChargeThroughputExponentResistance;
 
-    double mActualDod;                 // [%/100]
+    double mActualDod;                 // [%]
     double mActualVoltage;             // [V]
-    double mActualSoc;                 // [%/100]
+    double mActualSoc;                 // [%]
     double mActualCurrent;             // [A]
     double mTimeSinceLastAgingStep;    // [s]
+    double mActualTemperature;          // [K]
 
     std::vector< double > mTimeValues;       // [s]
     std::vector< double > mSocValues;        // [%]
     std::vector< double > mVoltageValues;    // [V]
+    std::vector< double > mTemperatureValues;    // [V]
+    const std::string mChargeCounting;
 };
 }    // namespace aging
 

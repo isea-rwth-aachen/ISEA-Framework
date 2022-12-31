@@ -60,25 +60,6 @@ template <>
 double ConstantStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor > >::Solve();
 #endif /* _EIGEN_ */
 
-#ifdef _ARMADILLO_
-
-/// Solver with constant dt and euler integration
-template <>
-class ConstantStepDglSystemSolver< arma::Mat< double > > : public SystemSolver< arma::Mat< double > >
-{
-    public:
-    ConstantStepDglSystemSolver( StateSystemGroup< arma::Mat< double > >* stateSystemGroup, double dt );
-
-    virtual ~ConstantStepDglSystemSolver() {}
-
-    virtual double Solve();
-
-    private:
-    boost::scoped_ptr< systm::DifferentialAlgebraicSystem< arma::Mat< double > > > daeSystem;
-    boost::numeric::odeint::runge_kutta4< arma::Mat< double > > mStepper;
-};
-
-#endif /* _ARMADILLO_ */
 
 } /* namespace systm */
 

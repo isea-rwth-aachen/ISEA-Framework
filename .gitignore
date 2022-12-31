@@ -26,7 +26,6 @@ CMakeFiles/
 *.mexa*
 /Debug
 /DebugMatlab
-/DebugArmadillo
 src/version/version.cpp
 src/version/version.h
 src/exceptions/xmlData.cpp
@@ -43,3 +42,5 @@ __pycache__/
 !/scenarios/*/*.csv
 secrets/
 testing/*
+.idea
+cmake-build-*

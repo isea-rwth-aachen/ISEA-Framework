@@ -2,12 +2,14 @@
 
 namespace aging
 {
-AnodeOverhang::AnodeOverhang( const double agingStepTime, const boost::shared_ptr< object::Object< double > >& voltage,
+AnodeOverhang::AnodeOverhang( const double agingStepTime, const boost::shared_ptr< object::Object< double > >& voltage, 
+                              const boost::shared_ptr< object::Object< double > >& dva,
                               const double& activCoef, const double& tauCoef,
                               const boost::shared_ptr< state::Soc >& socState,
                               const double socWhereOffsetIsZero, bool isEnabled )
     : AgingBase( agingStepTime, isEnabled )
     , mVoltage( voltage )
+    , mDVA (dva)
     , mActivCoef( activCoef )
     , mTauCoef( tauCoef )
     , mSocState( socState )
@@ -48,16 +50,13 @@ void AnodeOverhang::CalculateAging( const TwoportState&, double timestep, double
         double anodeVoltage = anodeVoltageSum / this->mTotalCalculationTime;
         double temperature = temperatureSum / this->mTotalCalculationTime;
         double tau = this->mTauCoef * std::exp( this->mActivCoef / temperature ) * 3600 * 24;
-        double charge = this->mSocState->GetValue< state::SocGetFormat::AS >();
-        if ( charge == 0 )    // If the charge is exactly 0, the overhang has no capacity and no charge can ever flow
-        {
-            charge = 1.0;
-            this->mSocState->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( charge );
-        }
+        
         double overhangVoltage = mVoltage->GetValue();
-        double capacity = charge / overhangVoltage;
-
-        double additionalCharge = capacity * ( overhangVoltage - anodeVoltage ) * ( 1 - exp( -stepTimeSeconds / tau ) );
+        
+        double capacitance = 1 / ( mDVA->GetValue(this->mSocState->GetValue< state::SocGetFormat::PERCENT >()) 
+         * this->mSocState->GetActualCapacity< state::SocGetFormat::AS >() );      
+       
+        double additionalCharge = capacitance * ( overhangVoltage - anodeVoltage ) * ( 1 - exp( -stepTimeSeconds / tau ) );
         this->mSocState->SetStoredEnergy< state::SocSetFormat::DELTA >( additionalCharge );
         this->mAnodeOffset -= additionalCharge;
 
@@ -67,6 +66,35 @@ void AnodeOverhang::CalculateAging( const TwoportState&, double timestep, double
         this->mTotalCalculationTime = 0.0;
     }
 }
+
+double AnodeOverhang::CalculateLinearCapacitance()
+{
+    double saveCharge = this->mSocState->GetValue< state::SocGetFormat::AS >();
+    double overhangVoltage = mVoltage->GetValue();
+
+    // Evaluate two additional points on the Anode QOCV for linearisation
+    double overhangCap = this->mSocState->GetActualCapacity();
+    double chargeDiff = 0.01 * overhangCap;
+    double chargePlus = saveCharge + chargeDiff;
+    double chargeMinus = saveCharge - chargeDiff;
+    
+    this->mSocState->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( chargePlus );
+    double overhangVoltagePlus = mVoltage->GetValue();
+    this->mSocState->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( chargeMinus );
+    double overhangVoltageMinus = mVoltage->GetValue();
+
+    this->mSocState->SetStoredEnergy< state::SocSetFormat::ABSOLUT >( saveCharge );
+
+    double calculatedCapacity = (2 * chargeDiff) / (overhangVoltagePlus - overhangVoltageMinus);
+    
+    if (calculatedCapacity > (saveCharge / overhangVoltage) )
+    {   
+        calculatedCapacity = saveCharge / overhangVoltage;
+    }
+
+    return calculatedCapacity;
+}
+
 
 void AnodeOverhang::CollectData( const TwoportState& twoportState, const TwoportState&, double timestep )
 {

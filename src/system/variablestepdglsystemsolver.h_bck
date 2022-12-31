@@ -52,42 +52,7 @@ VariableStepDglSystemSolver< T >::VariableStepDglSystemSolver( StateSystemGroup<
     ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "OnlyArmadillo" );
 }
 
-#ifdef _ARMADILLO_
 
-/// Solver with variable dt
-template <>
-class VariableStepDglSystemSolver< arma::Mat< double > > : public SystemSolver< arma::Mat< double > >
-{
-    public:
-    VariableStepDglSystemSolver( StateSystemGroup< arma::Mat< double > >* stateSystemGroup );
-
-    virtual ~VariableStepDglSystemSolver() {}
-
-    virtual double Solve();
-
-    private:
-    boost::scoped_ptr< systm::DifferentialAlgebraicSystem< arma::Mat< double > > > daeSystem;
-    boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< arma::Mat< double > > >::type mStepper;
-};
-
-/// Solver with variable dt
-template <>
-class VariableStepDglSystemSolver< arma::SpMat< double > > : public SystemSolver< arma::SpMat< double > >
-{
-    public:
-    VariableStepDglSystemSolver( StateSystemGroup< arma::SpMat< double > >* stateSystemGroup );
-
-    virtual ~VariableStepDglSystemSolver() {}
-
-    virtual double Solve();
-
-    private:
-    boost::scoped_ptr< systm::DifferentialAlgebraicSystem< arma::SpMat< double > > > daeSystem;
-    boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< arma::Mat< double > > >::type mStepper;
-    arma::Mat< double > mDenseStateVector;
-};
-
-#endif /* _ARMADILLO_ */
 
 #ifdef _EIGEN_
 template <>

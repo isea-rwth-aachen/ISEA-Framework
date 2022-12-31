@@ -36,30 +36,7 @@ double ConstantStepDglSystemSolver< Eigen::SparseMatrix< double, Eigen::RowMajor
 #endif /* _EIGEN_ */
 
 
-#ifdef _ARMADILLO_
 
-ConstantStepDglSystemSolver< arma::Mat< double > >::ConstantStepDglSystemSolver( StateSystemGroup< arma::Mat< double > >* stateSystemGroup,
-                                                                                 double dt )
-    : SystemSolver< arma::Mat< double > >( stateSystemGroup, dt )
-    , daeSystem( new systm::DifferentialAlgebraicSystem< arma::Mat< double > >( stateSystemGroup ) )
-{
-}
-
-double ConstantStepDglSystemSolver< arma::Mat< double > >::Solve()
-{
-    daeSystem->PrepareEquationSystem();
-    arma::Mat< double > states = this->mStateVector.submat( 0, 0, this->mStateVector.rows() - 2, 0 );
-    mStepper.do_step( *daeSystem, states, 0, this->mDt );
-    this->mStateVector.submat( 0, 0, this->mStateVector.rows() - 2, 0 ) = states;
-
-    this->mTime += this->mDt;
-
-    this->ResetStateSystemGroup();
-
-    return this->mTime;
-}
-
-#endif /* _ARMADILLO_ */
 
 } /* namespace systm */
 

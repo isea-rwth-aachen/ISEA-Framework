@@ -33,12 +33,14 @@ class Symbolic
     bool empty() const { return IsEmpty(); };
     Symbolic();
     explicit Symbolic( const char *content );
-    explicit Symbolic( const size_t content );
-    explicit Symbolic( const int content );
-    explicit Symbolic( const std::ptrdiff_t content );
+    explicit Symbolic( size_t content );
+    explicit Symbolic( int content );
+    explicit Symbolic( long int content );
+    explicit Symbolic( long long int content );
 
-    Symbolic( const double content );
-    ~Symbolic();
+
+    Symbolic( double content );//::TODO:: making one of the int copy contrsuctors non explicit instead of this one
+    ~Symbolic() = default;
     bool IsEmpty() const;
     bool IsOne() const;
     size_t size() const { return mContent.size(); };
@@ -55,7 +57,8 @@ class Symbolic
 
     private:
     bool ContentIsZero( const size_t &content ) const;
-    bool ContentIsZero( const std::ptrdiff_t &content ) const;
+    bool ContentIsZero( const long long int &content ) const;
+    bool ContentIsZero( const long int &content ) const;
     bool ContentIsZero( const int &content ) const;
     bool ContentIsZero( const double &content ) const;
     void DoNothingButAvoidCompilerWarning() const;
@@ -166,11 +169,6 @@ bool Symbolic< OutputType >::operator!=( const Symbolic< OutputType > &rhs ) con
     return strcmp( mContent, rhs.mContent ) != 0;
 }
 
-template < typename OutputType >
-Symbolic< OutputType >::Symbolic( const char *content )
-    : mContent( content )
-{
-}
 
 template < typename OutputType >
 Symbolic< OutputType > &Symbolic< OutputType >::operator=( const char *content )
@@ -182,27 +180,36 @@ Symbolic< OutputType > &Symbolic< OutputType >::operator=( const char *content )
     this->Simplyfy();
     return *this;
 }
+template < typename OutputType >
+Symbolic< OutputType >::Symbolic( const char *content )
+    : mContent( content )
+{
+}
+template < typename OutputType >
+Symbolic< OutputType >::Symbolic( size_t content )
+    : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
+{
+}
+
 
 template < typename OutputType >
-Symbolic< OutputType >::Symbolic( const size_t content )
+Symbolic< OutputType >::Symbolic( int content )
+    : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
+{
+}
+template < typename OutputType >
+Symbolic< OutputType >::Symbolic( long int content )
+    : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
+{
+}
+template < typename OutputType >
+Symbolic< OutputType >::Symbolic( long long int content )
     : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
 {
 }
 
 template < typename OutputType >
-Symbolic< OutputType >::Symbolic( const std::ptrdiff_t content )
-    : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
-{
-}
-
-template < typename OutputType >
-Symbolic< OutputType >::Symbolic( const int content )
-    : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
-{
-}
-
-template < typename OutputType >
-Symbolic< OutputType >::Symbolic( const double content )
+Symbolic< OutputType >::Symbolic( double content )
     : mContent( ContentIsZero( content ) ? StrCont() : StrCont( content ) )
 {
 }
@@ -213,10 +220,7 @@ Symbolic< OutputType >::Symbolic()
 {
 }
 
-template < typename OutputType >
-Symbolic< OutputType >::~Symbolic()
-{
-}
+
 
 template < typename OutputType >
 bool Symbolic< OutputType >::IsEmpty() const
@@ -247,9 +251,13 @@ bool Symbolic< OutputType >::ContentIsZero( const size_t &content ) const
 {
     return content == 0;
 }
-
 template < typename OutputType >
-bool Symbolic< OutputType >::ContentIsZero( const std::ptrdiff_t &content ) const
+bool Symbolic< OutputType >::ContentIsZero( const long long int &content ) const
+{
+    return content == 0;
+}
+template < typename OutputType >
+bool Symbolic< OutputType >::ContentIsZero( const long int &content ) const
 {
     return content == 0;
 }

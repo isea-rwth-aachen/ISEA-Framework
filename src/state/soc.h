@@ -33,7 +33,9 @@ enum class SocSetFormat
 {
     ABSOLUT,
     DELTA,
-    FACTOR
+    DELTALIM,
+    FACTOR,
+    PERCENT
 };
 
 /// This class describes the behaviour of the State of Charge depending on the capacity
@@ -208,8 +210,22 @@ void Soc::SetStoredEnergy( const double value )
             mActualSoc += value / mActualCapacity;
             break;
 
+        case SocSetFormat::DELTALIM:
+            mActualSoc += value / mActualCapacity;
+            if ( mActualSoc < 0 ) {
+                mActualSoc = 0;
+            }
+            else if ( mActualSoc > 1 ) {
+                mActualSoc = 1;
+            }
+            break;
+
         case SocSetFormat::FACTOR:
             mActualSoc = value;
+            break;
+            
+        case SocSetFormat::PERCENT:
+            mActualSoc = value / 100;
             break;
 
         default:

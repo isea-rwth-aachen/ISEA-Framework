@@ -12,7 +12,7 @@
 #include <map>
 #include <vector>
 
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 class TestOdeSystemThermal;
 class TestSimulation;

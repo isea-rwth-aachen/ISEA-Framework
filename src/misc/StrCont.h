@@ -27,11 +27,13 @@ class StrCont
     ///@param[in] inputInt Is transformed into string and copied into instance
     StrCont( const size_t &inputInt );
     ///@param[in] inputInt Is transformed into string and copied into instance
-    StrCont( const std::ptrdiff_t &inputInt );
+    StrCont( const long int &inputInt );
     ///@param[in] inputDouble Is transformed into string and copied into instance
     StrCont( const double &inputDouble );
+    StrCont( const long long int &inputInt );
+
     void swap( StrCont &rhs );
-    virtual ~StrCont();
+    virtual ~StrCont() = default;
     operator const char *() const;
     StrCont &operator+=( const StrCont &rhs );
     size_t size() const { return mContent.size(); };

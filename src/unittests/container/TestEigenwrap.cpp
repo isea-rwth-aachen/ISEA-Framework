@@ -6,7 +6,7 @@
 _._._._._._._._._._._._._._._._._._._._._.*/
 
 #include "TestEigenwrap.h"
-#include <eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 namespace CxxTest
 {

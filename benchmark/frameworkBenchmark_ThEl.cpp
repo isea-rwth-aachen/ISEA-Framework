@@ -166,14 +166,10 @@ int main( int argc, char *argv[] )
     // Equation solvers
     boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > > >::type stepperThermal =
      make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > >() );
-#if defined( _ARMADILLO_ ) && not defined( SPARSE_MATRIX_FORMAT )
-    boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< myMatrixType > >::type stepperElectrical =
-     make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< myMatrixType >() );
-#else
+
     boost::numeric::odeint::result_of::make_controlled< boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > > >::type stepperElectrical =
      make_controlled( 1.0e-10, 1.0e-10, boost::numeric::odeint::runge_kutta_cash_karp54< vector< double > >() );
     std::vector< double > tmpStateVector( electricalSimulation->mStateSystemGroup.mStateVector.n_rows, 0.0 );
-#endif
 
     boost::posix_time::ptime electricalStart;
     boost::posix_time::time_duration electricalDuration;
@@ -211,16 +207,7 @@ int main( int argc, char *argv[] )
                 break;
             }
 
-#if defined( _ARMADILLO_ ) && !defined( SPARSE_MATRIX_FORMAT )
-            // Run electrical equation solver
-            electricalSimulation->mStateSystemGroup.mDt = electricalSimulation->mDeltaTime;
-            while ( stepperElectrical.try_step( boost::ref( *electricalSimulation->mEqSystem ),
-                                                electricalSimulation->mStateSystemGroup.mStateVector, electricalSimulation->mTime,
-                                                electricalSimulation->mDeltaTime ) != boost::numeric::odeint::success )
-            {
-                electricalSimulation->mStateSystemGroup.mDt = electricalSimulation->mDeltaTime;
-            }
-#else
+
             // Run electrical equation solver
             misc::FastCopyMatrix( &tmpStateVector[0], electricalSimulation->mStateSystemGroup.mStateVector, tmpStateVector.size() );
             electricalSimulation->mStateSystemGroup.mDt = electricalSimulation->mDeltaTime;
@@ -231,7 +218,6 @@ int main( int argc, char *argv[] )
                 electricalSimulation->mStateSystemGroup.mDt = electricalSimulation->mDeltaTime;
             }
             misc::FastCopyMatrix( electricalSimulation->mStateSystemGroup.mStateVector, &tmpStateVector[0], tmpStateVector.size() );
-#endif
 
             electricalSimulation->UpdateSystemValues();
             electricalSimulation->UpdateAllThermalStatesPowerDissipation();

@@ -99,12 +99,12 @@ void SimulationStandalone::ReadXmlOptions()
     if ( optionsNode->HasElementDirectChild( "MaximalOperationalCellVoltageV" ) )
         mMaxCellVoltage = optionsNode->GetElementDoubleValue( "MaximalOperationalCellVoltageV" );
     else
-        mMaxCellVoltage = 10.0;    // Default voltage limit electrical simulation
+        mMaxCellVoltage = nan( "" );    // Default voltage limit electrical simulation
     if ( optionsNode->HasElementDirectChild( "MinimalOperationalCellVoltageV" ) )
         mMinCellVoltage = optionsNode->GetElementDoubleValue( "MinimalOperationalCellVoltageV" );
     else
-        mMinCellVoltage = 0.0;        // Default voltage limit electrical simulation
-    if ( mOutputDecimation < 0.0 )    // set default value if no decimation was given on the command line
+        mMinCellVoltage = nan( "" );    // Default voltage limit electrical simulation
+    if ( mOutputDecimation < 0.0 )      // set default value if no decimation was given on the command line
         mOutputDecimation = mStepTime;
 }
 

@@ -126,7 +126,7 @@ ScalarUnit Cellelement< T >::CalculateReversibleHeat() const
 
     if ( !HasReversibleHeat() )
     {
-        return 0;
+        return static_cast< ScalarUnit >( 0 );
     }
     return ( this->mThermalState->template GetValue< TemperatureGetFormat::KELVIN >() * this->mCurrentValue *
              mReversibleHeat->GetValue() );
@@ -351,7 +351,7 @@ std::pair< ScalarUnit, ScalarUnit > Cellelement< T >::GetVoltageRange()
 {
     if ( !mHasVoltageRange )
         CalculateVoltageRange();
-    return {mMinimumVoltage, mMaximumVoltage};
+    return { mMinimumVoltage, mMaximumVoltage };
 }
 
 }    // namespace electrical

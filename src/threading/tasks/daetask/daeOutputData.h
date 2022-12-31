@@ -11,7 +11,6 @@
 #include "../../taskData.h"
 #include "../../../misc/matrixInclude.h"
 #include <boost/shared_ptr.hpp>
-#include "../../serialization/armadilloMatrix.h"
 #include <boost/serialization/vector.hpp>
 
 
