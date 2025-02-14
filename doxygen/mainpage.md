@@ -9,6 +9,7 @@ This short introduction can be divided into the following parts:
 - [Compiling](compiling.html)
 - [XML-description language](xmlsprache.html)
 - [Standalone executable for electrical and thermal simulation ](xmlexecutable.html)
+- [Simulink S-Functions](xmlcinterface.html)
 - [Simulink Converter](simulink_converter.html)
 - [Visualization of simulation data](visualization.html)
 - [Half cell simulation](xmlhalfcell.html)

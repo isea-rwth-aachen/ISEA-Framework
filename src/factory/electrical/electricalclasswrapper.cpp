@@ -17,6 +17,9 @@ template class Factory< electrical::TwoPort< myMatrixType >, ArgumentTypeElectri
 template class ElectricalClassWrapper< myMatrixType, electrical::Capacity >;
 template class ElectricalClassWrapper< myMatrixType, electrical::OhmicResistance >;
 template class ElectricalClassWrapper< myMatrixType, electrical::VoltageSource >;
+template class ElectricalClassWrapper< myMatrixType, electrical::VoltageSource_OneState >;
+template class ElectricalClassWrapper< myMatrixType, electrical::VoltageSource_PreisachEverett >;
+template class ElectricalClassWrapper< myMatrixType, electrical::VoltageSource_PreisachDiscrete >;
 template class ElectricalClassWrapper< myMatrixType, electrical::ParallelRC >;
 template class ElectricalClassWrapper< myMatrixType, electrical::ParallelRCAlg >;
 template class ElectricalClassWrapper< myMatrixType, electrical::Cellelement >;

@@ -15,12 +15,13 @@ Factory< state::State, ArgumentTypeState > *FactoryBuilder< MatrixT, ValueT >::B
     Factory< state::State, ArgumentTypeState > *stateFactory = this->mStateFactory.get();
 
     stateFactory->AddWrapper( new StateClassWrapper< state::Soc >( stateFactory ), "Soc" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::CRateState< double > >( stateFactory ), "CRateState" );
     stateFactory->AddWrapper( new StateClassWrapper< state::SurfaceSoc >( stateFactory ), "SurfaceSoc" );
     stateFactory->AddWrapper( new StateClassWrapper< state::ThermalState< double > >( stateFactory ), "ThermalState" );
-    stateFactory->AddWrapper( new StateClassWrapper< state::ValueStateWrapper< ScalarUnit > >( stateFactory ),
-                              "ElectricalState" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::ValueStateWrapper< ScalarUnit > >( stateFactory ), "ElectricalState" );
     stateFactory->AddWrapper( new StateClassWrapper< state::AgingState >( stateFactory ), "AgingState" );
-
+    stateFactory->AddWrapper( new StateClassWrapper< state::LHDState< double > >( stateFactory ), "LHDState" );
+    stateFactory->AddWrapper( new StateClassWrapper< state::CDirection< double > >( stateFactory ), "CDirection" );
     return stateFactory;
 }
 
@@ -43,10 +44,14 @@ Factory< object::Object< double >, ArgumentTypeObject< double > > *FactoryBuilde
                                "LookupObj1D" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::LookupObj2D >( stateFactory, objectFactory ),
                                "LookupObj2D" );
+    objectFactory->AddWrapper( new ObjectClassWrapper< double, object::LookupObj3D >( stateFactory, objectFactory ),
+                               "LookupObj3D" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::LookupObj1dWithState >( stateFactory, objectFactory ),
                                "LookupObj1dWithState" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::LookupObj2dWithState >( stateFactory, objectFactory ),
                                "LookupObj2dWithState" );
+    objectFactory->AddWrapper( new ObjectClassWrapper< double, object::LookupObj3dWithState >( stateFactory, objectFactory ),
+                               "LookupObj3dWithState" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::MultiObj >( stateFactory, objectFactory ),
                                "MultiObj" );
     objectFactory->AddWrapper( new ObjectClassWrapper< double, object::ExpressionObject >( stateFactory, objectFactory ),
@@ -104,6 +109,15 @@ Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *FactoryBuilde
     electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource >( electricalFactory, objectFactory,
                                                                                                      stateFactory ),
                                    "VoltageSource" );
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_OneState >( electricalFactory, objectFactory,
+                                                                                                     stateFactory ),
+                                   "VoltageSource_OneState" );
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_PreisachEverett >(electricalFactory, objectFactory,
+                                                                                                              stateFactory ),
+                                   "VoltageSource_PreisachEverett" );
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_PreisachDiscrete >(electricalFactory, objectFactory, 
+                                                                                                              stateFactory ),
+                                   "VoltageSource_PreisachDiscrete" );
     electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::WarburgTanh >( electricalFactory,
                                                                                                    objectFactory, stateFactory ),
                                    "WarburgTanh" );

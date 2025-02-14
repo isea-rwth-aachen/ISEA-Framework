@@ -17,3 +17,4 @@ Build local docker image
 Run local docker image
 
 'docker run --rm -it iseaframe_cicd:local'
+

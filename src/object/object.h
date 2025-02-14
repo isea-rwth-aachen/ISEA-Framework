@@ -24,9 +24,13 @@ class Object
     virtual T GetValue() const = 0;    ///< Return the current value, for higher level classes this interface will return the latest value
     virtual T GetValue( const T val );
     virtual T GetValue( const T val1, const T val2 );
+    virtual T GetValue( const T val1, const T val2, const T val3 );
+    virtual T GetValue( const T val1, const T val2, const T val3, const T val4 );
     virtual T operator()() const = 0;    ///< Return the current value, for higher level classes this interface will return the latest value
     virtual T operator()( const T val );
     virtual T operator()( const T val, const T val2 );
+    virtual T operator()( const T val, const T val2, const T val3 );
+    virtual T operator()( const T val, const T val2, const T val3, const T val4 );
     virtual void SetFactor( const T factor );    // Set a factor that all values are multiplied by
 
     inline virtual T GetMaxValueOfLookup()
@@ -71,6 +75,19 @@ T Object< T >::GetValue( const T /* val1 */, const T /* val2 */ )
 }
 
 template < typename T >
+T Object< T >::GetValue( const T /* val1 */, const T /* val2 */, const T /* val3 */ )
+{
+    return mLastValue;
+}
+
+template < typename T >
+T Object< T >::GetValue( const T /* val1 */, const T /* val2 */, const T /* val3 */, const T /* val4 */ )
+{
+    return mLastValue;
+}
+
+
+template < typename T >
 T Object< T >::operator()( const T val )
 {
     return GetValue( val );
@@ -81,6 +98,18 @@ template < typename T >
 T Object< T >::operator()( const T val, const T val2 )
 {
     return GetValue( val, val2 );
+}
+
+template < typename T >
+T Object< T >::operator()( const T val, const T val2, const T val3 )
+{
+    return GetValue( val, val2, val3 );
+}
+
+template < typename T >
+T Object< T >::operator()( const T val, const T val2, const T val3, const T val4 )
+{
+    return GetValue( val, val2, val3, val4 );
 }
 
 template < typename T >
@@ -95,5 +124,5 @@ void Object< T >::SetFactor( const T factor )
     this->mFactor = factor;
 }
 
-} /* END NAMESPACE */
+}    // namespace object
 #endif /* _OBJECT_ */

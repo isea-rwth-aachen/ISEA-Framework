@@ -33,10 +33,13 @@ class AgingState : public State
     virtual double GetCellAge() const;
     virtual double GetChargeThroughput() const;
     virtual double GetValue() const;
+    virtual double GetLastValue() const;
 
     virtual double GetCapacityFactor() const;
+    virtual double GetLastCapacityFactor() const;
     virtual double GetSocOffset() const;
     virtual double GetResistanceFactor() const;
+    virtual double GetLastResistanceFactor() const;
 
     virtual void SetCellAge( const double &value, AgingStateSetFormat format = AgingStateSetFormat::ABSOLUT );
     virtual void SetChargeThroughput( const double &value, AgingStateSetFormat format = AgingStateSetFormat::ABSOLUT );
@@ -45,8 +48,10 @@ class AgingState : public State
     virtual void SetResistanceFactor( const double &value, AgingStateSetFormat format = AgingStateSetFormat::ABSOLUT );
 
     double mCapacityFactor;
+    double mLastCapacityFactor;
     double mSocOffset;
     double mResistanceFactor;
+    double mLastResistanceFactor;
 
     double mCellAge;
     double mChargeThroughput;

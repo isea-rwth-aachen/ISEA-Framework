@@ -19,13 +19,21 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #include "paralleltwoport.h"
 #include "twoport_with_state.h"
 #include "voltagesource.h"
+#include "voltagesource_onestate.h"
+#include "voltagesource_preisacheverett.h"
+#include "voltagesource_preisachdiscrete.h"
 
 #include "../state/soc.h"
 #include "../state/surface_soc.h"
 #include "../state/thermal_state.h"
+#include "../state/crate.h"
+#include "../state/cdirection.h"
+#include "../state/lhd.h"
 
 #include "../object/lookup_obj1d_with_state.h"
 #include "../object/lookup_obj2d_with_state.h"
+#include "../object/lookup_obj3d_with_state.h"
+
 
 class TestElectricalElement;    // friend
 namespace electrical
@@ -57,12 +65,74 @@ class Cellelement : public TwoPortWithState< T >
      typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
      boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
 
+
+    // Crate
+    explicit Cellelement(
+     size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState,
+     const boost::shared_ptr< state::CRateState< double > >& crateState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    explicit Cellelement(
+     const boost::shared_ptr< state::ThermalState< double > >& thermalState, const boost::shared_ptr< state::Soc >& socState,
+     const boost::shared_ptr< state::CRateState< double > >& crateState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    // C Direction
+    explicit Cellelement(
+     size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState,
+     const boost::shared_ptr< state::CDirection< double > >& cdirection, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    explicit Cellelement(
+     const boost::shared_ptr< state::ThermalState< double > >& thermalState, const boost::shared_ptr< state::Soc >& socState,
+     const boost::shared_ptr< state::CDirection< double > >& cdirection, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    // LHD Crate
+    explicit Cellelement(
+     size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const boost::shared_ptr< state::CRateState< double > >& crateState,
+     const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    explicit Cellelement(
+     const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const boost::shared_ptr< state::CRateState< double > >& crateState,
+     const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    // LHD C Direction
+    explicit Cellelement(
+     size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const boost::shared_ptr< state::CDirection< double > >& cdirection,
+     const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
+    explicit Cellelement(
+     const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+     const boost::shared_ptr< state::Soc >& socState, const boost::shared_ptr< state::CDirection< double > >& cdirection,
+     const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable = false,
+     typename TwoPort< T >::DataType dataValues = typename TwoPort< T >::DataType( new ElectricalDataStruct< ScalarUnit > ),
+     boost::shared_ptr< object::Object< double > > reversibleHeat = boost::shared_ptr< object::Object< double > >( 0 ) );
+
     virtual ~Cellelement(){};
 
     virtual bool IsCellelement() const;    ///< Is this element a cellelement?
     virtual void SetCurrentFromActiveBalancer( ScalarUnit current );    ///< This function gives the chance to actively balance a battery with a current
 
     double GetSocStateValue() const;
+    double GetCrateStateValue() const;
+    double GetCdirectionValue() const;
+    double GetLHDStateValue() const;
     double GetSurfaceSocStateValue() const;
 
     template < state::SocGetFormat FormatT = state::SocGetFormat::AH >
@@ -117,6 +187,9 @@ class Cellelement : public TwoPortWithState< T >
     bool HasHalfcells() const;
 
     const size_t mCellNumber;
+    bool CdirectionDefined;
+    bool CrateDefined;
+    bool LHDDefined;
 
     private:
     bool mSurfaceSocSet;

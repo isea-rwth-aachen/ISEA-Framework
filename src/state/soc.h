@@ -52,6 +52,7 @@ class Soc : public State
     template < SocGetFormat format = SocGetFormat::PERCENT >
     double GetValue() const;
     double GetValue() const;
+    double GetLastValue() const;
     const double& GetValueRef() const;
 
     template < SocGetFormat format = SocGetFormat::AS >
@@ -91,6 +92,8 @@ class Soc : public State
 
     double mActualCapacity;    // [As]
     double mActualSoc;         // [%]
+    double mLastSoc;           // [%]
+
     /// portion of the soc that is caused by an offset from aging. This offset is already included in mActualSoc.
     double mOffset;    // [%]
 
@@ -202,7 +205,8 @@ void Soc::SetStoredEnergy( const double value )
 {
     switch ( setFormat )
     {
-        case SocSetFormat::ABSOLUT:
+        mLastSoc = mActualSoc;
+        case SocSetFormat::ABSOLUT:            
             mActualSoc = value / mActualCapacity;
             break;
 
@@ -280,7 +284,7 @@ void Soc::SetCapacity( const double value )
         default:
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "UndefinedFormat", "Soc" );
     }
-
+    mLastSoc = mActualSoc;
     mActualSoc = storedEnergy / mActualCapacity;
     mOffset = offsetEnergy / mActualCapacity;
 }
@@ -304,7 +308,7 @@ void Soc::SetCapacityFactor( const double factor )
         default:
             ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "UndefinedFormat", "Soc" );
     }
-
+    mLastSoc = mActualSoc;
     mActualSoc = storedEnergy / mActualCapacity;
     mOffset = offsetEnergy / mActualCapacity;
 }

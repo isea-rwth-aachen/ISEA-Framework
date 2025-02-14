@@ -12,6 +12,7 @@ class State
 
     /// Deprecated
     virtual double GetValue() const = 0;
+    virtual double GetLastValue() const = 0;
     virtual double operator()() const { return GetValue(); };
 };
 }

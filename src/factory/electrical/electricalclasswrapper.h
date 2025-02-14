@@ -22,6 +22,9 @@
 #include "../../state/aging_state.h"
 #include "../../state/soc.h"
 #include "../../state/thermal_state.h"
+#include "../../state/crate.h"
+#include "../../state/cdirection.h"
+#include "../../state/lhd.h"
 
 #include "../../electrical/anode_element.h"
 #include "../../electrical/capacity.h"
@@ -38,6 +41,9 @@
 #include "../../electrical/serialtwoport.h"
 #include "../../electrical/sphericalDiffusion.h"
 #include "../../electrical/voltagesource.h"
+#include "../../electrical/voltagesource_onestate.h"
+#include "../../electrical/voltagesource_preisacheverett.h"
+#include "../../electrical/voltagesource_preisachdiscrete.h"
 #include "../../electrical/warburgCotanh.h"
 #include "../../electrical/warburgTanh.h"
 #include "../../electrical/zarc.h"
@@ -63,6 +69,9 @@ extern template class electrical::Cellelement< myMatrixType >;
 extern template class electrical::Zarc< myMatrixType >;
 extern template class electrical::ZarcAlg< myMatrixType >;
 extern template class electrical::VoltageSource< myMatrixType >;
+extern template class electrical::VoltageSource_OneState< myMatrixType >;
+extern template class electrical::VoltageSource_PreisachEverett< myMatrixType >;
+extern template class electrical::VoltageSource_PreisachDiscrete< myMatrixType >;
 extern template class electrical::WarburgTanh< myMatrixType >;
 extern template class electrical::WarburgCotanh< myMatrixType >;
 extern template class electrical::Rmphn< myMatrixType >;
@@ -89,6 +98,8 @@ struct ArgumentTypeElectrical
         , mSocDivisorAnode( 1 )
         , mSocDivisorKathode( 1 )
         , mSoc( nullptr )
+        , mCrate( nullptr )
+        , mCdirection( nullptr )
         , mParentCell( nullptr )
         , mMakeAllECMElementsObservable( false )
     {
@@ -107,6 +118,8 @@ struct ArgumentTypeElectrical
     size_t mSocDivisorKathode;
 
     boost::shared_ptr< state::Soc > mSoc;
+    boost::shared_ptr< state::CRateState< double > > mCrate;
+    boost::shared_ptr< state::CDirection< double > > mCdirection;
     boost::shared_ptr< electrical::Cellelement< myMatrixType > > mParentCell;
 
     /// make all twoports observable that are a discrete element in the ECM. Does not apply to serial and parallel
@@ -491,6 +504,153 @@ class ElectricalClassWrapper< MatrixT, VoltageSource > : public ElectricalClassW
         boost::shared_ptr< object::Object< double > > obj( this->GetObjectFactory()->CreateInstance( objparam, argObject.get() ) );
 
         return boost::shared_ptr< TwoPort< MatrixT > >( new VoltageSource< MatrixT >( obj, observable, elecData ) );
+    }
+};
+
+/// Classwrapper for electrical::VoltageSource_OneState
+template < typename MatrixT >
+class ElectricalClassWrapper< MatrixT, VoltageSource_OneState > : public ElectricalClassWrapperBase< MatrixT >
+{
+    public:
+    ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
+                            Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
+        : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
+    {
+    }
+
+    boost::shared_ptr< TwoPort< MatrixT > >
+    CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
+    {
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
+                                ( arg && arg->mMakeAllECMElementsObservable );
+        
+
+        boost::shared_ptr< xmlparser::XmlParameter > OCVavg_objparam( param->GetElementChild( "LookupAverageOCV" ) );
+        boost::scoped_ptr< ArgumentTypeObject< double > > argObject( new ArgumentTypeObject< double > );
+
+        auto elecData = this->CreateElectricalData();
+
+        boost::shared_ptr< object::Object< double > > OCVavg_Obj(
+         this->GetObjectFactory()->CreateInstance( OCVavg_objparam, this->SetObjectFactorToArg( arg, true, argObject, elecData ) ) );
+
+        boost::shared_ptr< xmlparser::XmlParameter > OCVwidth_objparam( param->GetElementChild( "LookupHystWidth" ) );
+
+        argObject.reset( new ArgumentTypeObject< double > );
+        argObject->mElectricalDataStruct = elecData;
+
+        boost::shared_ptr< object::Object< double > > OCVwidth_Obj(
+         this->GetObjectFactory()->CreateInstance( OCVwidth_objparam, argObject.get() ) );
+
+        boost::shared_ptr< xmlparser::XmlParameter > OCVtau_objparam( param->GetElementChild( "LookupHystTau" ) );
+
+        argObject.reset( new ArgumentTypeObject< double > );
+        argObject->mElectricalDataStruct = elecData;
+
+        boost::shared_ptr< object::Object< double > > OCVtau_Obj(
+         this->GetObjectFactory()->CreateInstance( OCVtau_objparam, argObject.get() ) );
+
+        double InitialCapacity = 1;
+        if ( param->HasElementDirectChild( "InitialCapacity" ) )
+            InitialCapacity = param->GetElementDoubleValue( "InitialCapacity" );
+        double gamma = 1;
+        if ( param->HasElementDirectChild( "gamma" ) )
+            gamma = param->GetElementDoubleValue( "gamma" );
+        double eta = 1;
+        if ( param->HasElementDirectChild( "eta" ) )
+            eta = param->GetElementDoubleValue( "eta" );
+
+        return boost::shared_ptr< TwoPort< MatrixT > >( new VoltageSource_OneState< MatrixT >( OCVavg_Obj, OCVwidth_Obj, OCVtau_Obj, InitialCapacity, eta, observable, elecData ) );
+    }
+};
+
+/// Classwrapper for electrical::VoltageSource_PreisachEverett
+template < typename MatrixT >
+class ElectricalClassWrapper< MatrixT, VoltageSource_PreisachEverett > : public ElectricalClassWrapperBase< MatrixT >
+{
+    public:
+    ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
+                            Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
+        : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
+    {
+    }
+
+    boost::shared_ptr< TwoPort< MatrixT > >
+    CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
+    {
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
+                                ( arg && arg->mMakeAllECMElementsObservable );
+
+        boost::shared_ptr< xmlparser::XmlParameter > objparam( param->GetElementChild( "LookupEverettFunctionValues" ) );
+        boost::scoped_ptr< ArgumentTypeObject< double > > argObject( new ArgumentTypeObject< double > );
+
+        auto elecData = this->CreateElectricalData();
+
+
+        boost::shared_ptr< object::Object< double > > obj(
+         this->GetObjectFactory()->CreateInstance( objparam, this->SetObjectFactorToArg( arg, true, argObject, elecData ) ) );
+
+        double minOCV = 0;
+        if ( param->HasElementDirectChild( "OCVmin" ) )
+            minOCV = param->GetElementDoubleValue( "OCVmin" );
+
+        boost::shared_ptr< ArgumentTypeState > argState = boost::make_shared< ArgumentTypeState >();
+        boost::shared_ptr< state::Soc > socObj( boost::static_pointer_cast< state::Soc >(this->GetStateFactory()->CreateInstance( param->GetElementChild( "Soc" ), argState.get() ) ) );
+
+        return boost::shared_ptr< TwoPort< MatrixT > >( new VoltageSource_PreisachEverett< MatrixT >( socObj, minOCV, obj, observable, elecData ) );
+    }
+};
+
+/// Classwrapper for electrical::VoltageSource_PreisachDiscrete
+template < typename MatrixT >
+class ElectricalClassWrapper< MatrixT, VoltageSource_PreisachDiscrete > : public ElectricalClassWrapperBase< MatrixT >
+{
+    public:
+    ElectricalClassWrapper( Factory< electrical::TwoPort< MatrixT >, ArgumentTypeElectrical > *electricalFactory,
+                            Factory< object::Object< double >, ArgumentTypeObject< double > > *objectFactory,
+                            Factory< state::State, ArgumentTypeState > *stateFactory )
+        : ElectricalClassWrapperBase< MatrixT >( electricalFactory, objectFactory, stateFactory )
+    {
+    }
+
+    boost::shared_ptr< TwoPort< MatrixT > >
+    CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
+    {
+        const bool observable = param->GetElementAttributeBoolValue( "observable", false ) ||
+                                param->GetElementAttributeBoolValue( "SurfaceEffect", false ) ||
+                                ( arg && arg->mMakeAllECMElementsObservable );
+
+        boost::shared_ptr< xmlparser::XmlParameter > objparamWeight( param->GetElementChild( "LookupWeights" ) );
+        boost::scoped_ptr< ArgumentTypeObject< double > > argObject( new ArgumentTypeObject< double > );
+        auto elecData = this->CreateElectricalData();
+        boost::shared_ptr< object::Object< double > > objWeight(
+         this->GetObjectFactory()->CreateInstance( objparamWeight, this->SetObjectFactorToArg( arg, true, argObject, elecData ) ) );
+
+        boost::shared_ptr< xmlparser::XmlParameter > objparamSwitchUpTH( param->GetElementChild( "LookupSwitchUpTH" ) );
+        argObject.reset( new ArgumentTypeObject< double > );
+        argObject->mElectricalDataStruct = elecData;
+        boost::shared_ptr< object::Object< double > > objSwitchUpTH(
+         this->GetObjectFactory()->CreateInstance( objparamSwitchUpTH, argObject.get() ) );
+
+        boost::shared_ptr< xmlparser::XmlParameter > objparamSwitchDownTH(param->GetElementChild( "LookupSwitchDownTH" ) );
+        argObject.reset( new ArgumentTypeObject< double > );
+        argObject->mElectricalDataStruct = elecData;
+        boost::shared_ptr< object::Object< double > > objSwitchDownTH(
+         this->GetObjectFactory()->CreateInstance( objparamSwitchDownTH, argObject.get() ) );  
+
+        int Discretization = 10;
+        if ( param->HasElementDirectChild( "Discretization" ) )
+            Discretization = param->GetElementDoubleValue( "Discretization" );
+
+        boost::shared_ptr< ArgumentTypeState > argState = boost::make_shared< ArgumentTypeState >();
+        boost::shared_ptr< state::Soc > socObj( boost::static_pointer_cast< state::Soc >(
+         this->GetStateFactory()->CreateInstance( param->GetElementChild( "Soc" ), argState.get() ) ) );
+
+        return boost::shared_ptr< TwoPort< MatrixT > >(
+         new VoltageSource_PreisachDiscrete< MatrixT >( socObj, Discretization, objWeight, objSwitchUpTH, objSwitchDownTH, observable, elecData ) );
     }
 };
 
@@ -987,8 +1147,10 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
     CreateInstance( const xmlparser::XmlParameter *param, const ArgumentTypeElectrical *arg = 0 )
     {
         typedef state::ThermalState< double > ThermalState_t;
+        typedef state::CRateState< double > CRateState_t;
+        typedef state::CDirection< double > CDirection_t;
         typedef state::Soc SocState_t;
-
+        typedef state::LHDState< double > LHDState_t;
 
         const bool isHalfcellsimulation = param->HasElementDirectChild( "Anode" );
 
@@ -1055,6 +1217,27 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
             boost::shared_ptr< SocState_t > socObj( boost::static_pointer_cast< SocState_t >(
              this->GetStateFactory()->CreateInstance( param->GetElementChild( "Soc" ), argState.get() ) ) );
 
+            boost::shared_ptr< CRateState_t > crateObj;
+            if ( param->HasElementDirectChild( "CRateState" ) )
+            {
+                crateObj = boost::static_pointer_cast< CRateState_t >(
+                 this->GetStateFactory()->CreateInstance( param->GetElementChild( "CRateState" ), argState.get() ) );
+            }
+
+            boost::shared_ptr< CDirection_t > cdirectionObj;
+            if ( param->HasElementDirectChild( "CDirection" ) )
+            {
+                cdirectionObj = boost::static_pointer_cast< CDirection_t >(
+                 this->GetStateFactory()->CreateInstance( param->GetElementChild( "CDirection" ), argState.get() ) );
+            }
+
+            boost::shared_ptr< LHDState_t > lhdObj;
+            if ( param->HasElementDirectChild( "LHDState" ) )
+            {
+                lhdObj = boost::static_pointer_cast< LHDState_t >(
+                 this->GetStateFactory()->CreateInstance( param->GetElementChild( "LHDState" ), argState.get() ) );
+            }
+
             boost::shared_ptr< object::Object< double > > reversibleHeat( 0 );
             if ( param->HasElementDirectChild( "ReversibleHeat" ) )
             {
@@ -1067,8 +1250,32 @@ class ElectricalClassWrapper< MatrixT, Cellelement > : public ElectricalClassWra
             if ( param->HasElementDirectChild( "SurfaceSoc" ) )
                 surfaceSoc = CreateSurfaceSoc( param, argState.get() );
 
-            auto cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, true,
-                                                                             this->CreateElectricalData(), reversibleHeat );
+            boost::shared_ptr< electrical::Cellelement< MatrixT > > cellelement;
+            if ( param->HasElementDirectChild( "CRateState" ) && !param->HasElementDirectChild( "LHDState" ) )
+            {
+                cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, crateObj, true,
+                                                                            this->CreateElectricalData(), reversibleHeat );
+            }
+            else if ( param->HasElementDirectChild( "CRateState" ) && param->HasElementDirectChild( "LHDState" ) )
+            {
+                cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, crateObj, lhdObj,
+                                                                            true, this->CreateElectricalData(), reversibleHeat );
+            }
+            else if ( param->HasElementDirectChild( "CDirection" ) && !param->HasElementDirectChild( "LHDState" ) )
+            {
+                cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, cdirectionObj, true,
+                                                                            this->CreateElectricalData(), reversibleHeat );
+            }
+            else if ( param->HasElementDirectChild( "CDirection" ) && param->HasElementDirectChild( "LHDState" ) )
+            {
+                cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, cdirectionObj, lhdObj,
+                                                                            true, this->CreateElectricalData(), reversibleHeat );
+            }
+            else
+            {
+                cellelement = boost::make_shared< Cellelement< MatrixT > >( mCellCounter, tempObj, socObj, true,
+                                                                            this->CreateElectricalData(), reversibleHeat );
+            }
 
             std::vector< electrical::TwoPort< myMatrixType > * > surfaceEffectedElements;
 

@@ -58,11 +58,13 @@ class SurfaceSoc : public State
     virtual ~SurfaceSoc(){};
 
     double GetValue() const;
+    double GetLastValue() const;
 
     private:
     boost::shared_ptr< object::Object< double > > mReverseLookup;
     std::vector< ::electrical::TwoPort< myMatrixType >* > mVecElements;
     double mCurrentValue;
+    double mLastValue;
 };
 }    // namespace state
 

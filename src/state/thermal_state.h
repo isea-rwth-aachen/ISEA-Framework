@@ -49,6 +49,7 @@ class ThermalState : public State
     template < TemperatureGetFormat format = CELSIUS >
     T GetValue() const;
     T GetValue() const;
+    T GetLastValue() const;
     const T& GetValueRef() const;
     /// Recalculates average temperature by adding new temperature weighted with volume
     void AddTemperature( T temperature, T volume );
@@ -71,6 +72,7 @@ class ThermalState : public State
     std::vector< PowerDissipationData > mPowerDissipations;
     T mFixedPowerDissipation;
     T mTemperature;
+    T mLastTemperature;
     T mTotalVolume;
 };
 
@@ -95,6 +97,13 @@ T ThermalState< T >::GetValue() const
 {
     return GetValue<>();
 }
+
+template < typename T >
+T ThermalState< T >::GetLastValue() const
+{
+    return mLastTemperature;
+}
+
 template < typename T >
 template < TemperatureGetFormat getFormat >
 T ThermalState< T >::GetValue() const
@@ -138,6 +147,7 @@ void ThermalState< T >::AddTemperature( T temperature, T volume )
 template < typename T >
 void ThermalState< T >::SetTemperature( T temperature )
 {
+    mLastTemperature = mTemperature;
     mTemperature = temperature;
 }
 

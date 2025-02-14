@@ -32,13 +32,14 @@ class ValueStateWrapper : public State
     };    // returns the Maximum dt step that can be done before any major change in the state/lookup occures
 
     virtual double GetValue() const { return *static_cast< double * >( mValue ); };
+    virtual double GetLastValue() const { return *static_cast< double * >( mLastValue ); };
 
     virtual double operator()() const { return *static_cast< double * >( mValue ); };
 
     private:
     ValueStateWrapper();
     ValueT *mValue;
-
+    ValueT *mLastValue;
     protected:
 };
 
@@ -46,6 +47,7 @@ template < typename ValueT >
 ValueStateWrapper< ValueT >::ValueStateWrapper( ValueT *value )
     : State()
     , mValue( value )
+    , mLastValue( value )
 {
 }
 

@@ -74,6 +74,9 @@ Parts of the framework are used in the following projects:
 3. E2Fuels – Modellgestützte Optimierung und Lebenszyklusanalyse batteriehybrider, maritimer Antriebssysteme
   * Förderkennzeichen: 03EIV011F
 
+4. BALd – Beschleunigte Alterungstests und Lebensdauerprognosen
+  * Förderkennzeichen: 03XP0320A
+
 Authors
 ===========
 Please acknowledge the [authors](DevelopmentTeam.md).

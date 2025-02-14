@@ -25,6 +25,9 @@
 
 #include "../../state/soc.h"
 #include "../../state/thermal_state.h"
+#include "../../state/crate.h"
+#include "../../state/cdirection.h"
+#include "../../state/lhd.h"
 
 #include "../../object/const_obj.h"
 #include "../../object/expression_obj.h"
@@ -33,6 +36,8 @@
 #include "../../object/lookup_obj1d_with_state.h"
 #include "../../object/lookup_obj2d.h"
 #include "../../object/lookup_obj2d_with_state.h"
+#include "../../object/lookup_obj3d.h"
+#include "../../object/lookup_obj3d_with_state.h"
 #include "../../object/multi_obj.h"
 
 
@@ -54,6 +59,8 @@ struct ArgumentTypeObject
     ArgumentTypeObject( ValueT objectFactor = 1.0 )
         : mObjectFactor( objectFactor )
         , mSoc( nullptr )
+        , mCrate( nullptr)
+        , mCdirection( nullptr)
         , mSetReverseLookUp( false ){};
 
     std::map< misc::StrCont, double, misc::cmp_str > mDoubleMap;
@@ -62,6 +69,8 @@ struct ArgumentTypeObject
      boost::shared_ptr< ElectricalDataStruct< ScalarUnit > >( new ElectricalDataStruct< ScalarUnit > );
 
     boost::shared_ptr< state::State > mSoc;
+    boost::shared_ptr< state::State > mCrate;
+    boost::shared_ptr< state::State > mCdirection;
     bool mSetReverseLookUp;
 };
 
@@ -531,6 +540,229 @@ class ObjectClassWrapper< ValueT, LookupObj2dWithState > : public ObjectClassWra
         return boost::make_shared< LookupObj2dWithState< ValueT > >( lookupData, measurementPointsRow,
                                                                      measurementPointsColumn, rowstate, colstate,
                                                                      lookup::LookupType( this->GetLookupType( param ) ) );
+    }
+};
+
+/// Classwrapper for object::LookupObj3D
+template < typename ValueT >
+class ObjectClassWrapper< ValueT, LookupObj3D > : public ObjectClassWrapperBase< ValueT >
+{
+    public:
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
+                        Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
+        : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
+    {
+    }
+
+
+    boost::shared_ptr< Object< ValueT > >
+    CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeObject< ValueT >* arg = 0 )
+    {
+        std::vector< std::vector< ValueT > > lookupData = param->GetElementDoubleVecVecValue( "LookupData" );
+        std::vector< ValueT > measurementPointsRow = param->GetElementDoubleVecValue( "MeasurementPointsRow" );
+        std::vector< ValueT > measurementPointsColumn = param->GetElementDoubleVecValue( "MeasurementPointsColumn" );
+        std::vector< ValueT > measurementPointsSlice = param->GetElementDoubleVecValue( "MeasurementPointsSlice" );
+
+        if ( arg != 0 )
+        {
+            double multiplier = this->GetMultiplier( arg );
+            if ( arg->mObjectFactor != 1.0 )
+                multiplier *= arg->mObjectFactor;
+            lookupData = lookupData * multiplier;
+
+            if ( this->GetOperator( arg ) == factory::OBJECT_MULTIPLICATION )
+            {
+                Object< ValueT >* cObj = NULL;
+                DoubleMapConstIterator it = arg->mDoubleMap.find( "Operand" );
+                double add = it->second;
+                memcpy( static_cast< void* >( &cObj ), static_cast< void* >( &add ), sizeof( double* ) );
+                return boost::make_shared< LookupObj3D< ValueT > >( lookupData, measurementPointsRow,
+                                                                    measurementPointsColumn, measurementPointsSlice,
+                                                                    static_cast< LookupObj3D< ValueT >* >( cObj ),
+                                                                    lookup::LookupType( this->GetLookupType( param ) ) );
+            }
+        }
+
+        return boost::make_shared< LookupObj3D< ValueT > >( lookupData, measurementPointsRow, measurementPointsColumn,
+                                                            measurementPointsSlice,
+                                                            lookup::LookupType( this->GetLookupType( param ) ) );
+    }
+};
+
+/// Classwrapper for object::LookupObj3dWithState
+template < typename ValueT >
+class ObjectClassWrapper< ValueT, LookupObj3dWithState > : public ObjectClassWrapperBase< ValueT >
+{
+    public:
+    ObjectClassWrapper( Factory< state::State, ArgumentTypeState >* stateFactory,
+                        Factory< object::Object< ValueT >, ArgumentTypeObject< ValueT > >* objectFactory )
+        : ObjectClassWrapperBase< ValueT >( stateFactory, objectFactory )
+    {
+    }
+
+    boost::shared_ptr< Object< ValueT > >
+    CreateInstance( const xmlparser::XmlParameter* param, const ArgumentTypeObject< ValueT >* arg = 0 )
+    {
+        boost::shared_ptr< state::State > soc;
+        boost::shared_ptr< state::State > crate;
+        boost::shared_ptr< state::State > cdirection;
+        ArgumentTypeState stateArg;
+
+        if ( arg )
+        {
+            stateArg.mElectricalDataStruct = arg->mElectricalDataStruct;
+
+            if ( arg->mSoc )
+            {
+                soc = arg->mSoc;
+            }
+
+
+            if ( arg->mCrate )
+            {
+                crate = arg->mCrate;
+            }
+
+            if ( arg->mCdirection )
+            {
+                cdirection = arg->mCdirection;
+            }
+        }
+
+        const auto rowStateNode = param->GetElementChild( "RowState" );
+
+        boost::shared_ptr< state::State > rowstate;
+        if ( rowStateNode->HasElementAttribute( "cacheref", "Soc" ) && soc )
+        {
+            rowstate = soc;
+        }
+        else if( rowStateNode->HasElementAttribute( "cacheref", "CRateState" ) && crate ) 
+        { 
+            rowstate = crate; 
+        }
+        else if( rowStateNode->HasElementAttribute( "cacheref", "CDirection" ) && cdirection ) 
+        { 
+            rowstate = cdirection; 
+        }
+        else
+            rowstate = this->GetStateFactory()->CreateInstance( param->GetElementChild( "RowState" ), &stateArg );
+
+        // Column
+        const auto colStateNode = param->GetElementChild( "ColState" );
+
+        boost::shared_ptr< state::State > colstate;
+
+        if ( colStateNode->HasElementAttribute( "cacheref", "Soc" ) && soc )
+        {
+            colstate = soc;
+        }
+        else if ( colStateNode->HasElementAttribute( "cacheref", "CRateState" ) && crate )
+        {
+            colstate = crate;
+        }
+        else if ( colStateNode->HasElementAttribute( "cacheref", "CDirection" ) && cdirection )
+        {
+            colstate = cdirection;
+        }
+        else
+            colstate = this->GetStateFactory()->CreateInstance( param->GetElementChild( "ColState" ), &stateArg );
+
+        // Slice
+        const auto sliStateNode = param->GetElementChild( "SliState" );
+
+        boost::shared_ptr< state::State > slistate;
+
+        if ( sliStateNode->HasElementAttribute( "cacheref", "CRateState" ) && crate )
+        {
+            slistate = crate;
+        }
+        else if ( sliStateNode->HasElementAttribute( "cacheref", "CRateState" ) && crate )
+        {
+            slistate = crate;
+        }
+        else if ( sliStateNode->HasElementAttribute( "cacheref", "CDirection" ) && cdirection )
+        {
+            slistate = cdirection;
+        }
+        else
+        {
+            slistate = this->GetStateFactory()->CreateInstance( param->GetElementChild( "SliState" ), &stateArg );
+        }
+
+        // Virtual
+        boost::shared_ptr< state::State > virstate;
+
+        if ( param->HasElementDirectChild( "VirtualState" ) )
+        {
+            const auto virStateNode = param->GetElementChild( "VirtualState" );
+            if ( sliStateNode->HasElementAttribute( "cacheref", "Soc" ) && soc )
+            {
+                virstate = soc;
+            }
+            else if ( virStateNode->HasElementAttribute( "cacheref", "CRateState" ) && crate )
+            {
+                virstate = crate;
+            }
+            else if ( virStateNode->HasElementAttribute( "cacheref", "CDirection" ) && cdirection )
+            {
+                virstate = cdirection;
+            }
+            else
+            {
+                virstate = this->GetStateFactory()->CreateInstance( param->GetElementChild( "VirtualState" ), &stateArg );
+            }
+        }
+
+        std::vector< std::vector< ValueT > > lookupData = param->GetElementDoubleVecVecValue( "LookupData" );
+        std::vector< ValueT > measurementPointsRow = param->GetElementDoubleVecValue( "MeasurementPointsRow" );
+        std::vector< ValueT > measurementPointsColumn = param->GetElementDoubleVecValue( "MeasurementPointsColumn" );
+        std::vector< ValueT > measurementPointsSlice = param->GetElementDoubleVecValue( "MeasurementPointsSlice" );
+
+        if ( arg != 0 )
+        {
+            double multiplier = this->GetMultiplier( arg );
+            if ( arg->mObjectFactor != 1.0 )
+                multiplier *= arg->mObjectFactor;
+            lookupData = lookupData * multiplier;
+
+            if ( this->GetOperator( arg ) == factory::OBJECT_MULTIPLICATION )
+            {
+
+                Object< ValueT >* cObj = NULL;
+                DoubleMapConstIterator it = arg->mDoubleMap.find( "Operand" );
+                double add = it->second;
+                memcpy( static_cast< void* >( &cObj ), static_cast< void* >( &add ), sizeof( double* ) );
+
+                if ( !param->HasElementDirectChild( "VirtualState" ) )
+                {
+                    return boost::make_shared< LookupObj3dWithState< ValueT > >(
+                     lookupData, measurementPointsRow, measurementPointsColumn, measurementPointsSlice, rowstate,
+                     colstate, slistate, static_cast< LookupObj3dWithState< ValueT >* >( cObj ),
+                     lookup::LookupType( this->GetLookupType( param ) ) );
+                }
+                else
+                {
+                    return boost::make_shared< LookupObj3dWithState< ValueT > >(
+                     lookupData, measurementPointsRow, measurementPointsColumn, measurementPointsSlice, rowstate,
+                     colstate, slistate, virstate, static_cast< LookupObj3dWithState< ValueT >* >( cObj ),
+                     lookup::LookupType( this->GetLookupType( param ) ) );
+                }
+            }
+        }
+
+        if ( !param->HasElementDirectChild( "VirtualState" ) )
+        {
+            return boost::make_shared< LookupObj3dWithState< ValueT > >( lookupData, measurementPointsRow, measurementPointsColumn,
+                                                                         measurementPointsSlice, rowstate, colstate, slistate,
+                                                                         lookup::LookupType( this->GetLookupType( param ) ) );
+        }
+        else
+        {
+            return boost::make_shared< LookupObj3dWithState< ValueT > >( lookupData, measurementPointsRow,
+                                                                         measurementPointsColumn, measurementPointsSlice,
+                                                                         rowstate, colstate, slistate, virstate,
+                                                                         lookup::LookupType( this->GetLookupType( param ) ) );
+        }
     }
 };
 

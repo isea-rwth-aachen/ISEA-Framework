@@ -629,6 +629,494 @@ class BicubicInterpolation2D : public LookupType2D< T >
     lookup::Linear2DInterpolation< T > myLinear2DInterpolation;
 };
 
+//-------------------------------------------------
+//                    3D
+//-------------------------------------------------
+
+/// This class contains measurement points and data to determine the lookup
+template < typename T >
+class LookupType3D
+{
+    // friend class
+    friend class ::TestLookup;
+
+    public:
+    LookupType3D( const std::vector< std::vector< T > > &lookupData, const std::vector< T > &measurementPointsRow,
+                  const std::vector< T > &measurementPointsColumn, const std::vector< T > &measurementPointsSlice )
+        // Input data
+        : mLookupData( measurementPointsSlice.size(),
+                       std::vector< std::vector< double > >( measurementPointsColumn.size(),
+                                                             std::vector< double >( measurementPointsRow.size(), 0 ) ) )
+        , mMeasurementPointsRow( measurementPointsRow )
+        , mMeasurementPointsColumn( measurementPointsColumn )
+        , mMeasurementPointsSlice( measurementPointsSlice )
+        , mCurrentMeasurementPointRowIndex( 0 )
+        , mCurrentMeasurementPointColumnIndex( 0 )
+        , mCurrentMeasurementPointSliceIndex( 0 )
+    {
+        /* create the point vectors from the imported data and adjust slice vector
+        for ( size_t i = 0; i < measurementPointsColumn.size(); ++i )
+        {
+            //find all crate points
+            if ( std::find( mMeasurementPointsSlice.begin(), mMeasurementPointsSlice.end(),
+        measurementPointsColumn[i][0] ) == mMeasurementPointsSlice.end() )
+            {
+                mMeasurementPointsSlice.push_back( measurementPointsColumn[i][0] );
+            }
+        }
+        // create row vector for temperatures
+        for ( size_t i = 1; i < measurementPointsColumn[0].size(); ++i )
+        {
+            // find all crate points
+            mMeasurementPointsColumn.push_back( measurementPointsColumn[0][i] );
+        }*/
+
+        // build 3D matrix from lookupData pointer
+        for ( size_t i = 0; i < mMeasurementPointsSlice.size(); ++i )
+        {
+            for ( size_t i1 = 0; i1 < mMeasurementPointsColumn.size(); ++i1 )
+            {
+                mLookupData[i][i1] = lookupData[i * mMeasurementPointsColumn.size() + i1];
+            }
+        }
+    };
+
+    virtual ~LookupType3D(){};
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice ) = 0;
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice, T lookupPointLHD ) = 0;
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice, T lookupPointLHD, T lookupPointLastSlice ) = 0;
+
+    const std::vector< std::vector< std::vector< T > > > &GetLookup() const { return mLookupData; };
+
+    virtual T GetMinValueOfLookup() const
+    {
+        T minvalue = mLookupData.at( 0 ).at( 0 ).at( 0 );
+        for ( size_t i = 0; i < mLookupData.size(); ++i )
+        {
+            for ( size_t i1 = 0; i1 < mLookupData[i].size(); ++i1 )
+            {
+                T minValueOfLookupVector = *std::min_element( mLookupData[i][i1].begin(), mLookupData[i][i1].end() );
+                if ( minValueOfLookupVector < minvalue )
+                    minvalue = minValueOfLookupVector;
+            }
+        }
+        return minvalue;
+    }
+
+    virtual T GetMaxValueOfLookup() const
+    {
+        T maxvalue = mLookupData.at( 0 ).at( 0 ).at( 0 );
+        for ( size_t i = 0; i < mLookupData.size(); ++i )
+        {
+            for ( size_t i1 = 0; i1 < mLookupData[i].size(); ++i1 )
+            {
+                T maxValueOfLookupVector = *std::max_element( mLookupData[i][i1].begin(), mLookupData[i][i1].end() );
+                if ( maxValueOfLookupVector > maxvalue )
+                    maxvalue = maxValueOfLookupVector;
+            }
+        }
+        return maxvalue;
+    }
+
+    inline const std::vector< T > &GetPointsRow() const { return mMeasurementPointsRow; }
+    inline const std::vector< T > &GetPointsCol() const { return mMeasurementPointsColumn; }
+    inline const std::vector< T > &GetPointsSli() const { return mMeasurementPointsSlice; }
+
+    protected:
+    // Get lower bound of row or column or slice, return the index
+    size_t GetLowerBound( const T value, size_t &currentMeasurementPointIndex, const std::vector< T > &measurementPoints )
+    {
+        while ( ( currentMeasurementPointIndex < measurementPoints.size() - 1 ) &&
+                ( value > measurementPoints[currentMeasurementPointIndex + 1] ) )
+            ++currentMeasurementPointIndex;
+
+        while ( ( currentMeasurementPointIndex > 0 ) && ( value < measurementPoints[currentMeasurementPointIndex] ) )
+            --currentMeasurementPointIndex;
+
+        return currentMeasurementPointIndex;
+    }
+
+    // Attributes
+    std::vector< std::vector< std::vector< T > > > mLookupData;
+    std::vector< T > mMeasurementPointsRow;
+    std::vector< T > mMeasurementPointsColumn;
+    std::vector< T > mMeasurementPointsSlice;
+    size_t mCurrentMeasurementPointRowIndex;
+    size_t mCurrentMeasurementPointColumnIndex;
+    size_t mCurrentMeasurementPointSliceIndex;
+};
+
+/// This class contains a linear interpolation behaviour for 3D lookups
+template < typename T >
+class Linear3DInterpolation : public LookupType3D< T >
+{
+    // friend class
+    friend class ::TestLookup;
+
+    public:
+    Linear3DInterpolation( const std::vector< std::vector< T > > &lookupData, const std::vector< T > &measurementPointsRow,
+                           const std::vector< T > &measurementPointsColumn, const std::vector< T > &measurementPointsSlice )
+        : LookupType3D< T >( lookupData, measurementPointsRow, measurementPointsColumn, measurementPointsSlice )
+
+        // Extended input data
+        , mExtendedMeasurementPointsRow( measurementPointsRow.size() + 2, 0 )    // + 2 because two points are added
+        , mExtendedMeasurementPointsColumn( measurementPointsColumn.size() + 2, 0 )    // + 2 because two points are added
+        , mExtendedMeasurementPointsSlice( measurementPointsSlice.size() + 2, 0 )    // + 2 because two points are added
+        , mExtendedLookupData( measurementPointsSlice.size() + 2,
+                               std::vector< std::vector< double > >( measurementPointsColumn.size() + 2,
+                                                                     std::vector< double >( measurementPointsRow.size() + 2, 0 ) ) )    // + 2 because two points are added
+        // + 2 because two points are added
+
+        // Slopes which are calculated only once
+        , mRowSlopes( mMeasurementPointsSlice.size() + 2,
+                      std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 2,
+                                                            std::vector< double >( measurementPointsRow.size() + 1, 0 ) ) )    // + 1 because there are (n - 1) row slopes for n row points
+        , mColumnSlopes( mMeasurementPointsSlice.size() + 2,
+                         std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 1,
+                                                               std::vector< double >( measurementPointsRow.size() + 2, 0 ) ) )    // + 1 because there are (n - 1) column slopes for n column points
+        , mSliceSlopes( mMeasurementPointsSlice.size() + 1,
+                        std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 2,
+                                                              std::vector< double >( measurementPointsRow.size() + 2, 0 ) ) )    // + 1 because there are (n - 1) slice slopes for n slice points
+        , mDifferenceOfQuotientOfSlopes(
+           mMeasurementPointsSlice.size() + 2,
+           std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 2,
+                                                 std::vector< double >( measurementPointsRow.size() + 1, 0 ) ) )    // + 1 because there are (n - 1) quotients of column slopes for n row points
+        , mDifferenceOfQuotientOfSliceSlopesRow(
+           mMeasurementPointsSlice.size() + 1,
+           std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 2,
+                                                 std::vector< double >( measurementPointsRow.size() + 1, 0 ) ) )
+        , mDifferenceOfQuotientOfSliceSlopesColumn(
+           mMeasurementPointsSlice.size() + 1,
+           std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 1,
+                                                 std::vector< double >( measurementPointsRow.size() + 2, 0 ) ) )
+        , mDifferenceOfQuotientOfSliceSlopesQuotient(
+           mMeasurementPointsSlice.size() + 1,
+           std::vector< std::vector< double > >( mMeasurementPointsColumn.size() + 1,
+                                                 std::vector< double >( measurementPointsRow.size() + 1, 0 ) ) )
+    {
+        // Constructor functions
+        CreateExtendedRowsOrColumns( this->mExtendedMeasurementPointsRow, this->mMeasurementPointsRow );    // Create extended row vector
+        CreateExtendedRowsOrColumns( this->mExtendedMeasurementPointsColumn, this->mMeasurementPointsColumn );    // Create extended column vector
+        CreateExtendedRowsOrColumns( this->mExtendedMeasurementPointsSlice, this->mMeasurementPointsSlice );    // Create extended column vector
+        CreateExtendedLookupData();
+        CalculateRowSlopes();
+        CalculateColumnSlopes();
+        CalculateSliceSlopes();
+        CalculateDifferenceOfQuotientsOfSlopes();
+    };
+
+    virtual ~Linear3DInterpolation(){
+     // Destructor functions: empty
+    };
+
+    /// Create extended row vector or column vector
+    void CreateExtendedRowsOrColumns( std::vector< T > &extendedMeasurementPoints, const std::vector< T > &measurementPoints )
+    {
+        // Boundary points for row and column points
+        const T mySmallNumber = -std::numeric_limits< T >::max();
+        const T myBigNumber = std::numeric_limits< T >::max();
+
+        extendedMeasurementPoints.front() = mySmallNumber;         // Fill first element
+        for ( size_t i = 0; i < measurementPoints.size(); ++i )    // Fill all but first and last element
+        {
+            extendedMeasurementPoints.at( i + 1 ) = measurementPoints.at( i );
+        }
+        extendedMeasurementPoints.back() = myBigNumber;    // Fill last element
+    };
+
+    /// Create extended lookup data
+    void CreateExtendedLookupData()
+    {
+        // Copy the rows and add two values, one at the beginning, one at the and
+        for ( size_t i1 = 0; i1 < this->mMeasurementPointsSlice.size(); ++i1 )
+        {
+            for ( size_t i = 0; i < this->mMeasurementPointsColumn.size(); ++i )
+            {
+                this->mExtendedLookupData.at( i1 + 1 ).at( i + 1 ).front() = this->mLookupData.at( i1 ).at( i ).front();    // Copy first element
+                for ( size_t j = 0; j < this->mMeasurementPointsRow.size(); ++j )    // Copy all elements except first and last
+                {
+                    this->mExtendedLookupData.at( i1 + 1 ).at( i + 1 ).at( j + 1 ) = this->mLookupData.at( i1 ).at( i ).at( j );
+                }
+                this->mExtendedLookupData.at( i1 + 1 ).at( i + 1 ).back() = this->mLookupData.at( i1 ).at( i ).back();    // Copy last element
+            }
+
+            // Copy the first and the last row
+            this->mExtendedLookupData.at( i1 + 1 ).front().assign( this->mExtendedLookupData.at( i1 + 1 ).at( 1 ).begin(),
+                                                                   this->mExtendedLookupData.at( i1 + 1 ).at( 1 ).end() );    // Copy first row
+            const size_t extendedColumnSizeMinus2 = this->mExtendedMeasurementPointsColumn.size() - 2;
+            this->mExtendedLookupData.at( i1 + 1 ).back().assign(
+             this->mExtendedLookupData.at( i1 + 1 ).at( extendedColumnSizeMinus2 ).begin(),
+             this->mExtendedLookupData.at( i1 + 1 ).at( extendedColumnSizeMinus2 ).end() );    // Copy last row
+        }
+        // Copy the first and the last slice
+        this->mExtendedLookupData.front().assign( this->mExtendedLookupData.at( 1 ).begin(),
+                                                  this->mExtendedLookupData.at( 1 ).end() );    // Copy first slice
+        const size_t extendedSliceSizeMinus2 = this->mExtendedMeasurementPointsSlice.size() - 2;
+        this->mExtendedLookupData.back().assign( this->mExtendedLookupData.at( extendedSliceSizeMinus2 ).begin(),
+                                                 this->mExtendedLookupData.at( extendedSliceSizeMinus2 ).end() );    // Copy last slice
+    };
+
+    /// Calculate row slopes
+    void CalculateRowSlopes()
+    {
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size(); ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size(); ++i )
+            {
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size() - 1;
+                      ++j )    // - 1 because there are n - 1 row slopes for n row points
+                {
+                    this->mRowSlopes.at( i1 ).at( i ).at( j ) =
+                     ( this->mExtendedLookupData.at( i1 ).at( i ).at( j + 1 ) -
+                       this->mExtendedLookupData.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsRow.at( j + 1 ) - this->mExtendedMeasurementPointsRow.at( j ) );
+                }
+            }
+        }
+    };
+
+    /// Calculate column slopes
+    void CalculateColumnSlopes()
+    {
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size(); ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size() - 1; ++i )
+            {
+                // Calculate column slopes
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size();
+                      ++j )    // - 1 because there are n - 1 row slopes for n row points
+                {
+                    this->mColumnSlopes.at( i1 ).at( i ).at( j ) =
+                     ( this->mExtendedLookupData.at( i1 ).at( i + 1 ).at( j ) -
+                       this->mExtendedLookupData.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsColumn.at( i + 1 ) - this->mExtendedMeasurementPointsColumn.at( i ) );
+                }
+            }
+        }
+    };
+
+    /// Calculate slice slopes
+    void CalculateSliceSlopes()
+    {
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size() - 1; ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size(); ++i )
+            {
+                // Calculate slice slopes
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size();
+                      ++j )    // - 1 because there are n - 1 row slopes for n row points
+                {
+                    this->mSliceSlopes.at( i1 ).at( i ).at( j ) =
+                     ( this->mExtendedLookupData.at( i1 + 1 ).at( i ).at( j ) -
+                       this->mExtendedLookupData.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsSlice.at( i1 + 1 ) - this->mExtendedMeasurementPointsSlice.at( i1 ) );
+                }
+            }
+        }
+    };
+
+    /// Calculate difference of quotients of slopes
+    void CalculateDifferenceOfQuotientsOfSlopes()
+    {
+        // difference in column slopes
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size(); ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size() - 1; ++i )
+            {
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size() - 1; ++j )
+                {
+                    this->mDifferenceOfQuotientOfSlopes.at( i1 ).at( i ).at( j ) =
+                     ( this->mColumnSlopes.at( i1 ).at( i ).at( j + 1 ) - this->mColumnSlopes.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsRow.at( j + 1 ) - this->mExtendedMeasurementPointsRow.at( j ) );
+                }
+            }
+        }
+
+        // difference in slice slopes in row direction
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size() - 1; ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size(); ++i )
+            {
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size() - 1; ++j )
+                {
+                    this->mDifferenceOfQuotientOfSliceSlopesRow.at( i1 ).at( i ).at( j ) =
+                     ( this->mSliceSlopes.at( i1 ).at( i ).at( j + 1 ) - this->mSliceSlopes.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsRow.at( j + 1 ) - this->mExtendedMeasurementPointsRow.at( j ) );
+                }
+            }
+        }
+
+        // difference in slice slopes in column direction
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size() - 1; ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size() - 1; ++i )
+            {
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size(); ++j )
+                {
+                    this->mDifferenceOfQuotientOfSliceSlopesColumn.at( i1 ).at( i ).at( j ) =
+                     ( this->mSliceSlopes.at( i1 ).at( i + 1 ).at( j ) - this->mSliceSlopes.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsColumn.at( i + 1 ) - this->mExtendedMeasurementPointsColumn.at( i ) );
+                }
+            }
+        }
+
+        // difference in slice slopes in quotient direction
+        for ( size_t i1 = 0; i1 < this->mExtendedMeasurementPointsSlice.size() - 1; ++i1 )
+        {
+            for ( size_t i = 0; i < this->mExtendedMeasurementPointsColumn.size() - 1; ++i )
+            {
+                for ( size_t j = 0; j < this->mExtendedMeasurementPointsRow.size() - 1; ++j )
+                {
+                    this->mDifferenceOfQuotientOfSliceSlopesQuotient.at( i1 ).at( i ).at( j ) =
+                     ( this->mDifferenceOfQuotientOfSliceSlopesColumn.at( i1 ).at( i ).at( j + 1 ) -
+                       this->mDifferenceOfQuotientOfSliceSlopesColumn.at( i1 ).at( i ).at( j ) ) /
+                     ( this->mExtendedMeasurementPointsRow.at( j + 1 ) - this->mExtendedMeasurementPointsRow.at( j ) );
+                }
+            }
+        }
+    };
+
+    /// Calculate 3d lookup
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice )
+    {
+        // Get the index of the relevant measurement points for this lookup point. Take the lower index, not the upper.
+        const size_t i1 = LookupType3D< T >::GetLowerBound( lookupPointSlice, this->mCurrentMeasurementPointSliceIndex,
+                                                            this->mExtendedMeasurementPointsSlice );    // C rate
+        const size_t j = LookupType3D< T >::GetLowerBound( lookupPointRow, this->mCurrentMeasurementPointRowIndex,
+                                                           this->mExtendedMeasurementPointsRow );    // SOC
+        const size_t i = LookupType3D< T >::GetLowerBound( lookupPointColumn, this->mCurrentMeasurementPointColumnIndex,
+                                                           this->mExtendedMeasurementPointsColumn );    // temperature
+
+        // Calculate the lookup
+        const T res = this->mExtendedLookupData[i1][i][j] +
+                      this->mRowSlopes[i1][i][j] * ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                      ( this->mColumnSlopes[i1][i][j] + ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                                                         this->mDifferenceOfQuotientOfSlopes[i1][i][j] ) *
+                       ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) +
+                      // difference quotient in slice direction
+                      ( this->mSliceSlopes[i1][i][j] +
+                        ( this->mDifferenceOfQuotientOfSliceSlopesRow[i1][i][j] ) *
+                         ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                        ( this->mDifferenceOfQuotientOfSliceSlopesColumn[i1][i][j] +
+                          ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                           this->mDifferenceOfQuotientOfSliceSlopesQuotient[i1][i][j] ) *
+                         ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) ) *
+                       ( lookupPointSlice - this->mExtendedMeasurementPointsSlice[i1] );
+
+        return res;
+    };
+
+
+    // LHD model
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice, T lookupPointLHD )
+    {
+        const T a = 0;
+        return a;
+    }
+
+    virtual T DoLookup( T lookupPointRow, T lookupPointColumn, T lookupPointSlice, T lookupPointLHD, T lookupPointLastSlice )
+    {
+        // Get the index of the relevant measurement points for this lookup point. Take the lower index, not the upper.
+        const size_t i2 = LookupType3D< T >::GetLowerBound( 0, this->mCurrentMeasurementPointSliceIndex,
+                                                            this->mExtendedMeasurementPointsSlice );    // 0 C
+        // const size_t i1 = LookupType3D< T >::GetLowerBound( LHDValue, this->mCurrentMeasurementPointSliceIndex,
+        //                                                 this->mExtendedMeasurementPointsSlice );    // C rate
+        const size_t j = LookupType3D< T >::GetLowerBound( lookupPointRow, this->mCurrentMeasurementPointRowIndex,
+                                                           this->mExtendedMeasurementPointsRow );    // SOC
+        const size_t i = LookupType3D< T >::GetLowerBound( lookupPointColumn, this->mCurrentMeasurementPointColumnIndex,
+                                                           this->mExtendedMeasurementPointsColumn );    // temperature
+
+        // Calculate the lookup
+        const T res0 = this->mExtendedLookupData[i2][i][j] +
+                       this->mRowSlopes[i2][i][j] * ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                       ( this->mColumnSlopes[i2][i][j] + ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                                                          this->mDifferenceOfQuotientOfSlopes[i2][i][j] ) *
+                        ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) +
+                       // difference quotient in slice direction
+                       ( this->mSliceSlopes[i2][i][j] + ( this->mDifferenceOfQuotientOfSliceSlopesRow[i2][i][j] *
+                                                           ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                                                          ( this->mDifferenceOfQuotientOfSliceSlopesColumn[i2][i][j] +
+                                                            ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                                                             this->mDifferenceOfQuotientOfSliceSlopesQuotient[i2][i][j] ) *
+                                                           ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) ) ) *
+                        ( 0 - this->mExtendedMeasurementPointsSlice[i2] );
+
+
+        T LHDValue;
+        if ( lookupPointSlice < 0 && lookupPointLHD < 0 )
+        {
+            LHDValue = lookupPointSlice;
+        }
+        else if ( lookupPointSlice > 0 && lookupPointLHD > 0 )
+        {
+            LHDValue = lookupPointSlice;
+        }
+        else if ( lookupPointSlice > 0 && lookupPointLHD < 0 )
+        {
+            LHDValue = -1 * lookupPointSlice;
+        }
+        else
+        {
+            LHDValue = -1 * lookupPointSlice;
+        }
+        // LHDValue = lookupPointLHD;
+
+        const size_t i1 = LookupType3D< T >::GetLowerBound( LHDValue, this->mCurrentMeasurementPointSliceIndex,
+                                                            this->mExtendedMeasurementPointsSlice );    // C rate
+
+        const T res = this->mExtendedLookupData[i1][i][j] +
+                      this->mRowSlopes[i1][i][j] * ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                      ( this->mColumnSlopes[i1][i][j] + ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                                                         this->mDifferenceOfQuotientOfSlopes[i1][i][j] ) *
+                       ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) +
+                      // difference quotient in slice direction
+                      ( this->mSliceSlopes[i1][i][j] + ( this->mDifferenceOfQuotientOfSliceSlopesRow[i1][i][j] *
+                                                          ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) +
+                                                         ( this->mDifferenceOfQuotientOfSliceSlopesColumn[i1][i][j] +
+                                                           ( lookupPointRow - this->mExtendedMeasurementPointsRow[j] ) *
+                                                            this->mDifferenceOfQuotientOfSliceSlopesQuotient[i1][i][j] ) *
+                                                          ( lookupPointColumn - this->mExtendedMeasurementPointsColumn[i] ) ) ) *
+                       ( LHDValue - this->mExtendedMeasurementPointsSlice[i1] );
+
+        T return_value;
+        if ( lookupPointSlice != 0 )
+        {
+            return_value = res0 + abs( lookupPointLHD / lookupPointSlice ) * ( res - res0 );
+        }
+        else if ( lookupPointLastSlice != 0 )
+        {
+            return_value = res0 + abs( lookupPointLHD / lookupPointLastSlice ) * ( res - res0 );
+        }
+        else
+        {
+            return_value = res0;
+        }
+
+        if ( std::isnan( return_value ) )
+        {
+            int a = 1;
+        }
+
+        return return_value;
+    };
+
+    private:
+    protected:
+    // Attributes
+    std::vector< T > mExtendedMeasurementPointsRow;
+    std::vector< T > mExtendedMeasurementPointsColumn;
+    std::vector< T > mExtendedMeasurementPointsSlice;
+    std::vector< std::vector< std::vector< T > > > mExtendedLookupData;    // matrix
+
+    std::vector< std::vector< std::vector< T > > > mRowSlopes;                                  // matrix
+    std::vector< std::vector< std::vector< T > > > mColumnSlopes;                               // matrix
+    std::vector< std::vector< std::vector< T > > > mSliceSlopes;                                // matrix
+    std::vector< std::vector< std::vector< T > > > mDifferenceOfQuotientOfSlopes;               // matrix
+    std::vector< std::vector< std::vector< T > > > mDifferenceOfQuotientOfSliceSlopesRow;       // matrix
+    std::vector< std::vector< std::vector< T > > > mDifferenceOfQuotientOfSliceSlopesColumn;    // matrix
+    std::vector< std::vector< std::vector< T > > > mDifferenceOfQuotientOfSliceSlopesQuotient;
+};
+
 };    // namespace lookup
 
 #endif /* _LOOKUPTYPE_ */

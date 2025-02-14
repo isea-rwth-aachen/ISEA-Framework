@@ -15,6 +15,9 @@ Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state
     , mReversibleHeat( reversibleHeat )
     , mCellNumber( cellNumber )
     , mHasVoltageRange( false )
+    , CdirectionDefined( false )
+    , CrateDefined( false )
+    , LHDDefined( false )
 {
     if ( !this->mThermalState )
         ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException",
@@ -33,6 +36,155 @@ Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< dou
 {
 }
 
+// C Rate
+template < typename T >
+Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CRateState< double > >& crateState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : TwoPortWithState< T >( socState, thermalState, crateState, observable, dataValues )
+    , mSurfaceSocSet( false )
+    , mAnode( nullptr )
+    , mCathode( nullptr )
+    , mConfigurationType( CellConfiguration::FULLCELL )
+    , mReversibleHeat( reversibleHeat )
+    , mCellNumber( cellNumber )
+    , mHasVoltageRange( false )
+    , CdirectionDefined( false )
+    , CrateDefined( true )
+    , LHDDefined( false )
+{
+    if ( !this->mThermalState )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException",
+                                             "mThermalState", "Cellelement" );
+
+    if ( !this->mSoc )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException", "mSoc",
+                                             "Cellelement" );
+}
+
+template < typename T >
+Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CRateState< double > >& crateState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : Cellelement< T >( 0, thermalState, socState, crateState, observable, dataValues, reversibleHeat )
+{
+}
+
+// Current direction
+template < typename T >
+Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CDirection< double > >& cdirection, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : TwoPortWithState< T >( socState, thermalState, cdirection, observable, dataValues )
+    , mSurfaceSocSet( false )
+    , mAnode( nullptr )
+    , mCathode( nullptr )
+    , mConfigurationType( CellConfiguration::FULLCELL )
+    , mReversibleHeat( reversibleHeat )
+    , mCellNumber( cellNumber )
+    , mHasVoltageRange( false )
+    , CdirectionDefined(true)
+    , CrateDefined( false )
+    , LHDDefined( false )
+{
+    if ( !this->mThermalState )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException",
+                                             "mThermalState", "Cellelement" );
+
+    if ( !this->mSoc )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException", "mSoc",
+                                             "Cellelement" );
+}
+
+template < typename T >
+Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CDirection< double > >& cdirection, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : Cellelement< T >( 0, thermalState, socState, cdirection, observable, dataValues, reversibleHeat )
+{
+}
+
+
+// LHD C rate
+template < typename T >
+Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CRateState< double > >& crateState,
+                               const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : TwoPortWithState< T >( socState, thermalState, crateState, lhdState, observable, dataValues )
+    , mSurfaceSocSet( false )
+    , mAnode( nullptr )
+    , mCathode( nullptr )
+    , mConfigurationType( CellConfiguration::FULLCELL )
+    , mReversibleHeat( reversibleHeat )
+    , mCellNumber( cellNumber )
+    , mHasVoltageRange( false )
+    , CdirectionDefined( false )
+    , CrateDefined( true )
+    , LHDDefined( true )
+{
+    if ( !this->mThermalState )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException",
+                                             "mThermalState", "Cellelement" );
+
+    if ( !this->mSoc )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException", "mSoc",
+                                             "Cellelement" );
+}
+
+template < typename T >
+Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CRateState< double > >& crateState,
+                               const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : Cellelement< T >( 0, thermalState, socState, crateState, lhdState, observable, dataValues, reversibleHeat )
+{
+}
+
+// LHD C direction 
+template < typename T >
+Cellelement< T >::Cellelement( size_t cellNumber, const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CDirection< double > >& cdirection,
+                               const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : TwoPortWithState< T >( socState, thermalState, cdirection, lhdState, observable, dataValues )
+    , mSurfaceSocSet( false )
+    , mAnode( nullptr )
+    , mCathode( nullptr )
+    , mConfigurationType( CellConfiguration::FULLCELL )
+    , mReversibleHeat( reversibleHeat )
+    , mCellNumber( cellNumber )
+    , mHasVoltageRange( false )
+    , CdirectionDefined( true )
+    , CrateDefined( false )
+    , LHDDefined( true )
+{
+    if ( !this->mThermalState )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException",
+                                             "mThermalState", "Cellelement" );
+
+    if ( !this->mSoc )
+        ErrorFunction< std::runtime_error >( __FUNCTION__, __LINE__, __FILE__, "AddNullptrToObjectException", "mSoc",
+                                             "Cellelement" );
+}
+
+template < typename T >
+Cellelement< T >::Cellelement( const boost::shared_ptr< state::ThermalState< double > >& thermalState,
+                               const boost::shared_ptr< state::Soc >& socState,
+                               const boost::shared_ptr< state::CDirection< double > >& cdirection,
+                               const boost::shared_ptr< state::LHDState< double > >& lhdState, const bool observable,
+                               typename TwoPort< T >::DataType dataValues, boost::shared_ptr< object::Object< double > > reversibleHeat )
+    : Cellelement< T >( 0, thermalState, socState, cdirection, lhdState, observable, dataValues, reversibleHeat )
+{
+}
+
 #ifndef _SYMBOLIC_
 template < typename T >
 void Cellelement< T >::LoadInternalData( std::vector< double >& dataVector )
@@ -48,6 +200,14 @@ void Cellelement< T >::SaveInternalData( std::vector< double >& dataVector )
 {
     TwoPort< T >::SaveInternalData( dataVector );
     dataVector.push_back( this->mSoc->GetValue() );
+    if ( CrateDefined )
+    {
+        dataVector.push_back( this->mCrate->GetValue() );
+    }
+    if ( LHDDefined )
+    {
+        dataVector.push_back( this->mLHD->GetValue() );
+    }
 }
 #endif
 
@@ -100,6 +260,24 @@ template < typename T >
 double Cellelement< T >::GetSocStateValue() const
 {
     return this->GetSocValue();
+}
+
+template < typename T >
+double Cellelement< T >::GetCrateStateValue() const
+{
+    return this->GetCrateValue();
+}
+
+template < typename T >
+double Cellelement< T >::GetCdirectionValue() const
+{
+    return this->GetCdirectionValue();
+}
+
+template < typename T >
+double Cellelement< T >::GetLHDStateValue() const
+{
+    return this->GetLHDValue();
 }
 
 template < typename T >

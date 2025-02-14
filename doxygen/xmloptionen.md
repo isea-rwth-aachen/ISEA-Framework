@@ -40,3 +40,17 @@ CalculationCycles                       | int > 0       | 1             | Number
 SteadyStateCycles                       | CalculationCycles > int >= 0      | 0             | Number of cycles in CalculationCycles that are simulated without collecting data for aging
 AgingSteps                              | int > 0       | 1             | Number of aging steps
 AgingStepTime                           | days          |               | Duration of each aging step
+
+Simulink
+===============
+There are four optional nodes for the Simulink model that can be used on the realtime system to keep the simulink vector sizes constant when the XML file is changed. These are used to set the compiled minimum size of following data:
+
+XML Tag                                 | Unit/Type | Default value | Explanation                                                                                 
+----------------------------------------|-----------|---------------|------------------------------------------------------------------------
+MinStateSize                            | int >= 0  | 1             | Minimum number of states passed to the equation solver
+MinOutputSize                           | int >= 0  | 1             | Minimum number of electrical quantities that are written to the output vectors
+MinNumberOfCells                        | int >= 0  | 1             | Minimum number of cells
+MinProbeSize                            | int >= 0  | 1             | Minimum number of thermal probes
+
+The compiled size is the maximum value out of these nodes and the dimensions which are required for the initial xml file.
+

@@ -7,8 +7,8 @@ _._._._._._._._._._._._._._._._._._._._._.*/
 #ifndef _VECTOROPERATOR_
 #define _VECTOROPERATOR_
 
-#include <vector>
 #include <cstring>
+#include <vector>
 
 template < typename T >
 std::vector< T > operator*( std::vector< T > vec, const T scalar )
@@ -36,6 +36,26 @@ std::vector< std::vector< T > > operator*( std::vector< std::vector< T > > vec, 
 #else
             vec[i][j] *= scalar;
 #endif
+        }
+    }
+    return vec;
+}
+
+template < typename T >
+std::vector< std::vector< T > > operator*( std::vector< std::vector< std::vector< T > > > vec, const T scalar )
+{
+    for ( size_t i1 = 0; i1 < vec.size(); ++i1 )
+    {
+        for ( size_t i = 0; i < vec.at( i1 ).size(); ++i )
+        {
+            for ( size_t j = 0; j < vec.at( i1 ).at( i ).size(); ++j )
+            {
+#ifdef _DEBUG_
+                vec.at( i1 ).at( i ).at( j ) *= scalar;
+#else
+                vec[i1][i][j] *= scalar;
+#endif
+            }
         }
     }
     return vec;
@@ -70,6 +90,60 @@ ScalarMatrixMultipication( std::vector< std::vector< T > > vecA, const std::vect
         for ( size_t j = 0; j < vecA[i].size(); ++j )
         {
             vecA[i][j] *= vecB[i][j];
+        }
+#endif
+    }
+    return vecA;
+}
+
+template < typename T >
+std::vector< std::vector< T > >
+ScalarMatrixMultipication( std::vector< std::vector< T > > vecA, const std::vector< std::vector< std::vector< T > > > &vecB )
+{
+    for ( size_t i1 = 0; i1 < vecB.size(); ++i1 )
+    {
+#ifdef _DEBUG_
+        for ( size_t i = 0; i < vecB.at( i1 ).size(); ++i )
+        {
+            for ( size_t j = 0; j < vecB.at( i1 ).at( i ).size(); ++j )
+            {
+                vecA.at( i1 * vecB.at( i1 ).size() + i ).at( j ) *= vecB.at( i1 ).at( i ).at( j );
+            }
+        }
+#else
+        for ( size_t i = 0; i < vecB[i1].size(); ++i )
+        {
+            for ( size_t j = 0; j < vecB[i1][i].size(); ++j )
+            {
+                vecA[i1 * vecB[i1].size() + i][j] *= vecB[i1][i][j];
+            }
+        }
+#endif
+    }
+    return vecA;
+}
+
+template < typename T >
+std::vector< std::vector< T > > ScalarMatrixMultipication( std::vector< std::vector< std::vector< T > > > vecA,
+                                                           const std::vector< std::vector< std::vector< T > > > &vecB )
+{
+    for ( size_t i1 = 0; i1 < vecA.size(); ++i1 )
+    {
+#ifdef _DEBUG_
+        for ( size_t i = 0; i < vecA.at( i1 ).size(); ++i )
+        {
+            for ( size_t j = 0; j < vecA.at( i1 ).at( i ).size(); ++j )
+            {
+                vecA.at( i1 ).at( i ).at( j ) *= vecB.at( i1 ).at( i ).at( j );
+            }
+        }
+#else
+        for ( size_t i = 0; i < vecA[i1].size(); ++i )
+        {
+            for ( size_t j = 0; j < vecA[i1][i].size(); ++j )
+            {
+                vecA[i1][i][j] *= vecB[i1][i][j];
+            }
         }
 #endif
     }

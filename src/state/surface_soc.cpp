@@ -20,6 +20,7 @@ namespace state
 
 SurfaceSoc::SurfaceSoc()
     : mCurrentValue( 0 )
+    , mLastValue(0)
 {
 }
 
@@ -32,7 +33,7 @@ void SurfaceSoc::UpdateLookUp()
     for ( size_t i = 0; i < mVecElements.size(); ++i )
         ocvValue += mVecElements[i]->GetVoltageValue();
 #endif
-
+    mLastValue = mCurrentValue;
     mCurrentValue = mReverseLookup->GetValue( ocvValue );
 }
 
@@ -42,5 +43,7 @@ void SurfaceSoc::SetReverseLookup( boost::shared_ptr< object::Object< double > >
 }
 
 double SurfaceSoc::GetValue() const { return mCurrentValue; }
+
+double SurfaceSoc::GetLastValue() const { return mLastValue; }
 
 }    // Namespace state

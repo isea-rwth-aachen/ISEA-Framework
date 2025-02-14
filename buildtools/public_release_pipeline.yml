@@ -1,0 +1,273 @@
+# define stages
+stages:
+  - build-docker
+  - build-framework
+  - build
+  - test
+  - docs
+  - deploy-docs
+  - build-interactive-docker
+
+# configure workflow
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# set defaults
+default:
+  tags: [ 'docker' ]
+
+# set varialbes
+variables:
+  DOCKER_BUILDKIT: 1
+  DOCKER_DRIVER: overlay2
+  IMAGE_TAG_LINUX_COMPILE: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}_linux_compile"
+  IMAGE_TAG_LINUX_TEST: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}_linux_test"
+  IMAGE_TAG_LINUX_INTERACTIVE: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}_linux_interactive"
+  IMAGE_TAG_LINUX_INTERACTIVE_MATLAB: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}_linux_interactive_matlab"
+  IMAGE_TAG_WINDOWSCC_COMPILE: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}_windowscc_compile"
+
+.ccache_init: &ccache_init
+  before_script:
+    - export PATH=/usr/lib/ccache:$PATH
+    - export CCACHE_BASEDIR="${CI_PROJECT_DIR}"
+    - export CCACHE_DIR="${CI_PROJECT_DIR}/ccache"
+    - mkdir -p ${CI_PROJECT_DIR}/ccache
+  cache:
+    key: "$TARGET_OS"
+    paths:
+      - ccache/
+
+docker-retag-images:
+  image: docker:20.10
+  stage: build-docker
+  rules:
+    - changes:
+        - docker/*
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - export CI_MERGE_REQUEST_TARGET_BRANCH_SLUG=$(echo -n ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} | tr [:upper:] [:lower:] | tr -c [:alnum:] '-')
+    - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_linux_compile"  $IMAGE_TAG_LINUX_COMPILE || :'
+    - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_linux_test"  $IMAGE_TAG_LINUX_TEST || :'
+    - 'docker tag "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_TARGET_BRANCH_SLUG}_windowscc_compile"  $IMAGE_TAG_WINDOWSCC_COMPILE || :'
+    - 'docker push $IMAGE_TAG_LINUX_COMPILE || :'
+    - 'docker push $IMAGE_TAG_LINUX_TEST || :'
+    - 'docker push $IMAGE_TAG_WINDOWSCC_COMPILE || :'
+
+# build docker image and push it into GitLab container registry
+docker-build-linux-compile:
+  # Use the official docker image.
+  image: docker:20.10
+  stage: build-docker
+  rules:
+    - changes:
+        - docker/*
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker build docker --target iseaframelinux --cache-from $IMAGE_TAG_LINUX_COMPILE --tag $IMAGE_TAG_LINUX_COMPILE --build-arg BASE_IMAGE="base"
+    - docker push $IMAGE_TAG_LINUX_COMPILE
+
+# build docker image and push it into GitLab container registry
+docker-build-linux-test:
+  # Use the official docker image.
+  image: docker:20.10
+  stage: build-docker
+  rules:
+    - changes:
+        - docker/*
+  needs: [ "docker-build-linux-compile" ]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - docker tag $IMAGE_TAG_LINUX_COMPILE $IMAGE_TAG_LINUX_TEST
+    - docker push $IMAGE_TAG_LINUX_TEST
+
+docker-build-windowscc-compile:
+  # Use the official docker image.
+  image: docker:20.10
+  stage: build-docker
+  rules:
+    - changes:
+        - docker/*
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+   - docker build docker --target iseaframecc --cache-from $IMAGE_TAG_WINDOWSCC_COMPILE --tag $IMAGE_TAG_WINDOWSCC_COMPILE --build-arg BASE_IMAGE="base"
+   - docker push $IMAGE_TAG_WINDOWSCC_COMPILE
+
+linux_compile:
+  stage: build-framework
+  image: $IMAGE_TAG_LINUX_COMPILE
+  variables:
+    TARGET_OS: "linux"
+  needs:
+    - job: docker-build-linux-compile
+      optional: true
+    - job: docker-retag-images
+      optional: true
+  artifacts:
+    paths:
+      - buildReleaseLinux
+      - src/exceptions/xmlData.cpp
+      - src/version/version.cpp
+      - src/version/version.h
+    expire_in: 1 week
+  <<: *ccache_init
+  script:
+    - ./buildtools/make_release.sh -m -c -b buildReleaseLinux ./ ; cd buildReleaseLinux ; make -j32 framework unittests
+
+windows_compile:
+  stage: build-framework
+  image: $IMAGE_TAG_WINDOWSCC_COMPILE
+  variables:
+    TARGET_OS: "windows"
+  needs:
+    - job: docker-build-windowscc-compile
+      optional: true
+    - job: docker-retag-images
+      optional: true
+  artifacts:
+    paths:
+      - buildReleaseWindows
+      - src/exceptions/xmlData.cpp
+      - src/version/version.cpp
+      - src/version/version.h
+    expire_in: 1 week
+  <<: *ccache_init
+  script:
+    - ./buildtools/make_release.sh -m -w -c -b buildReleaseWindows ./ ; cd buildReleaseWindows ; make -j32 ISEAFrameNumeric
+
+linux_standalones:
+  stage: build
+  image: $IMAGE_TAG_LINUX_COMPILE
+  variables:
+    TARGET_OS: "linux"
+  needs: [ "linux_compile" ]
+  artifacts:
+    paths:
+      - buildReleaseLinux/standalones
+  <<: *ccache_init
+  script:
+    - cd buildReleaseLinux ; make -j32 standalones
+
+windows_standalones:
+  stage: build
+  image: $IMAGE_TAG_WINDOWSCC_COMPILE
+  variables:
+    TARGET_OS: "windows"
+  needs: [  "windows_compile" ]
+  artifacts:
+    paths:
+      - buildReleaseWindows/standalones
+  <<: *ccache_init
+  script:
+    - cd buildReleaseWindows ; make -j32 standalones
+
+unittest_numeric:
+  stage: test
+  image: $IMAGE_TAG_LINUX_TEST
+  needs:
+    - linux_compile
+    - job: docker-build-linux-test
+      optional: True
+    - job: docker-retag-images
+      optional: true
+  script:
+    - cd buildReleaseLinux/unittest; ./unittestNumeric
+
+unittest_symbolic:
+  stage: test
+  image: $IMAGE_TAG_LINUX_TEST
+  needs:
+    - linux_compile
+    - job: docker-build-linux-test
+      optional: True
+    - job: docker-retag-images
+      optional: true
+  script:
+    - cd buildReleaseLinux/unittest; ./unittestSymbolic
+
+unittest_valgrind:
+  stage: test
+  image: $IMAGE_TAG_LINUX_TEST
+  needs:
+    - linux_compile
+    - job: docker-build-linux-test
+      optional: True
+    - job: docker-retag-images
+      optional: true
+  script:
+    - cd buildReleaseLinux/unittest/; ../../buildtools/valgrind.sh
+
+standalone_test:
+  stage: test
+  image: $IMAGE_TAG_LINUX_TEST
+  needs:
+    - linux_standalones
+    - job: docker-build-linux-test
+      optional: True
+    - job: docker-retag-images
+      optional: true
+  artifacts:
+    paths:
+      - scenariotest/standalone_test/output.txt
+    expire_in: 1 week
+  script:
+    - set -o pipefail ; cd scenariotest/standalone_test/; ./runTests.sh ../../buildReleaseLinux/standalones | tee output.txt
+
+documentation:
+  stage: docs
+  image: $IMAGE_TAG_LINUX_COMPILE
+  needs: [ "linux_compile" ]
+  artifacts:
+    paths:
+      - buildReleaseLinux/docRelease/html
+  script:
+    - cd buildReleaseLinux
+    - set -o pipefail ; make -j32 docRelease | tee output.txt
+    - (! grep "^error:" output.txt)
+
+development_documentation:
+  stage: docs
+  image: $IMAGE_TAG_LINUX_COMPILE
+  needs: [ "linux_compile" ]
+  artifacts:
+    paths:
+      - buildReleaseLinux/doc/html
+  script:
+    - cd buildReleaseLinux
+    - set -o pipefail ; make -j32 doc | tee output.txt
+    - (! grep "^error:" output.txt)
+
+pages:
+  stage: deploy-docs
+  image: alpine:latest
+  needs: [ "development_documentation" ]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    paths:
+    - public
+  script:
+    - cp -r buildReleaseLinux/doc/html public
+
+# build docker image and push it into GitLab container registry
+docker-build-linux-interactive:
+  # Use the official docker image.
+  image: docker:20.10
+  stage: build-interactive-docker
+  needs: [ "linux_standalones" ]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - mkdir -p docker/executables
+    - cp -r buildReleaseLinux/standalones/* docker/executables
+    - mkdir -p docker/sFunctions
+    - docker build docker --target iseaframeinteractive --cache-from $IMAGE_TAG_LINUX_INTERACTIVE --tag $IMAGE_TAG_LINUX_INTERACTIVE --build-arg BASE_IMAGE="base"
+    - docker push $IMAGE_TAG_LINUX_INTERACTIVE

@@ -17,6 +17,7 @@ Soc::Soc( const double initialCapacity, const double actualCapacity, const doubl
     , mInitialCapacity( initialCapacity * 3600 )
     , mActualCapacity( actualCapacity * 3600 )
     , mActualSoc( actualSoc / 100 )
+    , mLastSoc( actualSoc / 100 )
     , mOffset( 0.0 )
     , mMinimumValue( minimumValue / 100 )
     , mMaximumValue( maximumValue / 100 )
@@ -25,6 +26,8 @@ Soc::Soc( const double initialCapacity, const double actualCapacity, const doubl
 }
 
 double Soc::GetValue() const { return this->GetValue<>(); }
+
+double Soc::GetLastValue() const { return mLastSoc; };
 
 const double& Soc::GetValueRef() const { return this->mActualSoc; }
 

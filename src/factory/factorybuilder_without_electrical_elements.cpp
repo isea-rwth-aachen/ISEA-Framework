@@ -37,6 +37,16 @@ FactoryBuilderWithoutElectricalElements< MatrixT, ValueT >::BuildElectricalFacto
     electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource >( electricalFactory, objectFactory,
                                                                                                      stateFactory ),
                                    "VoltageSource" );
+
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_OneState >( electricalFactory, objectFactory,
+                                                                                                     stateFactory ),
+                                   "VoltageSource_OneState" );
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_PreisachEverett >( electricalFactory, objectFactory,
+                                                                                                     stateFactory ),
+                                   "VoltageSource_PreisachEverett" );
+    electricalFactory->AddWrapper( new ElectricalClassWrapper< MatrixT, electrical::VoltageSource_PreisachDiscrete >( electricalFactory, objectFactory,
+                                                                                                     stateFactory ),
+                                   "VoltageSource_PreisachDiscrete" );
     electricalFactory->AddWrapper( new ElectricalClassWrapperForAging< MatrixT, electrical::Cellelement >( electricalFactory, objectFactory,
                                                                                                            stateFactory, agingTwoPortFactory ),
                                    "CellElement" );

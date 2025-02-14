@@ -18,9 +18,13 @@ double AgingState::GetChargeThroughput() const { return mChargeThroughput; }
 
 double AgingState::GetCapacityFactor() const { return mCapacityFactor; }
 
+double AgingState::GetLastCapacityFactor() const { return mLastCapacityFactor; }
+
 double AgingState::GetSocOffset() const { return mSocOffset; }
 
 double AgingState::GetResistanceFactor() const { return mResistanceFactor; }
+
+double AgingState::GetLastResistanceFactor() const { return mLastResistanceFactor; }
 
 void AgingState::ChangeInternalValue( double &value, const double &newValue, AgingStateSetFormat format )
 {
@@ -38,6 +42,8 @@ void AgingState::ChangeInternalValue( double &value, const double &newValue, Agi
 }
 
 double AgingState::GetValue() const { return this->GetCapacityFactor(); }
+
+double AgingState::GetLastValue() const { return this->GetLastCapacityFactor(); }
 
 void AgingState::SetCellAge( const double &value, AgingStateSetFormat format )
 {

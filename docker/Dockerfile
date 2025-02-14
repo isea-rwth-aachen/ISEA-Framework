@@ -2,7 +2,7 @@ ARG BASE_IMAGE=base
 
 FROM phusion/baseimage:jammy-1.0.0 AS iseaframe-base
 
-FROM mathworks/matlab:r2021b AS iseaframe-matlab
+FROM git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b AS iseaframe-matlab
 
 FROM iseaframe-${BASE_IMAGE} AS iseaframebase
 
@@ -42,11 +42,12 @@ RUN pip install --no-cache-dir numpy matplotlib scipy
 FROM iseaframebase AS iseaframelinux
 
 # noop if base=matlab, needed otherwise
-COPY --from=iseaframe-matlab /opt/matlab/R2021b/extern /usr/local/MATLAB/R2021b/extern/
-COPY --from=iseaframe-matlab /opt/matlab/R2021b/bin/mexext /usr/local/MATLAB/R2021b/bin/
-COPY --from=iseaframe-matlab /opt/matlab/R2021b/bin/glnxa64/libmat.so /usr/local/MATLAB/R2021b/bin/glnxa64/
-COPY --from=iseaframe-matlab /opt/matlab/R2021b/bin/glnxa64/libmex.so /usr/local/MATLAB/R2021b/bin/glnxa64/
-COPY --from=iseaframe-matlab /opt/matlab/R2021b/bin/glnxa64/libmx.so /usr/local/MATLAB/R2021b/bin/glnxa64/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/extern /usr/local/MATLAB/R2021b/extern/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/simulink /usr/local/MATLAB/R2021b/simulink/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/bin/mexext /usr/local/MATLAB/R2021b/bin/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/bin/glnxa64/libmat.so /usr/local/MATLAB/R2021b/bin/glnxa64/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/bin/glnxa64/libmex.so /usr/local/MATLAB/R2021b/bin/glnxa64/
+COPY --from=git.isea.rwth-aachen.de:5050/ess/docker/matlab:r2021b /usr/local/MATLAB/R2021b/bin/glnxa64/libmx.so /usr/local/MATLAB/R2021b/bin/glnxa64/
 
 # lbzip2 package in ubuntu hirsute is broken https://bugs.launchpad.net/ubuntu/+source/lbzip2/+bug/1926092
 # temporarily installed from focal repo
@@ -182,6 +183,19 @@ RUN cd /usr/src ; \
 
 RUN cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/libwinpthread-1.dll ; \
     cp -r /usr/include/eigen3 /usr/x86_64-w64-mingw32/FrameworkExtensions/include/eigen3
+
+# set up MATLAB for cross-compiling
+RUN --mount=type=secret,id=MATLAB_DOWNLOAD_SSH_KEY set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    ssh \
+    rsync ; \
+    cd /usr/x86_64-w64-mingw32; \
+    rsync -aHAXxv --numeric-ids --delete --progress -e "ssh -o StrictHostKeyChecking=accept-new -i /run/secrets/MATLAB_DOWNLOAD_SSH_KEY -T -o Compression=no -x" ms630220@login.hpc.itc.rwth-aachen.de:/work/ms630220/windows_cc/Matlab_CC.tar ./matlab.tar ; \
+    tar -xf matlab.tar; \
+    rm matlab.tar; \
+    apt-get autoremove -y ssh rsync ; \
+    rm -rf /var/lib/apt/lists/*
 
 # install cxxtest headers
 RUN cd /usr/src ; \

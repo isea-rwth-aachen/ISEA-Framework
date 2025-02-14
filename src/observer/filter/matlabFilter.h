@@ -221,6 +221,15 @@ class MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >
                 this->mMatlabMatrices["SOCVec"][i].push_back( cell->GetSocStateValue() );
                 this->mMatlabMatrices["TemperaturVec"][i].push_back( cell->GetThermalState()->GetValue() );
 
+                if ( cell->CrateDefined )
+                {
+                    this->mMatlabMatrices["CrateVec"][i].push_back( cell->GetCrateStateValue() );
+                }
+                if ( cell->LHDDefined )
+                {
+                    this->mMatlabMatrices["LHDVec"][i].push_back( cell->GetLHDStateValue() );
+                }
+
                 if ( cell->GetConfigurationType() == electrical::CellConfiguration::HALFCELL )
                 {
                     this->mMatlabMatrices["AnodeVoltageVec"][i].push_back( cell->GetAnodeVoltageValue() * -1 );
@@ -269,6 +278,8 @@ MatlabFilterBase< T, electrical::TwoPort, PreparationType< T > >::MatlabFilterBa
     this->mMatlabMatrices["CathodePotentialVec"];
     this->mMatlabMatrices["ThermischLeistungVec"];
     this->mMatlabMatrices["SOCVec"];
+    this->mMatlabMatrices["CrateVec"];
+    this->mMatlabMatrices["LHDVec"];
     this->mMatlabMatrices["AnodeSOCVec"];
     this->mMatlabMatrices["CathodeSOCVec"];
     this->mMatlabMatrices["TemperaturVec"];
