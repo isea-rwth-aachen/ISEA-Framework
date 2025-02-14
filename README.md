@@ -33,7 +33,7 @@ Downloads
 Precompiled versions can be downloaded from Gitlab.
 
 Linux Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=linux_standalones)<br/>
-Windows Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=windows_standalones)<br/>
+Windows Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/raw/Publication_Samsung_35E_Model/standalones/standalones.zip?ref_type=heads&inline=false)<br/>
 <br/><br/>
 Documentation: [View online](https://isea.pages.rwth-aachen.de/framework) | [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=documentation) | [Download Development Version](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=development_documentation)
 
