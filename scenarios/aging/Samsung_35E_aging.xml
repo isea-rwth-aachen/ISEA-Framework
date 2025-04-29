@@ -435,7 +435,7 @@
                 <Cyclical class="CyclicalAging" enabled="True">
                     <ChargeExponentCapacity>0.5</ChargeExponentCapacity>
                     <ChargeExponentResistance>1</ChargeExponentResistance>
-					<FormulaCapacity> 0.002428 *exp(-0.069329*meanSOC)+0.0002313   *exp(0.023945*meanSOC)-4.5292 *pow(10,-7)*pow(deltaDOD,2)+6.342*pow(10,-5)*deltaDOD  -0.0009737 </FormulaCapacity> <!--All Data Model-->
+					<FormulaCapacity> 0.002706   *exp(-0.085025*meanSOC)+ 0.0003278 *exp(0.018903*meanSOC)-4.5292 *pow(10,-7)*pow(deltaDOD,2)+6.313*pow(10,-5)*deltaDOD  -0.0009899   </FormulaCapacity> <!--All Data Model-->
                     <MinBetaCapacity>0</MinBetaCapacity>
                     <FormulaResistance>0</FormulaResistance>
                     <MinBetaResistance>0</MinBetaResistance>
