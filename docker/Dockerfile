@@ -61,7 +61,7 @@ RUN set -ex; \
     lbzip2 ; \
     mkdir -p /usr/src/boost; \
     cd /usr/src; \
-    wget -O boost.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/1.67.0/source/boost_1_67_0.tar.bz2; \
+    wget -O boost.tar.bz2 https://archives.boost.io/release/1.67.0/source/boost_1_67_0.tar.bz2; \
     tar -I lbzip2 -xf boost.tar.bz2 -C boost --strip-components=1; \
     cd boost; \
     ./bootstrap.sh; \
@@ -166,7 +166,7 @@ RUN cd /usr/src ; \
     cmake .. -DCMAKE_TOOLCHAIN_FILE=/usr/src/toolchain_files/ToolchainClangLinux2Win.cmake ; \
     make -j8 ; \
     mkdir -p /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/ ; \
-    cp zlibd.dll /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/libzlib.dll
+    cp zd.dll /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/zd.dll
 
 # install matio
 RUN cd /usr/src ; \

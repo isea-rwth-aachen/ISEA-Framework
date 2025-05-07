@@ -1,3 +1,7 @@
+Version 2.26.1
+===========
+- Fix bug in creation of Rmphn elements in Simulink matrix model creator 
+
 Version 2.26.0
 ===========
 - Change capacity calculation for the anode overhang to use DVA values

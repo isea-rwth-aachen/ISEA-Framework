@@ -44,3 +44,4 @@ secrets/
 testing/*
 .idea
 cmake-build-*
+/.vs

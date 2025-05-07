@@ -6,8 +6,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} "${CMAKE_SOURCE_DIR}/cmake/")
 cmake_policy(SET CMP0009 NEW)
 set(ISEAFrameVERSION_MAJOR 2)
 set(ISEAFrameVERSION_MINOR 26)
-set(ISEAFramePATCH_LEVEL 0)
-set(ISEAFrameNAME "max_aging")
+set(ISEAFramePATCH_LEVEL 1)
+set(ISEAFrameNAME "simu_matrix_model_bugfix")
 set(ISEAFrameVERSION
     "${ISEAFrameVERSION_MAJOR}.${ISEAFrameVERSION_MINOR}.${ISEAFramePATCH_LEVEL}"
 )
