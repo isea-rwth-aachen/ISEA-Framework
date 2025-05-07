@@ -17,6 +17,7 @@ class TestSvgExport : public CxxTest::TestSuite
     void testSvgExportStopEvaluateDepth();
     void testSvgExportGetHeightOfTwoPort();
     void testPreamble();
+    void testBody();
     void testEnding();
 
     private:

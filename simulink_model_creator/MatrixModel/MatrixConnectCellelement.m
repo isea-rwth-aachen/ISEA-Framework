@@ -18,8 +18,11 @@ for i = 1:size(allBlocks, 1)
     add_line(system, 'SoC/1', strcat(allBlocks(i,:), '/2'), 'autorouting', 'on');
     if startsWith(allBlocks(i,:), 'Rmphn')
         rmphnSystem = [system '/' strtrim(allBlocks(i,:))];
-        add_line(rmphnSystem, 'T/1', 'ParallelRC_Elem1/1');
-        add_line(rmphnSystem, 'SoC/1', 'ParallelRC_Elem1/2');
+        rmphnBlocks = GetAllBlocksInCircuit(rmphnSystem);
+        for j = 1:size(rmphnBlocks, 1)
+            add_line(rmphnSystem, 'T/1', [rmphnBlocks(j,:) '/1']);
+            add_line(rmphnSystem, 'SoC/1', [rmphnBlocks(j,:) '/2']);
+        end
     end
 end
 

@@ -55,8 +55,12 @@ Factory< aging::AgingBase, ArgumentTypeAging >* FactoryBuilderForAging< MatrixT,
 
     agingFactory->AddWrapper( new AgingClassWrapper< aging::CalendarianAging >( objectFactory, stateFactory ),
                               "CalendarianAging" );
+    agingFactory->AddWrapper( new AgingClassWrapper< aging::CalendarianAging2 >( objectFactory, stateFactory ),
+                              "CalendarianAging2" );
     agingFactory->AddWrapper( new AgingClassWrapper< aging::CyclicalAging >( objectFactory, stateFactory ),
                               "CyclicalAging" );
+    agingFactory->AddWrapper( new AgingClassWrapper< aging::CyclicalAging2 >( objectFactory, stateFactory ),
+                              "CyclicalAging2" );
     agingFactory->AddWrapper( new AgingClassWrapper< aging::AnodeOverhang >( objectFactory, stateFactory ),
                               "AnodeOverhang" );
     agingFactory->AddWrapper( new AgingClassWrapper< aging::GenericAging >( objectFactory, stateFactory ),

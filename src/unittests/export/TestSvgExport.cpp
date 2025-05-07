@@ -4920,6 +4920,16 @@ void TestSvgExport::testPreamble()
     TS_ASSERT_EQUALS( std::string( correctPreamble ), testPreamble_Stream.str() );
 }
 
+void TestSvgExport::testBody()
+{
+    boost::shared_ptr< electrical::TwoPort< myMatrixType > > ePerformancePack_Network(
+     GenerateNetworkFromFile( "../../scenarios/thermal_electrical/e_performance_pack_ThEl.xml" ) );
+    boost::shared_ptr< electrical::TwoPort< myMatrixType > > testShowBattery_Network(
+     GenerateNetworkFromFile( "../../scenarios/thermal_electrical/TestShowBattery_ThEl.xml" ) );
+    boost::shared_ptr< electrical::TwoPort< myMatrixType > > nissanLeafSingleCell_NetWork(
+     GenerateNetworkFromFile( "../../scenarios/thermal_electrical/nissan_leaf_single_cell_ThEl.xml" ) );
+}
+
 void TestSvgExport::testEnding()
 {
     std::stringstream ss;

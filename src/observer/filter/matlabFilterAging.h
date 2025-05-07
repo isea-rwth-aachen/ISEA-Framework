@@ -9,6 +9,8 @@
 #include "../../aging/anode_overhang.h"
 #include "../../aging/calendarian_aging.h"
 #include "../../aging/cyclical_aging.h"
+#include "../../aging/calendarian_aging2.h"
+#include "../../aging/cyclical_aging2.h"
 #include "../../aging/generic_aging.h"
 #include "../../visitor/visitor.h"
 #include "matlabFilter.h"
@@ -34,6 +36,8 @@ class MatlabFilterAging : public MatlabFilter< T, aging::AgingTwoPort, Preparati
 
     virtual void Visit( aging::CalendarianAging &calendarianAging );
     virtual void Visit( aging::CyclicalAging &cyclicalAging );
+    virtual void Visit( aging::CalendarianAging2 &calendarianAging2 );
+    virtual void Visit( aging::CyclicalAging2 &cyclicalAging2 );
     virtual void Visit( aging::AnodeOverhang &anodeOverhang );
     virtual void Visit( aging::GenericAging &genericAging );
     virtual void Visit( aging::AgingLAM &agingLam );
@@ -69,6 +73,16 @@ MatlabFilterAging< T >::MatlabFilterAging( std::string filename, const size_t ma
     this->mMatlabMatrices["cyclic.BetaCapacity"];
     this->mMatlabMatrices["cyclic.BetaResistance"];
     this->mMatlabMatrices["cyclic.SocOffset"];
+    this->mMatlabMatrices["calendric2.CapacityFactor"];
+    this->mMatlabMatrices["calendric2.ResistanceFactor"];
+    this->mMatlabMatrices["calendric2.AlphaCapacity"];
+    this->mMatlabMatrices["calendric2.AlphaResistance"];
+    this->mMatlabMatrices["calendric2.SocOffset"];
+    this->mMatlabMatrices["cyclic2.CapacityFactor"];
+    this->mMatlabMatrices["cyclic2.ResistanceFactor"];
+    this->mMatlabMatrices["cyclic2.BetaCapacity"];
+    this->mMatlabMatrices["cyclic2.BetaResistance"];
+    this->mMatlabMatrices["cyclic2.SocOffset"];
     this->mMatlabMatrices["anodeOverhang.AnodeOverhangSoc"];
     this->mMatlabMatrices["anodeOverhang.AnodeOverhangVoltage"];
     this->mMatlabMatrices["anodeOverhang.AnodeSocOffset"];
@@ -174,6 +188,16 @@ void MatlabFilterAging< T >::Visit( aging::CalendarianAging &calendarianAging )
 }
 
 template < typename T >
+void MatlabFilterAging< T >::Visit( aging::CalendarianAging2 &calendarianAging2 )
+{
+    this->mMatlabMatrices["calendric2.CapacityFactor"][mCellNumber].push_back( calendarianAging2.GetCapacityFactor() );
+    this->mMatlabMatrices["calendric2.ResistanceFactor"][mCellNumber].push_back( calendarianAging2.GetResistanceFactor() );
+    this->mMatlabMatrices["calendric2.AlphaCapacity"][mCellNumber].push_back( calendarianAging2.GetStressFactorCapacity() );
+    this->mMatlabMatrices["calendric2.AlphaResistance"][mCellNumber].push_back( calendarianAging2.GetStressFactorResistance() );
+    this->mMatlabMatrices["calendric2.SocOffset"][mCellNumber].push_back( calendarianAging2.GetSocOffset() );
+}
+
+template < typename T >
 void MatlabFilterAging< T >::Visit( aging::CyclicalAging &cyclicalAging )
 {
     this->mMatlabMatrices["cyclic.CapacityFactor"][mCellNumber].push_back( cyclicalAging.GetCapacityFactor() );
@@ -181,6 +205,16 @@ void MatlabFilterAging< T >::Visit( aging::CyclicalAging &cyclicalAging )
     this->mMatlabMatrices["cyclic.BetaCapacity"][mCellNumber].push_back( cyclicalAging.GetStressFactorCapacity() );
     this->mMatlabMatrices["cyclic.BetaResistance"][mCellNumber].push_back( cyclicalAging.GetStressFactorResistance() );
     this->mMatlabMatrices["cyclic.SocOffset"][mCellNumber].push_back( cyclicalAging.GetSocOffset() );
+}
+
+template < typename T >
+void MatlabFilterAging< T >::Visit( aging::CyclicalAging2 &cyclicalAging2 )
+{
+    this->mMatlabMatrices["cyclic2.CapacityFactor"][mCellNumber].push_back( cyclicalAging2.GetCapacityFactor() );
+    this->mMatlabMatrices["cyclic2.ResistanceFactor"][mCellNumber].push_back( cyclicalAging2.GetResistanceFactor() );
+    this->mMatlabMatrices["cyclic2.BetaCapacity"][mCellNumber].push_back( cyclicalAging2.GetStressFactorCapacity() );
+    this->mMatlabMatrices["cyclic2.BetaResistance"][mCellNumber].push_back( cyclicalAging2.GetStressFactorResistance() );
+    this->mMatlabMatrices["cyclic2.SocOffset"][mCellNumber].push_back( cyclicalAging2.GetSocOffset() );
 }
 
 template < typename T >
