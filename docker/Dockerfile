@@ -166,7 +166,7 @@ RUN cd /usr/src ; \
     cmake .. -DCMAKE_TOOLCHAIN_FILE=/usr/src/toolchain_files/ToolchainClangLinux2Win.cmake ; \
     make -j8 ; \
     mkdir -p /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/ ; \
-    cp zd.dll /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/zd.dll
+    cp libzd.dll /usr/x86_64-w64-mingw32/FrameworkExtensions/lib/64/libzd.dll
 
 # install matio
 RUN cd /usr/src ; \
