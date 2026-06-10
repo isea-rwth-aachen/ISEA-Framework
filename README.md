@@ -32,10 +32,10 @@ Downloads
 =========
 Precompiled versions can be downloaded from Gitlab.
 
-Linux Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=linux_standalones)<br/>
-Windows Standalones: [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=windows_standalones)<br/>
+Linux Standalones: [Download](https://gitlab.git.nrw/rwth-carl/framework/-/jobs/artifacts/main/download?job=linux_standalones)<br/>
+Windows Standalones: [Download](https://gitlab.git.nrw/rwth-carl/framework/-/jobs/artifacts/main/download?job=windows_standalones)<br/>
 <br/><br/>
-Documentation: [View online](https://isea.pages.rwth-aachen.de/framework) | [Download](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=documentation) | [Download Development Version](https://git.rwth-aachen.de/isea/framework/-/jobs/artifacts/main/download?job=development_documentation)
+Documentation: [View online](https://framework-b22212.pages.git.nrw) | [Download](https://gitlab.git.nrw/rwth-carl/framework/-/jobs/artifacts/main/download?job=documentation) | [Download Development Version](https://gitlab.git.nrw/rwth-carl/framework/-/jobs/artifacts/main/download?job=development_documentation)
 
 
 Required Software:
@@ -49,7 +49,7 @@ Only for Windows:
 
 Compiling
 =========
-This software can be compiled on Linux or Windows. Instructions can be found in the [documentation](https://isea.pages.rwth-aachen.de/framework/compiling.html).
+This software can be compiled on Linux or Windows. Instructions can be found in the [documentation](https://framework-b22212.pages.git.nrw/compiling.html).
 
 Documentation
 =========
@@ -60,7 +60,7 @@ The other one can be build as described by running
 make doc 
 </pre>
 
-The current version of the documentation can be viewed [here](https://isea.pages.rwth-aachen.de/framework)
+The current version of the documentation can be viewed [here](https://framework-b22212.pages.git.nrw)
 
 Featured Projects
 =================
