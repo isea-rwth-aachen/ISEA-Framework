@@ -185,15 +185,9 @@ RUN cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll /usr/x86_64-w64-mingw32/F
 
 # install cxxtest headers
 RUN cd /usr/src ; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-    wget ; \
-    wget https://netcologne.dl.sourceforge.net/project/cxxtest/cxxtest/4.4/cxxtest-4.4.tar.gz ; \
-    tar -xf cxxtest-4.4.tar.gz ; \
-    mv cxxtest-4.4/cxxtest/ /usr/x86_64-w64-mingw32/FrameworkExtensions/include/ ; \
-    rm cxxtest-4.4.tar.gz ; \
-    rm -r cxxtest-4.4 ; \
-    apt-get autoremove -y wget
+    git clone https://github.com/CxxTest/cxxtest.git ; \
+    mv cxxtest/cxxtest/ /usr/x86_64-w64-mingw32/FrameworkExtensions/include/ ; \
+    rm -r cxxtest
 
 FROM iseaframelinux AS iseaframedev
 RUN set -ex ; \
